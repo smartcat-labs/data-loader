@@ -38,7 +38,7 @@ public class BuildRunner {
 		final Map<RandomBuilder, Map<String, Rule>> result = Maps.newHashMap();
 
 		for (RandomBuilder randomBuilder : builderSet) {
-			for (Entry<String, Rule<? extends Comparable<?>>> entry : randomBuilder.getFieldRules().entrySet()) {
+			for (Entry<String, Rule<?>> entry : randomBuilder.getFieldRules().entrySet()) {
 				String fieldName = entry.getKey();
 				Rule rule = entry.getValue();
 				if (rule.isExclusive()) {
@@ -58,13 +58,13 @@ public class BuildRunner {
 			
 			for (Entry<String, Rule> entryFieldExclusiveRule : entryBuilderFieldRule.getValue().entrySet()) {
 				for (RandomBuilder randombuilder : builderSet) {
-					Map<String, Rule<? extends Comparable<?>>> existingFieldRules = randombuilder.getFieldRules();
+					Map<String, Rule<?>> existingFieldRules = randombuilder.getFieldRules();
 					
 					String fieldName = entryFieldExclusiveRule.getKey();
-					Rule<? extends Comparable<?>> rule = existingFieldRules.get(fieldName);
+					Rule<?> rule = existingFieldRules.get(fieldName);
 					
 					if (rule != null && !rule.isExclusive()) {
-						Rule<? extends Comparable<?>> recalculatedRule = rule.recalculatePrecedance(entryFieldExclusiveRule.getValue());
+						Rule recalculatedRule = rule.recalculatePrecedance(entryFieldExclusiveRule.getValue());
 						existingFieldRules.put(fieldName, recalculatedRule);
 					}
 					

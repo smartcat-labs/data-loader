@@ -1,6 +1,6 @@
 package io.smartcat.model;
 
-public interface Rule<T extends Comparable<T>> {
+public interface Rule<T> {
 	
 	boolean isExclusive();
 	

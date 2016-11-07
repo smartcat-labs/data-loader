@@ -158,6 +158,7 @@ public class UserTest {
 				.randomFrom("lastname", "annison", "berkley", "chaplin", "dickinson")
 				.randomFromRange("numberOfCards", 0L, 14L)
 				.randomFromRange("accountBalance", 2.72, 3.14)
+				.randomSubsetFrom("favoriteMovies", "Predator", "Comandos", "Terminator 2", "Conan", "Red Sonya")
 				.randomFromRange("birthDate", oldestBirthDate, yougnestBirthDate)
 				.toBeBuilt(5);
 		
@@ -172,6 +173,7 @@ public class UserTest {
 			.randomFrom("lastname", "annison", "berkley", "chaplin", "dickinson")
 			.randomFromRange("numberOfCards", 0L, 14L)
 			.randomFromRange("accountBalance", 2.72, 3.14)
+			.randomSubsetFrom("favoriteMovies", "Predator", "Comandos", "Terminator 2", "Conan", "Red Sonya")
 			.exclusiveRandomFromRange("birthDate", oldestBirthDateX, yougnestBirthDateX)
 			.toBeBuilt(3);
 		

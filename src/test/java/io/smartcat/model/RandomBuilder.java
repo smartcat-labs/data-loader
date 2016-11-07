@@ -7,14 +7,16 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.assertj.core.util.Lists;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class RandomBuilder {
 	
-	private Map<String,Rule<? extends Comparable<?>>> fieldRules = Maps.newHashMap();
+	private Map<String,Rule<?>> fieldRules = Maps.newHashMap();
 	
 	private int numberOfObjects;
 	
@@ -73,6 +75,13 @@ public class RandomBuilder {
 		return this;
 	}
 	
+	public RandomBuilder randomSubsetFrom(String fieldName, String...values ) {
+		
+		fieldRules.put(fieldName, SubSetRule.withValues(Sets.newHashSet(values)));
+		
+		return this;
+	}
+	
 	public RandomBuilder toBeBuilt(int numberOfObjects) {
 		this.numberOfObjects = numberOfObjects;
 		return this;
@@ -103,6 +112,12 @@ public class RandomBuilder {
 		Long randomNumberOfCards = (Long) fieldRules.get("numberOfCards").getRandomAllowedValue();
 		Double randomAccountBalance = (Double) fieldRules.get("accountBalance").getRandomAllowedValue();
 		
+		
+		
+		Set<String> randomFavoriteMovies = (Set<String>) fieldRules.get("favoriteMovies").getRandomAllowedValue();
+		
+
+		
 		Instant instant = Instant.ofEpochMilli(randomBirthDate).atZone(ZoneId.systemDefault()).toInstant();
 		
 //		Address address = nestedObjectBuilderMap.get("address").build();
@@ -113,6 +128,7 @@ public class RandomBuilder {
 		user.setLastname(randomLastname);
 		user.setNumberOfCards(randomNumberOfCards);
 		user.setAccountBalance(randomAccountBalance);
+		user.setFavoriteMovies(randomFavoriteMovies);
 		
 		return user;
 	}
@@ -121,7 +137,7 @@ public class RandomBuilder {
 		return this.build(numberOfObjects);
 	}
 
-	public Map<String,Rule<? extends Comparable<?>>> getFieldRules() {
+	public Map<String,Rule<?>> getFieldRules() {
 		return fieldRules;
 	}
 
@@ -132,5 +148,6 @@ public class RandomBuilder {
 	public void setNestedObjectBuilderMap(Map<String, RandomBuilder> nestedObjectBuilderMap) {
 		this.nestedObjectBuilderMap = nestedObjectBuilderMap;
 	}
+
 	
 }

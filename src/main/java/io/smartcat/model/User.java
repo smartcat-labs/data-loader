@@ -1,5 +1,6 @@
 package io.smartcat.model;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -73,7 +74,7 @@ public class User {
 	public List<String> getFavoriteMovies() {
 		return favoriteMovies;
 	}
-	public void setFavoriteMovies(List<String> favoriteMovies) {
+	public void setFavoriteMovies(Collection<String> favoriteMovies) {
 		this.favoriteMovies.clear();
 		if (favoriteMovies != null) {
 			this.favoriteMovies.addAll(favoriteMovies);
