@@ -1,23 +1,22 @@
 package io.smartcat.data.loader;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import io.smartcat.data.loader.model.User;
 
 public class BuildRunner {
 
-    private final Set<RandomBuilder> builderSet = Sets.newHashSet();
+    private final Set<RandomBuilder> builderSet = new HashSet<>();
 
     public List<User> build() {
         recalculateRules();
-        List<User> resultList = Lists.newArrayList();
+        List<User> resultList = new ArrayList<>();
         for (RandomBuilder builder : builderSet) {
             List<User> entityList = builder.buildAll();
             resultList.addAll(entityList);
@@ -37,8 +36,8 @@ public class BuildRunner {
     }
 
     private Map<RandomBuilder, Map<String, Rule>> fetchExclusiveRules(final Set<RandomBuilder> builderSet) {
-        final Map<String, Rule> fieldRuleMap = Maps.newHashMap();
-        final Map<RandomBuilder, Map<String, Rule>> result = Maps.newHashMap();
+        final Map<String, Rule> fieldRuleMap = new HashMap<>();
+        final Map<RandomBuilder, Map<String, Rule>> result = new HashMap<>();
 
         for (RandomBuilder randomBuilder : builderSet) {
             for (Entry<String, Rule<?>> entry : randomBuilder.getFieldRules().entrySet()) {
@@ -56,7 +55,7 @@ public class BuildRunner {
 
     private Set<RandomBuilder> recalculatedBuilderSet(Set<RandomBuilder> builderSet,
             Map<RandomBuilder, Map<String, Rule>> builderFieldNameExclusiveRuleMap) {
-        Set<RandomBuilder> result = Sets.newHashSet();
+        Set<RandomBuilder> result = new HashSet<>();
 
         for (Entry<RandomBuilder, Map<String, Rule>> entryBuilderFieldRule : builderFieldNameExclusiveRuleMap
                 .entrySet()) {

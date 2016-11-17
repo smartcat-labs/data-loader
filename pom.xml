@@ -8,8 +8,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>loadgen</name>
-    <description>Demo project for contextual load generator</description>
+    <name>Data loader</name>
+    <description>Data loader for contextual load generator</description>
 
     <modules>
         <module>data-gen</module>

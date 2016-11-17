@@ -4,24 +4,23 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import io.smartcat.data.loader.model.User;
 
 public class RandomBuilder {
 
-    private Map<String, Rule<?>> fieldRules = Maps.newHashMap();
+    private Map<String, Rule<?>> fieldRules = new HashMap<>();
 
     private int numberOfObjects;
 
-    private Map<String, RandomBuilder> nestedObjectBuilderMap = Maps.newHashMap();
+    private Map<String, RandomBuilder> nestedObjectBuilderMap = new HashMap<>();
 
     public RandomBuilder randomFromRange(String fieldName, LocalDateTime startDate, LocalDateTime endDate) {
         long lower = startDate.toInstant(ZoneOffset.UTC).toEpochMilli();
@@ -78,7 +77,7 @@ public class RandomBuilder {
 
     public RandomBuilder randomSubsetFrom(String fieldName, String... values) {
 
-        fieldRules.put(fieldName, SubSetRule.withValues(Sets.newHashSet(values)));
+        fieldRules.put(fieldName, SubSetRule.withValues(Arrays.asList(values)));
 
         return this;
     }
@@ -93,7 +92,7 @@ public class RandomBuilder {
     }
 
     public List<User> build(long numberOfUsersToBuild) {
-        List<User> result = Lists.newArrayList();
+        List<User> result = new ArrayList<>();
         for (long i = 1; i <= numberOfUsersToBuild; i++) {
             User randomUser = buildRandom();
             result.add(randomUser);

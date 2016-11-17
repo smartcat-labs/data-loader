@@ -1,18 +1,17 @@
 package io.smartcat.data.loader;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 public class SubSetRule<T> implements Rule<Set<T>> {
 
     private boolean exclusive;
-    private final Set<T> values = Sets.newHashSet();
+    private final Set<T> values = new HashSet<>();
 
     private SubSetRule() {
     }
@@ -48,9 +47,9 @@ public class SubSetRule<T> implements Rule<Set<T>> {
     private Set<T> getRandomSubset(Set<T> values) {
         int randomSize = ThreadLocalRandom.current().nextInt(0, values.size());
 
-        List<T> list = Lists.newArrayList(values);
+        List<T> list = new ArrayList<>(values);
         Collections.shuffle(list);
-        Set<T> randomSubset = Sets.newHashSet(list.subList(0, randomSize));
+        Set<T> randomSubset = new HashSet(list.subList(0, randomSize));
 
         return randomSubset;
     }

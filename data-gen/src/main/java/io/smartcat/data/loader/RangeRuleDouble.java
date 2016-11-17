@@ -1,16 +1,16 @@
 package io.smartcat.data.loader;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
-import org.assertj.core.util.Lists;
 
 public class RangeRuleDouble implements Rule<Double> {
 
     private boolean exclusive;
 
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
-    private List<Double> ranges = Lists.newArrayList();
+    private List<Double> ranges = new ArrayList<>();
 
     private RangeRuleDouble() {
     };
@@ -18,7 +18,7 @@ public class RangeRuleDouble implements Rule<Double> {
     public static RangeRuleDouble withRanges(Double... rangeMarkers) {
         RangeRuleDouble result = new RangeRuleDouble();
 
-        result.ranges.addAll(Lists.newArrayList(rangeMarkers));
+        result.ranges.addAll(Arrays.asList(rangeMarkers));
 
         return result;
     }
@@ -27,7 +27,7 @@ public class RangeRuleDouble implements Rule<Double> {
         RangeRuleDouble result = new RangeRuleDouble();
 
         result.exclusive = true;
-        result.ranges.addAll(Lists.newArrayList(rangeMarkers));
+        result.ranges.addAll(Arrays.asList(rangeMarkers));
 
         return result;
     }
@@ -35,7 +35,7 @@ public class RangeRuleDouble implements Rule<Double> {
     public static RangeRuleDouble withRanges(List<Double> rangeMarkers) {
         RangeRuleDouble result = new RangeRuleDouble();
 
-        result.ranges.addAll(Lists.newArrayList(rangeMarkers));
+        result.ranges.addAll(rangeMarkers);
 
         return result;
     }
@@ -84,26 +84,26 @@ public class RangeRuleDouble implements Rule<Double> {
             // -y1-------------y1----
             // ----y1------------y2--
             // ----y1----------y2----
-            return Lists.newArrayList();
+            return new ArrayList<>();
         }
 
         if (x1 < y1 && y2 < x2) { // 2.
             // ----x1----------x2----
             // --------y1--y2--------
-            return Lists.newArrayList(x1, y1, y2, x2);
+            return Arrays.asList(x1, y1, y2, x2);
         }
 
         if (y1 <= x1) { // x2 > y2, otherwise 1.
             // ----x1----------x2----
             // -y1--------y2--------- <
             // ----y1-----y2--------- =
-            return Lists.newArrayList(y2, x2);
+            return Arrays.asList(y2, x2);
         }
 
         if (x2 <= y2) { // x1 < y1 otherwise 1.
             // ----x1----------x2----
             // --------y1--------y2--
-            return Lists.newArrayList(x1, y1);
+            return Arrays.asList(x1, y1);
         }
 
         throw new IllegalStateException("Unexpected error: x1=" + x1 + ", x2=" + x2 + ", y1=" + y1 + ", y2=" + y2);

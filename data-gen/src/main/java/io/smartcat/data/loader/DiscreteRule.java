@@ -1,15 +1,15 @@
 package io.smartcat.data.loader;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
-import com.google.common.collect.Lists;
 
 public class DiscreteRule implements Rule<String> {
 
     private boolean exclusive;
 
-    private final List<String> allowedValues = Lists.newArrayList();
+    private final List<String> allowedValues = new ArrayList<>();
 
     private DiscreteRule() {
     };
@@ -17,7 +17,7 @@ public class DiscreteRule implements Rule<String> {
     public static DiscreteRule newSet(String... allowedValues) {
         DiscreteRule result = new DiscreteRule();
 
-        result.allowedValues.addAll(Lists.newArrayList(allowedValues));
+        result.allowedValues.addAll(Arrays.asList(allowedValues));
 
         return result;
     }
@@ -25,7 +25,7 @@ public class DiscreteRule implements Rule<String> {
     public static DiscreteRule newSet(List<String> allowedValues) {
         DiscreteRule result = new DiscreteRule();
 
-        result.allowedValues.addAll(Lists.newArrayList(allowedValues));
+        result.allowedValues.addAll(allowedValues);
 
         return result;
     }
@@ -34,7 +34,7 @@ public class DiscreteRule implements Rule<String> {
         DiscreteRule result = new DiscreteRule();
 
         result.exclusive = true;
-        result.allowedValues.addAll(Lists.newArrayList(allowedValues));
+        result.allowedValues.addAll(Arrays.asList(allowedValues));
 
         return result;
     }
