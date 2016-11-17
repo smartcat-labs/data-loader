@@ -1,6 +1,6 @@
-# Summary
+# Data loader
 
-This library ease the creation of test data.
+This project aims to simplify generating test or load data but with context.
 
 Why:
 

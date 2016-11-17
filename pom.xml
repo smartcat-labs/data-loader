@@ -1,117 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.smartcat</groupId>
-    <artifactId>loadgen</artifactId>
+    <artifactId>data-loader</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>loadgen</name>
     <description>Demo project for contextual load generator</description>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.1.RELEASE</version>
-        <relativePath /> <!-- lookup parent from repository -->
-    </parent>
+    <modules>
+        <module>data-gen</module>
+        <module>load-gen</module>
+    </modules>
+
+    <issueManagement>
+        <system>github.com</system>
+        <url>https://github.com/smartcat-labs/data-loader/issues</url>
+    </issueManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <version.plugin.checkstyle>2.17</version.plugin.checkstyle>
+        <version.junit>4.12</version.junit>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency>
-        <dependency>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo</artifactId>
-            <version>1.50.5</version>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-
-            </plugin>
-
-            <plugin>
-                <groupId>com.syncleus.maven.plugins</groupId>
-                <artifactId>maven-mongodb-plugin</artifactId>
-                <version>1.1.1</version>
-                <executions>
-                    <execution>
-                        <id>start</id>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                        <configuration>
-                            <version>3.2.9</version>
-                            <!-- optional, defaults to latest production 
-                                release -->
-
-                            <databaseDirectory>/tmp/mongotest</databaseDirectory>
-                            <!-- optional, default is a new dir in java.io.tmpdir -->
-
-                            <artifactDirectory>/tmp/mongoartifact</artifactDirectory>
-                            <!-- optional, set directory where MongoDB artifacts 
-                                are stores, default is ~/.embedmongo -->
-
-                            <logging>file</logging>
-                            <!-- optional (file|console|none), default is 
-                                console -->
-
-                            <logFile>${project.build.directory}/myfile.log</logFile>
-                            <!-- optional, can be used when logging=file, 
-                                default is ./mongod.log -->
-
-                            <logFileEncoding>utf-8</logFileEncoding>
-                            <!-- optional, can be used when logging=file, 
-                                default is utf-8 -->
-
-                            <bindIp>127.0.0.1</bindIp>
-                            <!-- optional, default is to listen on all interfaces -->
-
-
-                            <skip>false</skip>
-                            <!-- optional, skips this plugin entirely, use 
-                                on the command line like -Dmongodb.skip -->
-
-                            <defaultImportDatabase>test</defaultImportDatabase>
-                            <!-- optional, name of the default database to 
-                                import data -->
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>stop</id>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- Check style on build. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
