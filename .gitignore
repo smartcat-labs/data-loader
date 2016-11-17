@@ -1,27 +1,15 @@
-*.class
+## Common
+**/temp
 
-/.settings/
-/target/
-/.idea/
-/gen/
-/out/
-/build/
-*.project
+## Java
+**/target
+*.settings
 *.classpath
+*.project
+*.java-version
+
+## Scala
+**/.idea
+
+## Intellij
 *.iml
-*.DS_Store
-.springBeans
-.checkstyle
-
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.ear
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-/target/

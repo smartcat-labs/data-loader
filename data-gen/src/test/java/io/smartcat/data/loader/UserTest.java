@@ -1,6 +1,5 @@
 package io.smartcat.data.loader;
 
-/*
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -8,18 +7,11 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import io.smartcat.UserRepository;
+import io.smartcat.data.loader.model.User;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class UserTest {
 
-    @Autowired
     private UserRepository userRepository;
 
     @Before
@@ -47,24 +39,22 @@ public class UserTest {
 
         long yesterday = LocalDateTime.now().minusDays(1).toInstant(ZoneOffset.UTC).toEpochMilli();
         long yesterdayPlus1Hour = LocalDateTime.now().minusDays(1).plusHours(1).toInstant(ZoneOffset.UTC)
-                .toEpochMilli();
+            .toEpochMilli();
 
         RandomAddressBuilder addressBuilder = new RandomAddressBuilder();
         addressBuilder
-                .randomCityFrom("New York", "Moscow", "London", "Paris", "Budapest", "Las Vegas", "Ulm", "Berlin",
-                        "Madrid")
-                .randomHouseNumberRange(0, 50)
-                .randomStreetFrom("snake street", "nuts str", "cat street", "strawberry street");
+            .randomCityFrom("New York", "Moscow", "London", "Paris", "Budapest", "Las Vegas", "Ulm", "Berlin", "Madrid")
+            .randomHouseNumberRange(0, 50)
+            .randomStreetFrom("snake street", "nuts str", "cat street", "strawberry street");
 
         List<User> users = randomUserBuilder
-                .randomUsernameFrom("destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac", "pevac",
-                        "hardy")
-                .randomBirthDateBetween(oldestBirthDate, yougnestBirthDate)
-                .randomFavoriteMoviesFrom("Predator", "Comandos", "Terminator 2", "Conan", "Red Sonya") // set random
-                                                                                                        // subset
-                .randomFirstNameFrom("Alice", "Bob", "Charlie", "Dick", "Eve", "Eleanor", "Boaty")
-                .randomLastNameFrom("Avalanche", "Bizmark", "Kok", "McBoatface").randomNumberOfCardsBetween(0, 5)
-                .withAddressBuilder(addressBuilder).build(numberOfUsers);
+            .randomUsernameFrom("destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac", "pevac",
+                "hardy").randomBirthDateBetween(oldestBirthDate, yougnestBirthDate)
+            .randomFavoriteMoviesFrom("Predator", "Comandos", "Terminator 2", "Conan", "Red Sonya") // set random
+            // subset
+            .randomFirstNameFrom("Alice", "Bob", "Charlie", "Dick", "Eve", "Eleanor", "Boaty")
+            .randomLastNameFrom("Avalanche", "Bizmark", "Kok", "McBoatface").randomNumberOfCardsBetween(0, 5)
+            .withAddressBuilder(addressBuilder).build(numberOfUsers);
 
         userRepository.save(users);
         long numberOfSavedUsers = userRepository.count();
@@ -98,27 +88,25 @@ public class UserTest {
 
         long yesterday = LocalDateTime.now().minusDays(1).toInstant(ZoneOffset.UTC).toEpochMilli();
         long yesterdayPlus1Hour = LocalDateTime.now().minusDays(1).plusHours(1).toInstant(ZoneOffset.UTC)
-                .toEpochMilli();
+            .toEpochMilli();
 
         RandomAddressBuilder addressBuilder = new RandomAddressBuilder();
         addressBuilder
-                .randomCityFrom("New York", "Moscow", "London", "Paris", "Budapest", "Las Vegas", "Ulm", "Berlin",
-                        "Madrid")
-                .randomHouseNumberRange(0, 50)
-                .randomStreetFrom("snake street", "nuts str", "cat street", "strawberry street");
+            .randomCityFrom("New York", "Moscow", "London", "Paris", "Budapest", "Las Vegas", "Ulm", "Berlin", "Madrid")
+            .randomHouseNumberRange(0, 50)
+            .randomStreetFrom("snake street", "nuts str", "cat street", "strawberry street");
 
         List<User> users = randomUserBuilder
-                .randomUsernameFrom("destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac", "pevac",
-                        "hardy")
-                .randomBirthDateBetween(oldestBirthDate, yougnestBirthDate)
-                .randomFavoriteMoviesFrom("Predator", "Comandos", "Terminator 2", "Conan", "Red Sonya") // set random
-                                                                                                        // subset
-                .randomFirstNameFrom("Alice", "Bob", "Charlie", "Dick", "Eve", "Eleanor", "Boaty")
-                .randomLastNameFrom("Avalanche", "Bizmark", "Kok", "McBoatface").randomNumberOfCardsBetween(0, 5)
-                .withAddressBuilder(addressBuilder) // builder for nested objects
-                // .withExactBuilder(exactUserBuilder) // builder for
-                .build(numberOfUsers); // creates 50 users based on randomUserBuilder and exactly 10 users based on
-                                       // exactUserBuilder where uniqeRules from exactUserBuilder
+            .randomUsernameFrom("destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac", "pevac",
+                "hardy").randomBirthDateBetween(oldestBirthDate, yougnestBirthDate)
+            .randomFavoriteMoviesFrom("Predator", "Comandos", "Terminator 2", "Conan", "Red Sonya") // set random
+            // subset
+            .randomFirstNameFrom("Alice", "Bob", "Charlie", "Dick", "Eve", "Eleanor", "Boaty")
+            .randomLastNameFrom("Avalanche", "Bizmark", "Kok", "McBoatface").randomNumberOfCardsBetween(0, 5)
+            .withAddressBuilder(addressBuilder) // builder for nested objects
+            // .withExactBuilder(exactUserBuilder) // builder for
+            .build(numberOfUsers); // creates 50 users based on randomUserBuilder and exactly 10 users based on
+        // exactUserBuilder where uniqeRules from exactUserBuilder
         //
 
         userRepository.save(users);
@@ -132,24 +120,24 @@ public class UserTest {
         // exclusive rule - rule in a builder that states that only users built with this builder can satisfy that rule.
         RandomUserBuilder exactUserBuilder = new RandomUserBuilder();
         List<User> exactUsers = exactUserBuilder
-                .randomUsernameFrom("destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac", "pevac",
-                        "hardy")
-                .randomBirthDateBetween(newOldestBirthDate, newYougnestBirthDate) // .exclusiveRule() // means that when
-                                                                                  // combined with other builders no
-                                                                                  // users built by other builders can
-                                                                                  // satisfy this rules, i.e. only this
-                                                                                  // builder can build users in that
-                                                                                  // range of birthdates
-                // rule -
-                // type : randomFromRangeRule [a,b), randomFromSet
-                // exclusive: boolean,
-                //
-                // .oneWith(favoiteMovies("Predator", "Terminator", "LotR"))
-                // .oneWith(favoriteMovies("LotR", "Pirates))
-                // .oneWith(favoriteMovies("Matrix", "Lotr", "Fight Club"))
-                // .oneWith(favoriteMovies(Matrix", "Terminator"))
-                // .oneWith(favoriteMovies("Conan"))
-                .build(5);
+            .randomUsernameFrom("destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac", "pevac",
+                "hardy")
+            .randomBirthDateBetween(newOldestBirthDate, newYougnestBirthDate) // .exclusiveRule() // means that when
+            // combined with other builders no
+            // users built by other builders can
+            // satisfy this rules, i.e. only this
+            // builder can build users in that
+            // range of birthdates
+            // rule -
+            // type : randomFromRangeRule [a,b), randomFromSet
+            // exclusive: boolean,
+            //
+            // .oneWith(favoiteMovies("Predator", "Terminator", "LotR"))
+            // .oneWith(favoriteMovies("LotR", "Pirates))
+            // .oneWith(favoriteMovies("Matrix", "Lotr", "Fight Club"))
+            // .oneWith(favoriteMovies(Matrix", "Terminator"))
+            // .oneWith(favoriteMovies("Conan"))
+            .build(5);
         //
         // exactUsers.get(0).setFavoriteMovies(Lists.newArrayList("Predator", "Terminator", "LotR"));
         // exactUsers.get(1).setFavoriteMovies(Lists.newArrayList("LotR", "Pirates"));
@@ -168,13 +156,12 @@ public class UserTest {
         LocalDateTime yougnestBirthDate = LocalDateTime.of(2000, 1, 1, 0, 0);
 
         randomUserBuilder
-                .randomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac",
-                        "pevac")
-                .randomFrom("firstname", "john", "alice", "bob", "charlie", "david", "elon")
-                .randomFrom("lastname", "annison", "berkley", "chaplin", "dickinson")
-                .randomFromRange("numberOfCards", 0L, 14L).randomFromRange("accountBalance", 2.72, 3.14)
-                .randomSubsetFrom("favoriteMovies", "Predator", "Comandos", "Terminator 2", "Conan", "Red Sonya")
-                .randomFromRange("birthDate", oldestBirthDate, yougnestBirthDate).toBeBuilt(5);
+            .randomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac", "pevac")
+            .randomFrom("firstname", "john", "alice", "bob", "charlie", "david", "elon")
+            .randomFrom("lastname", "annison", "berkley", "chaplin", "dickinson")
+            .randomFromRange("numberOfCards", 0L, 14L).randomFromRange("accountBalance", 2.72, 3.14)
+            .randomSubsetFrom("favoriteMovies", "Predator", "Comandos", "Terminator 2", "Conan", "Red Sonya")
+            .randomFromRange("birthDate", oldestBirthDate, yougnestBirthDate).toBeBuilt(5);
 
         RandomBuilder exclusiveUserBuilder = new RandomBuilder();
 
@@ -182,12 +169,12 @@ public class UserTest {
         LocalDateTime yougnestBirthDateX = LocalDateTime.of(1985, 1, 2, 0, 0);
 
         exclusiveUserBuilder
-                .exclusiveRandomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero")
-                .randomFrom("firstname", "john", "alice", "bob", "charlie", "david", "elon")
-                .randomFrom("lastname", "annison", "berkley", "chaplin", "dickinson")
-                .randomFromRange("numberOfCards", 0L, 14L).randomFromRange("accountBalance", 2.72, 3.14)
-                .randomSubsetFrom("favoriteMovies", "Predator", "Comandos", "Terminator 2", "Conan", "Red Sonya")
-                .exclusiveRandomFromRange("birthDate", oldestBirthDateX, yougnestBirthDateX).toBeBuilt(3);
+            .exclusiveRandomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero")
+            .randomFrom("firstname", "john", "alice", "bob", "charlie", "david", "elon")
+            .randomFrom("lastname", "annison", "berkley", "chaplin", "dickinson")
+            .randomFromRange("numberOfCards", 0L, 14L).randomFromRange("accountBalance", 2.72, 3.14)
+            .randomSubsetFrom("favoriteMovies", "Predator", "Comandos", "Terminator 2", "Conan", "Red Sonya")
+            .exclusiveRandomFromRange("birthDate", oldestBirthDateX, yougnestBirthDateX).toBeBuilt(3);
 
         BuildRunner runner = new BuildRunner();
 
@@ -203,4 +190,3 @@ public class UserTest {
     }
 
 }
-*/

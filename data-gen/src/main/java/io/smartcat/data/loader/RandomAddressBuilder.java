@@ -2,6 +2,8 @@ package io.smartcat.data.loader;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import io.smartcat.data.loader.model.Address;
+
 public class RandomAddressBuilder {
 
     private String[] cities;

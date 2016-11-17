@@ -4,13 +4,14 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.assertj.core.util.Lists;
-import org.assertj.core.util.Sets;
+import io.smartcat.data.loader.model.User;
 
 public class RandomUserBuilder {
 
@@ -74,7 +75,7 @@ public class RandomUserBuilder {
     }
 
     public List<User> build(long numberOfUsersToBuild) {
-        List<User> result = Lists.newArrayList();
+        List<User> result = new ArrayList<>();
         for (long i = 1; i <= numberOfUsersToBuild; i++) {
             User randomUser = buildRandomUser();
             result.add(randomUser);
@@ -106,7 +107,7 @@ public class RandomUserBuilder {
         user.setNumberOfCards(randomNumberOfCards);
 
         int randomNumberOfFavoriteMovies = ThreadLocalRandom.current().nextInt(0, movies.length);
-        Set<String> moviesSet = Sets.newHashSet();
+        Set<String> moviesSet = new HashSet<>();
         for (int i = 0; i < randomNumberOfFavoriteMovies; i++) {
             int randomIndex = ThreadLocalRandom.current().nextInt(1, movies.length);
             moviesSet.add(movies[randomIndex]);
