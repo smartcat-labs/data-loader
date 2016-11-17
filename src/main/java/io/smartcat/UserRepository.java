@@ -6,6 +6,9 @@ import org.springframework.data.repository.CrudRepository;
 
 import io.smartcat.model.User;
 
-public interface UserRepository extends CrudRepository<User, Serializable>{
+/**
+ * SpringData Repo.
+ */
+public interface UserRepository extends CrudRepository<User, Serializable> {
 
 }
