@@ -2,7 +2,6 @@ package io.smartcat.data.loader.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 
@@ -15,7 +14,6 @@ public class User {
     private String username;
     private String firstname;
     private String lastname;
-    private Date birthDate;
 
     private Long numberOfCards;
 
@@ -29,9 +27,9 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [username=" + username + ", firstname=" + firstname + ", lastname=" + lastname + ", birthDate="
-                + birthDate + ", numberOfCards=" + numberOfCards + ", accountBalance=" + accountBalance
-                + ", favoriteMovies=" + favoriteMovies + ", address=" + address + "]";
+        return "User [username=" + username + ", firstname=" + firstname + ", lastname=" + lastname
+            + ", numberOfCards=" + numberOfCards + ", accountBalance=" + accountBalance + ", favoriteMovies="
+            + favoriteMovies + ", address=" + address + "]";
     }
 
     public String getUsername() {
@@ -64,14 +62,6 @@ public class User {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
-    }
-
-    public Date getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(Date birthDate) {
-        this.birthDate = birthDate;
     }
 
     public long getNumberOfCards() {

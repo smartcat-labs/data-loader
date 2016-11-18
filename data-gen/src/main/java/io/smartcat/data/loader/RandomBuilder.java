@@ -1,16 +1,13 @@
 package io.smartcat.data.loader;
 
-import java.time.Instant;
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import io.smartcat.data.loader.model.User;
 
@@ -97,39 +94,52 @@ public class RandomBuilder {
     public List<User> build(long numberOfUsersToBuild) {
         List<User> result = new ArrayList<>();
         for (long i = 1; i <= numberOfUsersToBuild; i++) {
-            User randomUser = buildRandom();
-            result.add(randomUser);
+            final User randomUser;
+            try {
+                randomUser = buildRandom(User.class);
+                result.add(randomUser);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            }
         }
 
         return result;
     }
 
-    private User buildRandom() {
-        User user = new User();
+    private <T> T buildRandom(Class<T> clazz) throws IllegalAccessException, InstantiationException {
+        final T instance;
+        instance = clazz.newInstance();
+        fieldRules.keySet().forEach(key -> set(instance, key, fieldRules.get(key).getRandomAllowedValue()));
+        return instance;
 
-        // TODO handle null pointers
-        String randomUsername = (String) fieldRules.get("username").getRandomAllowedValue();
-        Long randomBirthDate = (Long) fieldRules.get("birthDate").getRandomAllowedValue();
-        String randomFirstName = (String) fieldRules.get("firstname").getRandomAllowedValue();
-        String randomLastname = (String) fieldRules.get("lastname").getRandomAllowedValue();
-        Long randomNumberOfCards = (Long) fieldRules.get("numberOfCards").getRandomAllowedValue();
-        Double randomAccountBalance = (Double) fieldRules.get("accountBalance").getRandomAllowedValue();
+        //        User user = new User();
 
-        Set<String> randomFavoriteMovies = (Set<String>) fieldRules.get("favoriteMovies").getRandomAllowedValue();
+        //        // TODO handle null pointers
+        //        String randomUsername = (String) fieldRules.get("username").getRandomAllowedValue();
+        //        Long randomBirthDate = (Long) fieldRules.get("birthDate").getRandomAllowedValue();
+        //        String randomFirstName = (String) fieldRules.get("firstname").getRandomAllowedValue();
+        //        String randomLastname = (String) fieldRules.get("lastname").getRandomAllowedValue();
+        //        Long randomNumberOfCards = (Long) fieldRules.get("numberOfCards").getRandomAllowedValue();
+        //        Double randomAccountBalance = (Double) fieldRules.get("accountBalance").getRandomAllowedValue();
 
-        Instant instant = Instant.ofEpochMilli(randomBirthDate).atZone(ZoneId.systemDefault()).toInstant();
+        //        Set<String> randomFavoriteMovies = (Set<String>) fieldRules.get("favoriteMovies")
+        // .getRandomAllowedValue();
+        //
+        //        Instant instant = Instant.ofEpochMilli(randomBirthDate).atZone(ZoneId.systemDefault()).toInstant();
+        //
+        //        // Address address = nestedObjectBuilderMap.get("address").build();
+        //
+        //        user.setUsername(randomUsername);
+        //        user.setBirthDate(Date.from(instant));
+        //        user.setFirstname(randomFirstName);
+        //        user.setLastname(randomLastname);
+        //        user.setNumberOfCards(randomNumberOfCards);
+        //        user.setAccountBalance(randomAccountBalance);
+        //        user.setFavoriteMovies(randomFavoriteMovies);
 
-        // Address address = nestedObjectBuilderMap.get("address").build();
-
-        user.setUsername(randomUsername);
-        user.setBirthDate(Date.from(instant));
-        user.setFirstname(randomFirstName);
-        user.setLastname(randomLastname);
-        user.setNumberOfCards(randomNumberOfCards);
-        user.setAccountBalance(randomAccountBalance);
-        user.setFavoriteMovies(randomFavoriteMovies);
-
-        return user;
+        //        return user;
     }
 
     public List<User> buildAll() {
@@ -146,6 +156,23 @@ public class RandomBuilder {
 
     public void setNestedObjectBuilderMap(Map<String, RandomBuilder> nestedObjectBuilderMap) {
         this.nestedObjectBuilderMap = nestedObjectBuilderMap;
+    }
+
+    public static boolean set(Object object, String fieldName, Object fieldValue) {
+        Class<?> clazz = object.getClass();
+        while (clazz != null) {
+            try {
+                Field field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                field.set(object, fieldValue);
+                return true;
+            } catch (NoSuchFieldException e) {
+                clazz = clazz.getSuperclass();
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return false;
     }
 
 }
