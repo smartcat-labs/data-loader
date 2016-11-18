@@ -1,10 +1,10 @@
 package io.smartcat.data.loader.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import com.google.common.collect.Lists;
 
 /**
  * User dummy entity.
@@ -21,7 +21,7 @@ public class User {
 
     private Double accountBalance;
 
-    private final List<String> favoriteMovies = Lists.newArrayList();
+    private final List<String> favoriteMovies = new ArrayList<>();
 
     private Address address;
 

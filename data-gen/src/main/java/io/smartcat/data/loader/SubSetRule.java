@@ -8,6 +8,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Rule for creating a set of random values that is a subset of passed allowed values.
+ *
+ * @param <T>
+ */
 public class SubSetRule<T> implements Rule<Set<T>> {
 
     private boolean exclusive;

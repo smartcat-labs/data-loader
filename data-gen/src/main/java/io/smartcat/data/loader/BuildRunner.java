@@ -10,6 +10,9 @@ import java.util.Set;
 
 import io.smartcat.data.loader.model.User;
 
+/**
+ * Class that manages builders and recalculates the rules in those builder.
+ */
 public class BuildRunner {
 
     private final Set<RandomBuilder> builderSet = new HashSet<>();

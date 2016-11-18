@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Rule for discrete set of allowed values (i.e. not range).
+ */
 public class DiscreteRule implements Rule<String> {
 
     private boolean exclusive;

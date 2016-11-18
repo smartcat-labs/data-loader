@@ -14,6 +14,9 @@ import java.util.Set;
 
 import io.smartcat.data.loader.model.User;
 
+/**
+ * Class used for building random objects of certain type.
+ */
 public class RandomBuilder {
 
     private Map<String, Rule<?>> fieldRules = new HashMap<>();

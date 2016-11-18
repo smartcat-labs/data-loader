@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+/***
+ * Rule for creating random range values.
+ */
 public final class RangeRule implements Rule<Long> {
 
     private boolean exclusive;
