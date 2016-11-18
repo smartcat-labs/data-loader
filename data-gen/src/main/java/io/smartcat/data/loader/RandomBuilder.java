@@ -94,9 +94,8 @@ public class RandomBuilder {
     public List<User> build(long numberOfUsersToBuild) {
         List<User> result = new ArrayList<>();
         for (long i = 1; i <= numberOfUsersToBuild; i++) {
-            final User randomUser;
             try {
-                randomUser = buildRandom(User.class);
+                final User randomUser = buildRandom(User.class);
                 result.add(randomUser);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
