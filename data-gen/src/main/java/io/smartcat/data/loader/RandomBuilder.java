@@ -1,12 +1,12 @@
 package io.smartcat.data.loader;
 
 import java.lang.reflect.Field;
-import java.sql.Date;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +26,8 @@ public class RandomBuilder<T> {
 
     private Map<String, RandomBuilder<?>> nestedObjectBuilderMap = new HashMap<>();
 
-    public RandomBuilder(Class<T> clazz) {
-        this.objectType = clazz;
+    public RandomBuilder(Class<T> objectType) {
+        this.objectType = objectType;
     }
 
     public RandomBuilder<T> randomFromRange(String fieldName, LocalDateTime startDate, LocalDateTime endDate) {
@@ -93,10 +93,6 @@ public class RandomBuilder<T> {
     public RandomBuilder<T> toBeBuilt(int numberOfObjects) {
         this.numberOfObjects = numberOfObjects;
         return this;
-    }
-
-    public T build(T entity) {
-        return null;
     }
 
     public List<T> build(long numberOfUsersToBuild) {
