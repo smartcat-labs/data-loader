@@ -84,9 +84,12 @@ public class RandomBuilder<T> {
     }
 
     public RandomBuilder<T> randomSubsetFrom(String fieldName, String... values) {
-
         fieldRules.put(fieldName, SubSetRule.withValues(Arrays.asList(values)));
+        return this;
+    }
 
+    public RandomBuilder<T> randomSubListFrom(String fieldName, String... values) {
+        fieldRules.put(fieldName, SubListRule.withValues(Arrays.asList(values)));
         return this;
     }
 
@@ -95,27 +98,35 @@ public class RandomBuilder<T> {
         return this;
     }
 
-    public List<T> build(long numberOfUsersToBuild) {
+    public List<T> build(long numberOfEntitiesToBuild) {
         List<T> result = new ArrayList<>();
-        for (long i = 1; i <= numberOfUsersToBuild; i++) {
-            try {
-                final T randomUser = buildRandom(objectType);
-                result.add(randomUser);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            }
+        for (long i = 1; i <= numberOfEntitiesToBuild; i++) {
+            final T randomUser = buildOne();
+            result.add(randomUser);
         }
 
         return result;
     }
 
-    private <T> T buildRandom(Class<T> clazz) throws IllegalAccessException, InstantiationException {
-        final T instance;
-        instance = clazz.newInstance();
+    private T buildOne() {
+        final T instance = initObject();
+
         fieldRules.keySet().forEach(key -> set(instance, key, fieldRules.get(key).getRandomAllowedValue()));
+
+        nestedObjectBuilderMap.keySet().forEach(key -> set(instance, key, nestedObjectBuilderMap.get(key).buildOne()));
+
         return instance;
+    }
+
+    private T initObject() {
+        T instance;
+        try {
+            instance = objectType.newInstance();
+            return instance;
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     public List<T> buildAll() {
@@ -139,6 +150,7 @@ public class RandomBuilder<T> {
         while (clazz != null) {
             try {
                 Field field = clazz.getDeclaredField(fieldName);
+
                 field.setAccessible(true);
                 field.set(object, fieldValue);
                 return true;

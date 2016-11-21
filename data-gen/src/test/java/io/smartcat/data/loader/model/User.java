@@ -1,15 +1,12 @@
 package io.smartcat.data.loader.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Set;
 
 /**
  * User dummy entity.
  */
-//@Document(collection = "users")
 public class User {
 
     private String username;
@@ -21,9 +18,13 @@ public class User {
 
     private Double accountBalance;
 
-    private final List<String> favoriteMovies = new ArrayList<>();
+    private List<String> favoriteMovies;
+
+    private Set<String> nicknames;
 
     private Address address;
+
+    private List<Address> otherAddresses;
 
     // getters and setters
 
@@ -31,7 +32,8 @@ public class User {
     public String toString() {
         return "User [username=" + username + ", firstname=" + firstname + ", lastname=" + lastname + ", birthDate="
                 + birthDate + ", numberOfCards=" + numberOfCards + ", accountBalance=" + accountBalance
-                + ", favoriteMovies=" + favoriteMovies + ", address=" + address + "]";
+                + ", favoriteMovies=" + favoriteMovies + ", nicknames=" + nicknames + ", address=" + address
+                + ", otherAddresses=" + otherAddresses + "]";
     }
 
     public String getUsername() {
@@ -86,11 +88,8 @@ public class User {
         return favoriteMovies;
     }
 
-    public void setFavoriteMovies(Collection<String> favoriteMovies) {
-        this.favoriteMovies.clear();
-        if (favoriteMovies != null) {
-            this.favoriteMovies.addAll(favoriteMovies);
-        }
+    public void setFavoriteMovies(List<String> favoriteMovies) {
+        this.favoriteMovies = favoriteMovies;
     }
 
     public Address getAddress() {
@@ -103,6 +102,22 @@ public class User {
 
     public void setNumberOfCards(Long numberOfCards) {
         this.numberOfCards = numberOfCards;
+    }
+
+    public List<Address> getOtherAddresses() {
+        return otherAddresses;
+    }
+
+    public void setOtherAddresses(List<Address> otherAddresses) {
+        this.otherAddresses = otherAddresses;
+    }
+
+    public Set<String> getNicknames() {
+        return nicknames;
+    }
+
+    public void setNicknames(Set<String> nicknames) {
+        this.nicknames = nicknames;
     }
 
 }
