@@ -8,41 +8,40 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import io.smartcat.data.loader.model.User;
-
 /**
  * Class that manages builders and recalculates the rules in those builder.
+ *
+ * @param <T>
  */
-public class BuildRunner {
+public class BuildRunner<T> {
 
-    private final Set<RandomBuilder> builderSet = new HashSet<>();
+    private final Set<RandomBuilder<T>> builderSet = new HashSet<>();
 
-    public List<User> build() {
+    public List<T> build() {
         recalculateRules();
-        List<User> resultList = new ArrayList<>();
-        for (RandomBuilder builder : builderSet) {
-            List<User> entityList = builder.buildAll();
+        List<T> resultList = new ArrayList<>();
+        for (RandomBuilder<T> builder : builderSet) {
+            List<T> entityList = builder.buildAll();
             resultList.addAll(entityList);
         }
         return resultList;
     }
 
-    public void addBuilder(RandomBuilder builder) {
+    public void addBuilder(RandomBuilder<T> builder) {
         builderSet.add(builder);
     }
 
     private void recalculateRules() {
-        Map<RandomBuilder, Map<String, Rule>> builderFieldNameExclusiveRuleMap = fetchExclusiveRules(builderSet);
-        Set<RandomBuilder> builderSetWithRecalculatedRules = recalculatedBuilderSet(builderSet,
+        Map<RandomBuilder<T>, Map<String, Rule>> builderFieldNameExclusiveRuleMap = fetchExclusiveRules(builderSet);
+        Set<RandomBuilder<T>> builderSetWithRecalculatedRules = recalculatedBuilderSet(builderSet,
                 builderFieldNameExclusiveRuleMap);
-
     }
 
-    private Map<RandomBuilder, Map<String, Rule>> fetchExclusiveRules(final Set<RandomBuilder> builderSet) {
+    private Map<RandomBuilder<T>, Map<String, Rule>> fetchExclusiveRules(final Set<RandomBuilder<T>> builderSet) {
         final Map<String, Rule> fieldRuleMap = new HashMap<>();
-        final Map<RandomBuilder, Map<String, Rule>> result = new HashMap<>();
+        final Map<RandomBuilder<T>, Map<String, Rule>> result = new HashMap<>();
 
-        for (RandomBuilder randomBuilder : builderSet) {
+        for (RandomBuilder<T> randomBuilder : builderSet) {
             for (Entry<String, Rule<?>> entry : randomBuilder.getFieldRules().entrySet()) {
                 String fieldName = entry.getKey();
                 Rule rule = entry.getValue();
@@ -56,11 +55,11 @@ public class BuildRunner {
         return result;
     }
 
-    private Set<RandomBuilder> recalculatedBuilderSet(Set<RandomBuilder> builderSet,
-            Map<RandomBuilder, Map<String, Rule>> builderFieldNameExclusiveRuleMap) {
-        Set<RandomBuilder> result = new HashSet<>();
+    private Set<RandomBuilder<T>> recalculatedBuilderSet(Set<RandomBuilder<T>> builderSet,
+            Map<RandomBuilder<T>, Map<String, Rule>> builderFieldNameExclusiveRuleMap) {
+        Set<RandomBuilder<T>> result = new HashSet<>();
 
-        for (Entry<RandomBuilder, Map<String, Rule>> entryBuilderFieldRule : builderFieldNameExclusiveRuleMap
+        for (Entry<RandomBuilder<T>, Map<String, Rule>> entryBuilderFieldRule : builderFieldNameExclusiveRuleMap
                 .entrySet()) {
 
             for (Entry<String, Rule> entryFieldExclusiveRule : entryBuilderFieldRule.getValue().entrySet()) {

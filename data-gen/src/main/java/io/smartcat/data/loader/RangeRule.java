@@ -62,54 +62,12 @@ public final class RangeRule implements Rule<Long> {
         }
         RangeRule otherRule = (RangeRule) exclusiveRule;
 
-        if (!rangesIntersects(this.ranges, otherRule.getAllowedRanges())) {
+        if (!RangeUtil.rangesIntersects(this.ranges, otherRule.getAllowedRanges())) {
             return this;
         }
-        List<Long> newRanges = recalculateRanges(otherRule.getAllowedRanges());
+        List<Long> newRanges = RangeUtil.recalculateRanges(this.ranges, otherRule.getAllowedRanges());
 
         return RangeRule.withRanges(newRanges);
-    }
-
-    private boolean rangesIntersects(List<Long> range1, List<Long> range2) {
-        return range1.get(0) <= range2.get(1) && range2.get(0) <= range1.get(1);
-    }
-
-    private List<Long> recalculateRanges(List<Long> exclusiveRanges) {
-
-        Long x1 = this.ranges.get(0);
-        Long x2 = this.ranges.get(1);
-        Long y1 = exclusiveRanges.get(0);
-        Long y2 = exclusiveRanges.get(1);
-
-        if (y1 <= x1 && x2 <= y2) { // 1.
-            // ----x1----------x2----
-            // -y1---------------y2--
-            // -y1-------------y1----
-            // ----y1------------y2--
-            // ----y1----------y2----
-            return new ArrayList<>();
-        }
-
-        if (x1 < y1 && y2 < x2) { // 2.
-            // ----x1----------x2----
-            // --------y1--y2--------
-            return Arrays.asList(x1, y1, y2, x2);
-        }
-
-        if (y1 <= x1) { // x2 > y2, otherwise 1.
-            // ----x1----------x2----
-            // -y1--------y2--------- <
-            // ----y1-----y2--------- =
-            return Arrays.asList(y2, x2);
-        }
-
-        if (x2 <= y2) { // x1 < y1 otherwise 1.
-            // ----x1----------x2----
-            // --------y1--------y2--
-            return Arrays.asList(x1, y1);
-        }
-
-        throw new IllegalStateException("Unexpected error: x1=" + x1 + ", x2=" + x2 + ", y1=" + y1 + ", y2=" + y2);
     }
 
     @Override
