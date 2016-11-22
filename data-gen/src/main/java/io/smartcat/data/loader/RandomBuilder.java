@@ -10,7 +10,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+
+import io.smartcat.data.loader.util.Randomizer;
+import io.smartcat.data.loader.util.RandomizerImpl;
 
 /**
  * Class used for building random objects of certain type.
@@ -27,15 +29,15 @@ public class RandomBuilder<T> {
 
     private Map<String, RandomBuilder<?>> nestedObjectBuilderMap = new HashMap<>();
 
-    private Random random = new Random();
+    private Randomizer random = new RandomizerImpl();
 
     public RandomBuilder(Class<T> objectType) {
         this.objectType = objectType;
     }
 
-    public RandomBuilder(Class<T> objectType, Random providedRandom) {
+    public RandomBuilder(Class<T> objectType, Randomizer random) {
         this.objectType = objectType;
-        this.random = providedRandom;
+        this.random = random;
     }
 
     public RandomBuilder<T> randomFromRange(String fieldName, LocalDateTime startDate, LocalDateTime endDate) {

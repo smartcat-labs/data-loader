@@ -4,13 +4,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import io.smartcat.data.loader.model.Address;
 import io.smartcat.data.loader.model.User;
+import io.smartcat.data.loader.util.Randomizer;
 
 public class UserTest {
 
@@ -66,24 +66,16 @@ public class UserTest {
 
     @Test
     public void should_set_usernames_randomly_from_the_provided_list() {
-        // RandomBuilder<User> randomUserBuilder = new RandomBuilder<>(User.class);
-        // randomUserBuilder.ran
 
-        // inject randomizer with our seed and check that the usernames are generated according to the predicted random
-        // number
-        //
-        Random seededRandom = new Random(1); // 0,3,2,3,4
-
-        // seededRandom.ints(5, 0, 5).forEach(System.out::println);
-
-        RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, seededRandom);
+        Randomizer randomizerMock = new RandomizerMock();
+        RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, randomizerMock);
 
         List<User> builtUsers = randomUserBuilder
                 .randomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac")
                 .build(5);
 
         Assert.assertEquals("destroyerOfW0rldz", builtUsers.get(0).getUsername());
-        Assert.assertEquals("subzero", builtUsers.get(1).getUsername());
+        Assert.assertEquals("univerzalBlack", builtUsers.get(1).getUsername());
         Assert.assertEquals("johnycage", builtUsers.get(2).getUsername());
         Assert.assertEquals("subzero", builtUsers.get(3).getUsername());
         Assert.assertEquals("krelac", builtUsers.get(4).getUsername());

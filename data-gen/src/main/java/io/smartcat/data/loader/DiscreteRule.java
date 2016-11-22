@@ -3,7 +3,8 @@ package io.smartcat.data.loader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+
+import io.smartcat.data.loader.util.Randomizer;
 
 /**
  * Rule for discrete set of allowed values (i.e. not range).
@@ -14,7 +15,7 @@ public class DiscreteRule implements Rule<String> {
 
     private final List<String> allowedValues = new ArrayList<>();
 
-    private Random random = new Random();
+    private Randomizer random;
 
     private DiscreteRule() {
     };
@@ -27,7 +28,7 @@ public class DiscreteRule implements Rule<String> {
         return result;
     }
 
-    public DiscreteRule withRandom(Random random) {
+    public DiscreteRule withRandom(Randomizer random) {
         this.random = random;
         return this;
     }
