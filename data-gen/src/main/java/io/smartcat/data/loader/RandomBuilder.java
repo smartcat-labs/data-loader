@@ -101,8 +101,8 @@ public class RandomBuilder<T> {
     public List<T> build(long numberOfEntitiesToBuild) {
         List<T> result = new ArrayList<>();
         for (long i = 1; i <= numberOfEntitiesToBuild; i++) {
-            final T randomUser = buildOne();
-            result.add(randomUser);
+            final T randomEntity = buildOne();
+            result.add(randomEntity);
         }
 
         return result;
