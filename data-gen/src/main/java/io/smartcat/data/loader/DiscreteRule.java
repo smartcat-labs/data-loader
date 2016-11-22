@@ -3,7 +3,7 @@ package io.smartcat.data.loader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 
 /**
  * Rule for discrete set of allowed values (i.e. not range).
@@ -14,6 +14,8 @@ public class DiscreteRule implements Rule<String> {
 
     private final List<String> allowedValues = new ArrayList<>();
 
+    private Random random = new Random();
+
     private DiscreteRule() {
     };
 
@@ -23,6 +25,11 @@ public class DiscreteRule implements Rule<String> {
         result.allowedValues.addAll(Arrays.asList(allowedValues));
 
         return result;
+    }
+
+    public DiscreteRule withRandom(Random random) {
+        this.random = random;
+        return this;
     }
 
     public static DiscreteRule newSet(List<String> allowedValues) {
@@ -68,7 +75,7 @@ public class DiscreteRule implements Rule<String> {
 
     @Override
     public String getRandomAllowedValue() {
-        int randomIndex = ThreadLocalRandom.current().nextInt(0, allowedValues.size());
+        int randomIndex = this.random.nextInt(allowedValues.size());
         String value = allowedValues.get(randomIndex);
         return value;
     }
