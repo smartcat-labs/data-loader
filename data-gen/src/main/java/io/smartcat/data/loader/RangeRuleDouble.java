@@ -86,9 +86,10 @@ public class RangeRuleDouble implements Rule<Double> {
         // 0 , 1
         int randomRangeIndex = 0;
         if (ranges.size() > 2) {
-            randomRangeIndex = random.nextInt(ranges.size() / 2 );
+            randomRangeIndex = random.nextInt(ranges.size() / 2);
         }
-        Double randomDouble = random.nextDouble(ranges.get(randomRangeIndex * 2), ranges.get((randomRangeIndex * 2) + 1));
+        Double randomDouble = random.nextDouble(ranges.get(randomRangeIndex * 2),
+                ranges.get((randomRangeIndex * 2) + 1));
 
         return randomDouble;
     }

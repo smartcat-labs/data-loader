@@ -88,9 +88,10 @@ public class RangeRuleDate implements Rule<Date> {
         // 0 , 1
         int randomRangeIndex = 0;
         if (ranges.size() > 2) {
-            randomRangeIndex = random.nextInt(ranges.size() / 2 );
+            randomRangeIndex = random.nextInt(ranges.size() / 2);
         }
-        Long randomValue = random.nextLong(ranges.get(randomRangeIndex * 2).getTime(), ranges.get((randomRangeIndex * 2) + 1).getTime());
+        Long randomValue = random.nextLong(ranges.get(randomRangeIndex * 2).getTime(),
+                ranges.get((randomRangeIndex * 2) + 1).getTime());
         Instant radnomInstant = Instant.ofEpochMilli(randomValue);
 
         return Date.from(radnomInstant);
