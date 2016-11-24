@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+
+import io.smartcat.data.loader.util.Randomizer;
 
 /**
  * Rule for creating random range values.
@@ -17,8 +18,15 @@ public class RangeRuleDate implements Rule<Date> {
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
     private List<Date> ranges = new ArrayList<>();
 
+    private Randomizer random;
+
     private RangeRuleDate() {
     };
+
+    public RangeRuleDate withRandom(Randomizer random) {
+        this.random = random;
+        return this;
+    }
 
     public static RangeRuleDate withRanges(Date... rangeMarkers) {
         RangeRuleDate result = new RangeRuleDate();
@@ -80,24 +88,12 @@ public class RangeRuleDate implements Rule<Date> {
         // 0 , 1
         int randomRangeIndex = 0;
         if (ranges.size() > 2) {
-            randomRangeIndex = ThreadLocalRandom.current().nextInt(0, ranges.size() / 2);
+            randomRangeIndex = random.nextInt(ranges.size() / 2 );
         }
-        System.out.println("size is: " + ranges.size());
-        System.out.println("randomRangeIdex is: " + randomRangeIndex);
+        Long randomValue = random.nextLong(ranges.get(randomRangeIndex * 2).getTime(), ranges.get((randomRangeIndex * 2) + 1).getTime());
+        Instant radnomInstant = Instant.ofEpochMilli(randomValue);
 
-        // randomRangeIndex == 0 => index1 = 0, index2 = 1;
-        // randomRangeIndex == 1 => index1 = 2, index2 = 3;
-        // randomRangeIndex == 2 => index1 = 4, index2 = 5;
-        // randomRangeIndex == 3 => index1 = 6, index2 = 7;
-
-        Long randomBirthDateTimestamp = ThreadLocalRandom.current().nextLong(ranges.get(randomRangeIndex * 2).getTime(),
-                ranges.get((randomRangeIndex * 2) + 1).getTime());
-        // if we used generic type <T> instead of Long there would be no way to get random of type T because we do not
-        // know what is the type T
-
-        Instant birtDateInstant = Instant.ofEpochMilli(randomBirthDateTimestamp);
-
-        return Date.from(birtDateInstant);
+        return Date.from(radnomInstant);
     }
 
 }

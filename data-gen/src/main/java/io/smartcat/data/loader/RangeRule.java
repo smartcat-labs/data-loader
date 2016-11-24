@@ -3,7 +3,8 @@ package io.smartcat.data.loader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+
+import io.smartcat.data.loader.util.Randomizer;
 
 /***
  * Rule for creating random range values.
@@ -15,8 +16,15 @@ public final class RangeRule implements Rule<Long> {
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
     private List<Long> ranges = new ArrayList<>();
 
+    private Randomizer random;
+
     private RangeRule() {
     };
+
+    public RangeRule withRandom(Randomizer random) {
+        this.random = random;
+        return this;
+    }
 
     public static RangeRule withRanges(Long... rangeMarkers) {
         RangeRule result = new RangeRule();
@@ -78,21 +86,12 @@ public final class RangeRule implements Rule<Long> {
         // 0 , 1
         int randomRangeIndex = 0;
         if (ranges.size() > 2) {
-            randomRangeIndex = ThreadLocalRandom.current().nextInt(0, ranges.size() / 2);
+            randomRangeIndex = random.nextInt(ranges.size() / 2 );
         }
-        System.out.println("size is: " + ranges.size());
-        System.out.println("randomRangeIdex is: " + randomRangeIndex);
 
-        // randomRangeIndex == 0 => index1 = 0, index2 = 1;
-        // randomRangeIndex == 1 => index1 = 2, index2 = 3;
-        // randomRangeIndex == 2 => index1 = 4, index2 = 5;
-        // randomRangeIndex == 3 => index1 = 6, index2 = 7;
-        Long randomBirthDate = ThreadLocalRandom.current().nextLong(ranges.get(randomRangeIndex * 2),
-                ranges.get((randomRangeIndex * 2) + 1));
-        // if we used generic type <T> instead of Long there would be no way to get random of type T because we do not
-        // know what is the type T
+        Long randomValue = random.nextLong(ranges.get(randomRangeIndex * 2), ranges.get((randomRangeIndex * 2) + 1));
 
-        return randomBirthDate;
+        return randomValue;
     }
 
 }

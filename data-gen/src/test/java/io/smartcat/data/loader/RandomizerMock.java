@@ -7,11 +7,33 @@ import io.smartcat.data.loader.util.Randomizer;
  */
 public class RandomizerMock implements Randomizer {
 
-    private int seed = 0;
+    private int seedInt = 0;
+    private long seedLong = 0;
+    private double seedDouble = 0;
 
     @Override
     public int nextInt(int bound) {
-        return seed++;
+        return seedInt++;
+    }
+
+    @Override
+    public long nextLong(long bound) {
+        return seedLong++;
+    }
+
+    @Override
+    public long nextLong(long lower, long upper) {
+        return seedLong++;
+    }
+
+    @Override
+    public double nextDouble(double lower, double upper) {
+        return seedDouble++;
+    }
+
+    @Override
+    public boolean nextBoolean() {
+        return true;
     }
 
 }

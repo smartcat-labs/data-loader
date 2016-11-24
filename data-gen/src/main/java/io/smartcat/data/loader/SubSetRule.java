@@ -5,7 +5,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
+
+import io.smartcat.data.loader.util.Randomizer;
 
 /**
  * Rule for creating a set of random values that is a subset of passed allowed values.
@@ -17,7 +18,14 @@ public class SubSetRule<T> implements Rule<Set<T>> {
     private boolean exclusive;
     private final Set<T> values = new HashSet<>();
 
+    private Randomizer random;
+
     private SubSetRule() {
+    }
+
+    public SubSetRule<T> withRandom(Randomizer random) {
+        this.random = random;
+        return this;
     }
 
     public static <T> SubSetRule<T> withValues(List<T> allowedValues) {
@@ -50,7 +58,7 @@ public class SubSetRule<T> implements Rule<Set<T>> {
     }
 
     private Set<T> getRandomSubset(Set<T> values) {
-        int randomSize = ThreadLocalRandom.current().nextInt(0, values.size() + 1);
+        int randomSize = random.nextInt(values.size() + 1);
 
         List<T> list = new ArrayList<>(values);
         Collections.shuffle(list);

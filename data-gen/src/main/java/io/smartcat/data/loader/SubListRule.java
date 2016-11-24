@@ -3,7 +3,8 @@ package io.smartcat.data.loader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+
+import io.smartcat.data.loader.util.Randomizer;
 
 /**
  * Rule for creating a list of random values that is a sublist of passed allowed values.
@@ -17,7 +18,14 @@ public class SubListRule<T> implements Rule<List<T>> {
     private boolean exclusive;
     private final List<T> values = new ArrayList<>();
 
+    private Randomizer random;
+
     private SubListRule() {
+    }
+
+    public SubListRule<T> withRandom(Randomizer random) {
+        this.random = random;
+        return this;
     }
 
     public static <T> SubListRule<T> withValues(List<T> allowedValues) {
@@ -52,7 +60,7 @@ public class SubListRule<T> implements Rule<List<T>> {
     private List<T> getRandomSubList(List<T> values) {
         List<T> result = new LinkedList<>();
         for (T t : values) {
-            boolean shouldAdd = ThreadLocalRandom.current().nextBoolean();
+            boolean shouldAdd = random.nextBoolean();
             if (shouldAdd) {
                 result.add(t);
             }
