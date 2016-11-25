@@ -1,9 +1,10 @@
-package io.smartcat.data.loader;
+package io.smartcat.data.loader.rules;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.smartcat.data.loader.RangeUtil;
 import io.smartcat.data.loader.util.Randomizer;
 
 /***

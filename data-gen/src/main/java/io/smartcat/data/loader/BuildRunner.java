@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import io.smartcat.data.loader.rules.Rule;
+
 import java.util.Set;
 
 /**

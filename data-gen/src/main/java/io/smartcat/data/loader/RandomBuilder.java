@@ -11,6 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.smartcat.data.loader.rules.DiscreteRule;
+import io.smartcat.data.loader.rules.RangeRuleDate;
+import io.smartcat.data.loader.rules.RangeRuleDouble;
+import io.smartcat.data.loader.rules.RangeRuleLong;
+import io.smartcat.data.loader.rules.Rule;
+import io.smartcat.data.loader.rules.SubListRule;
+import io.smartcat.data.loader.rules.SubSetRule;
 import io.smartcat.data.loader.util.Randomizer;
 import io.smartcat.data.loader.util.RandomizerImpl;
 

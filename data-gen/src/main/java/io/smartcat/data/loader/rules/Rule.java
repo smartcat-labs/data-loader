@@ -1,4 +1,4 @@
-package io.smartcat.data.loader;
+package io.smartcat.data.loader.rules;
 
 /**
  * Rule is used for generating random values of certain type.
