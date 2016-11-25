@@ -73,7 +73,7 @@ public class RangeRuleDate implements Rule<Date> {
         }
         List<Date> newRanges = RangeUtil.recalculateRanges(this.ranges, otherRule.getAllowedRanges());
 
-        return RangeRuleDate.withRanges(newRanges);
+        return RangeRuleDate.withRanges(newRanges).withRandom(random);
     }
 
     private List<Date> getAllowedRanges() {

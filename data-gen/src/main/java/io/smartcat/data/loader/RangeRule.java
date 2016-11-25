@@ -75,7 +75,7 @@ public final class RangeRule implements Rule<Long> {
         }
         List<Long> newRanges = RangeUtil.recalculateRanges(this.ranges, otherRule.getAllowedRanges());
 
-        return RangeRule.withRanges(newRanges);
+        return RangeRule.withRanges(newRanges).withRandom(random);
     }
 
     @Override

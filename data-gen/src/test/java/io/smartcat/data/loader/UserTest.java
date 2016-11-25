@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import io.smartcat.data.loader.model.Address;
 import io.smartcat.data.loader.model.User;
-import io.smartcat.data.loader.util.Randomizer;
 
 public class UserTest {
 
@@ -64,23 +63,6 @@ public class UserTest {
 
     }
 
-    @Test
-    public void should_set_usernames_randomly_from_the_provided_list() {
-
-        Randomizer randomizerMock = new RandomizerMock();
-        RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, randomizerMock);
-
-        List<User> builtUsers = randomUserBuilder
-                .randomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac")
-                .build(5);
-
-        Assert.assertEquals("destroyerOfW0rldz", builtUsers.get(0).getUsername());
-        Assert.assertEquals("univerzalBlack", builtUsers.get(1).getUsername());
-        Assert.assertEquals("johnycage", builtUsers.get(2).getUsername());
-        Assert.assertEquals("subzero", builtUsers.get(3).getUsername());
-        Assert.assertEquals("krelac", builtUsers.get(4).getUsername());
-
-    }
 
     // @Test
     // public void buildRunnerTest() {

@@ -75,7 +75,7 @@ public class RangeRuleDouble implements Rule<Double> {
         }
         List<Double> newRanges = RangeUtil.recalculateRanges(this.ranges, otherRule.getAllowedRanges());
 
-        return RangeRuleDouble.withRanges(newRanges);
+        return RangeRuleDouble.withRanges(newRanges).withRandom(random);
     }
 
     @Override

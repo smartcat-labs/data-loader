@@ -71,7 +71,7 @@ public class DiscreteRule implements Rule<String> {
 
         allowedValues.removeAll(otherRule.getAllowedValues());
 
-        return DiscreteRule.newSet(allowedValues);
+        return DiscreteRule.newSet(allowedValues).withRandom(random);
     }
 
     @Override
