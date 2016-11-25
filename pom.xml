@@ -138,7 +138,8 @@
 
     <distributionManagement>
         <repository>
-            <id>bintray</id>
+            <id>bintray-smartcat-labs-maven</id>
+            <name>smartcat-labs-maven</name>
             <url>https://api.bintray.com/maven/smartcat-labs/maven/data-loader/;publish=1</url>
         </repository>
     </distributionManagement>
