@@ -9,6 +9,6 @@ public final class Worker implements Runnable {
 
     @Override
     public void run() {
-        LOGGER.info("Worker executed");
+
     }
 }

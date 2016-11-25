@@ -39,7 +39,7 @@ public class ImpulseGenerator {
         timer = new Timer("impulse-generator-timer");
         timer.scheduleAtFixedRate(new Counter(), 0, 1000);
 
-        impulseExecutor = new ScheduledThreadPoolExecutor(5, (runnable) -> {
+        impulseExecutor = new ScheduledThreadPoolExecutor(1, (runnable) -> {
             Thread thread = new Thread(runnable);
             thread.setName("load-gen-impulse-thread-" + IMPULSE_THREAD_COUNT.getAndIncrement());
             thread.setDaemon(true);
@@ -47,7 +47,7 @@ public class ImpulseGenerator {
             return thread;
         });
 
-        workerExecutor = new ThreadPoolExecutor(5, 100, 0L, TimeUnit.MILLISECONDS,
+        workerExecutor = new ThreadPoolExecutor(5, 100, 200L, TimeUnit.MILLISECONDS,
             new LinkedBlockingDeque<>(), (runnable) -> {
             Thread thread = new Thread(runnable);
             thread.setName("load-gen-counter-thread-" + COUNTER_THREAD_COUNT.getAndIncrement());
