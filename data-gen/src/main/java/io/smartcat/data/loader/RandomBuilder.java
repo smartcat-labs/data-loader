@@ -59,12 +59,12 @@ public class RandomBuilder<T> {
     }
 
     public RandomBuilder<T> randomFromRange(String fieldName, Long lower, Long upper) {
-        fieldRules.put(fieldName, RangeRule.withRanges(lower, upper).withRandom(random));
+        fieldRules.put(fieldName, RangeRuleLong.withRanges(lower, upper).withRandom(random));
         return this;
     }
 
     public RandomBuilder<T> exclusiveRandomFromRange(String fieldName, Long lower, Long upper) {
-        fieldRules.put(fieldName, RangeRule.withRangesX(lower, upper).withRandom(random));
+        fieldRules.put(fieldName, RangeRuleLong.withRangesX(lower, upper).withRandom(random));
         return this;
     }
 
