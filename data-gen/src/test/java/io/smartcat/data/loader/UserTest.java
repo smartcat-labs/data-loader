@@ -60,9 +60,10 @@ public class UserTest {
         Assert.assertTrue("birthdate should be before May 2, 1975",
                 u.getBirthDate().compareTo(Date.from(mayTheSecond.toInstant(ZoneOffset.UTC))) < 0);
         Assert.assertEquals(u.getAddress().getCity(), "Isengard");
+        Assert.assertEquals(u.getAddress().getHouseNumber(), 5L);
+        Assert.assertEquals(u.getAddress().getStreet(), "White Wizzard Boulevard");
 
     }
-
 
     // @Test
     // public void buildRunnerTest() {
