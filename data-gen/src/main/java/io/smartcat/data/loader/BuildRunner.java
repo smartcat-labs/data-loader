@@ -72,8 +72,6 @@ public class BuildRunner<T> {
                     Rule<?> rule = existingFieldRules.get(fieldName);
 
                     if (rule != null && !rule.isExclusive()) {
-
-                        // does not compile because: recalculatePrecedance(Rule<T> exclusiveRule) is called with recalculatePrecedance(Rule<?> exclusiveRule)
                         Rule<?> recalculatedRule = rule.recalculatePrecedance(entryFieldExclusiveRule.getValue());
                         existingFieldRules.put(fieldName, recalculatedRule);
                     }

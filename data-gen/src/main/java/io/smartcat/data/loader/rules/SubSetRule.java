@@ -47,7 +47,7 @@ public class SubSetRule<T> implements Rule<Set<T>> {
     }
 
     @Override
-    public Rule<Set<T>> recalculatePrecedance(Rule<Set<T>> exclusiveRule) {
+    public Rule<Set<T>> recalculatePrecedance(Rule<?> exclusiveRule) {
         // TODO
         throw new UnsupportedOperationException();
     }

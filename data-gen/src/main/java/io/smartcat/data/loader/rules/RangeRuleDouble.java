@@ -62,7 +62,7 @@ public class RangeRuleDouble implements Rule<Double> {
     }
 
     @Override
-    public Rule<Double> recalculatePrecedance(Rule<Double> exclusiveRule) {
+    public Rule<Double> recalculatePrecedance(Rule<?> exclusiveRule) {
         if (!exclusiveRule.isExclusive()) {
             throw new IllegalArgumentException("no need to calculate rule precedance with non exclusive rule");
         }

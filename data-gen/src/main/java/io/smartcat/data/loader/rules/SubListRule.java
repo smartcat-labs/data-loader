@@ -47,7 +47,7 @@ public class SubListRule<T> implements Rule<List<T>> {
     }
 
     @Override
-    public Rule<List<T>> recalculatePrecedance(Rule<List<T>> exclusiveRule) {
+    public Rule<List<T>> recalculatePrecedance(Rule<?> exclusiveRule) {
         // TODO
         throw new UnsupportedOperationException();
     }

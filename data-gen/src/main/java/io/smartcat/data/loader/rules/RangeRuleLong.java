@@ -62,7 +62,7 @@ public final class RangeRuleLong implements Rule<Long> {
     }
 
     @Override
-    public Rule<Long> recalculatePrecedance(Rule<Long> exclusiveRule) {
+    public Rule<Long> recalculatePrecedance(Rule<?> exclusiveRule) {
         if (!exclusiveRule.isExclusive()) {
             throw new IllegalArgumentException("no need to calculate rule precedance with non exclusive rule");
         }

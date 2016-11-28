@@ -60,7 +60,7 @@ public class RangeRuleDate implements Rule<Date> {
     }
 
     @Override
-    public Rule<Date> recalculatePrecedance(Rule<Date> exclusiveRule) {
+    public Rule<Date> recalculatePrecedance(Rule<?> exclusiveRule) {
         if (!exclusiveRule.isExclusive()) {
             throw new IllegalArgumentException("no need to calculate rule precedance with non exclusive rule");
         }
