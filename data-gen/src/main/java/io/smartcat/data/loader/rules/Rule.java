@@ -9,7 +9,7 @@ public interface Rule<T> {
 
     boolean isExclusive();
 
-    Rule<?> recalculatePrecedance(Rule<?> exclusiveRule);
+    Rule<T> recalculatePrecedance(Rule<?> exclusiveRule);
 
     T getRandomAllowedValue();
 
