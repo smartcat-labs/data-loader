@@ -110,6 +110,12 @@ public class RandomBuilder<T> {
         return this;
     }
 
+    public RandomBuilder<T> randomSubListWithBuilder(String fieldName, RandomBuilder<?> builder, long lower,
+            long upper) {
+        // TODO as part of issue #37
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
     public RandomBuilder<T> toBeBuilt(int numberOfObjects) {
         this.numberOfObjects = numberOfObjects;
         return this;
