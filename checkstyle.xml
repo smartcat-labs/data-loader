@@ -23,6 +23,11 @@
 
     <module name="TreeWalker">
 
+        <module name="JavadocMethod">
+            <property name="scope" value="protected"/>
+            <property name="allowMissingPropertyJavadoc" value="true" />
+        </module>
+
         <module name="JavadocType"/>
         <module name="JavadocVariable">
             <property name="scope" value="protected"/>
@@ -79,6 +84,8 @@
         <module name="IllegalInstantiation"/>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
+
+        <module name="HideUtilityClassConstructor"/>
 
         <module name="ArrayTypeStyle"/>
         <module name="UpperEll"/>

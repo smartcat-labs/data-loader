@@ -19,6 +19,11 @@ public class BuildRunner<T> {
 
     private final Set<RandomBuilder<T>> builderSet = new HashSet<>();
 
+    /**
+     * Build all random builders in the list.
+     *
+     * @return List of built typed random builders
+     */
     public List<T> build() {
         recalculateRules();
         List<T> resultList = new ArrayList<>();
@@ -29,6 +34,11 @@ public class BuildRunner<T> {
         return resultList;
     }
 
+    /**
+     * Add builder to the list.
+     *
+     * @param builder Typed random builder
+     */
     public void addBuilder(RandomBuilder<T> builder) {
         builderSet.add(builder);
     }

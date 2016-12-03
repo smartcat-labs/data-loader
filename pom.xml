@@ -107,31 +107,6 @@
                         <encoding>${project.build.sourceEncoding}</encoding>
                     </configuration>
                 </plugin>
-
-                <!-- Check style on build. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${version.plugin.checkstyle}</version>
-                    <executions>
-                        <execution>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                            <configuration>
-                                <configLocation>checkstyle.xml</configLocation>
-                                <!-- Apply rules for test sources as well -->
-                                <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                                <consoleOutput>true</consoleOutput>
-                                <failsOnError>true</failsOnError>
-                                <!-- Define path to checkstyle properties -->
-                                <propertiesLocation>checkstyle.properties</propertiesLocation>
-                                <excludes>**/generated/**/*</excludes>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -152,6 +127,7 @@
             </activation>
             <build>
                 <plugins>
+                    <!-- Check style on build. -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-checkstyle-plugin</artifactId>
