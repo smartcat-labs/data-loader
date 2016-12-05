@@ -25,6 +25,7 @@ public class SubSetRule<T> implements Rule<Set<T>> {
 
     /**
      * Set Randomizer for the Rule.
+     * 
      * @param random Randomizer impl.
      * @return SubSetRule<T> with set Randomizer.
      */

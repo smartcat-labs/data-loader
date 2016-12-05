@@ -23,8 +23,7 @@ public class RangeRuleDateTest {
         LocalDateTime tenDaysAgo = now.minusDays(10);
         LocalDateTime threeDaysAgo = now.minusDays(3);
 
-        List<User> builtUsers = randomUserBuilder.randomFromRange("birthDate", tenDaysAgo, threeDaysAgo)
-                .build(1000);
+        List<User> builtUsers = randomUserBuilder.randomFromRange("birthDate", tenDaysAgo, threeDaysAgo).build(1000);
 
         Assert.assertEquals(1000, builtUsers.size());
 
@@ -48,19 +47,15 @@ public class RangeRuleDateTest {
         LocalDateTime threeDaysAgo = now.minusDays(3);
 
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, randomizer);
-        randomUserBuilder
-            .randomFromRange("birthDate", tenDaysAgo, threeDaysAgo)
-            .randomFrom("username", "alice")
-            .toBeBuilt(1000);
+        randomUserBuilder.randomFromRange("birthDate", tenDaysAgo, threeDaysAgo).randomFrom("username", "alice")
+                .toBeBuilt(1000);
 
         LocalDateTime sevenDaysAgo = now.minusDays(7);
         LocalDateTime fiveDaysAgo = now.minusDays(5);
 
         RandomBuilder<User> exclusiveBuilder = new RandomBuilder<User>(User.class, randomizer);
-        exclusiveBuilder
-            .exclusiveRandomFromRange("birthDate", sevenDaysAgo, fiveDaysAgo)
-            .randomFrom("username", "bob")
-            .toBeBuilt(500);
+        exclusiveBuilder.exclusiveRandomFromRange("birthDate", sevenDaysAgo, fiveDaysAgo).randomFrom("username", "bob")
+                .toBeBuilt(500);
 
         BuildRunner<User> buildRunner = new BuildRunner<>();
         buildRunner.addBuilder(randomUserBuilder);

@@ -24,6 +24,7 @@ public final class RangeRuleLong implements Rule<Long> {
 
     /**
      * Set Randomizer for the Rule.
+     * 
      * @param random Randomizer impl.
      * @return RangeRuleLong with set Randomizer.
      */
@@ -34,6 +35,7 @@ public final class RangeRuleLong implements Rule<Long> {
 
     /**
      * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+     * 
      * @param rangeMarkers array of longs that denote the ranges.
      * @return RangeRuleLong with set ranges.
      */
@@ -63,6 +65,7 @@ public final class RangeRuleLong implements Rule<Long> {
 
     /**
      * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+     * 
      * @param rangeMarkers list of longs that denote the ranges.
      * @return RangeRuleLong with set ranges.
      */

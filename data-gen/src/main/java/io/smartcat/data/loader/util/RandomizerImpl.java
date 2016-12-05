@@ -11,6 +11,7 @@ public class RandomizerImpl implements Randomizer {
 
     /**
      * Returns a random int value between 0 (inclusive) and the specified value (exclusive).
+     * 
      * @param bound
      * @return random int
      */
@@ -44,7 +45,5 @@ public class RandomizerImpl implements Randomizer {
     public boolean nextBoolean() {
         return random.nextBoolean();
     }
-
-
 
 }

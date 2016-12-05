@@ -12,9 +12,8 @@ public class SubSetRuleTest {
     @Test
     public void should_set_set_property() {
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class);
-        randomUserBuilder
-            .randomFrom("username", "Melkor")
-            .randomSubsetFrom("nicknames", "Belegurth", "Morgoth").toBeBuilt(1000);
+        randomUserBuilder.randomFrom("username", "Melkor").randomSubsetFrom("nicknames", "Belegurth", "Morgoth")
+                .toBeBuilt(1000);
 
         List<User> result = randomUserBuilder.buildAll();
 
@@ -26,22 +25,22 @@ public class SubSetRuleTest {
 
         for (User u : result) {
             Assert.assertEquals("Melkor", u.getUsername());
-           if (u.getNicknames().isEmpty()) {
-               atLeastOneEmptySet = true;
-           } else if (u.getNicknames().size() == 1) {
-               atLeastOneWithSetOfSizeOne = true;
+            if (u.getNicknames().isEmpty()) {
+                atLeastOneEmptySet = true;
+            } else if (u.getNicknames().size() == 1) {
+                atLeastOneWithSetOfSizeOne = true;
 
-               String nickname = u.getNicknames().stream().findFirst().get();
-               boolean nicknameIsBelegurth = nickname.equals("Belegurth");
-               boolean nicknameIsMorgoth = nickname.equals("Morgoth");
+                String nickname = u.getNicknames().stream().findFirst().get();
+                boolean nicknameIsBelegurth = nickname.equals("Belegurth");
+                boolean nicknameIsMorgoth = nickname.equals("Morgoth");
                 Assert.assertTrue("Melkor must have nickname either Belegurth or Morgoth, but was" + nickname,
                         nicknameIsBelegurth || nicknameIsMorgoth);
             } else {
-               atLeastOneWithSetOfSizeTwo = true;
-               Assert.assertEquals(u.getNicknames().size(), 2);
+                atLeastOneWithSetOfSizeTwo = true;
+                Assert.assertEquals(u.getNicknames().size(), 2);
                 Assert.assertTrue("both nicknames must be present in the set",
                         u.getNicknames().contains("Belegurth") && u.getNicknames().contains("Morgoth"));
-           }
+            }
         }
 
         Assert.assertTrue("should be at least one with empty list.", atLeastOneEmptySet);

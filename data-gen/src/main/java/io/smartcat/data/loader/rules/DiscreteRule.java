@@ -22,6 +22,7 @@ public class DiscreteRule implements Rule<String> {
 
     /**
      * Set list of allowed String values for the rule.
+     * 
      * @param allowedValues array of allowed values
      * @return DiscreteRule with allowed values.
      */
@@ -35,6 +36,7 @@ public class DiscreteRule implements Rule<String> {
 
     /**
      * Set Randomizer for the Rule.
+     * 
      * @param random Randomizer impl.
      * @return DiscreteRule with set Randomizer.
      */
@@ -45,6 +47,7 @@ public class DiscreteRule implements Rule<String> {
 
     /**
      * Set list of allowed String values for the rule.
+     * 
      * @param allowedValues list of allowed values
      * @return DiscreteRule with list of allowed values.
      */
@@ -57,8 +60,8 @@ public class DiscreteRule implements Rule<String> {
     }
 
     /**
-     * Set exclusive list of values for the rule, meaning that only builder that uses this
-     * instance of the rule can create value for the property with any of these values.
+     * Set exclusive list of values for the rule, meaning that only builder that uses this instance of the rule can
+     * create value for the property with any of these values.
      *
      * @param allowedValues array of Strings that denote the exclusive values.
      * @return exclusive exclusive DiscreteRule with allowed values.

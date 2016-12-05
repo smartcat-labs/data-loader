@@ -17,8 +17,7 @@ public class RangeRuleLongTest {
         Randomizer randomizerMock = new RandomizerImpl();
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, randomizerMock);
 
-        List<User> builtUsers = randomUserBuilder.randomFromRange("numberOfCards", 0L, 5L)
-                .build(1000);
+        List<User> builtUsers = randomUserBuilder.randomFromRange("numberOfCards", 0L, 5L).build(1000);
 
         Assert.assertEquals(1000, builtUsers.size());
 
@@ -34,16 +33,12 @@ public class RangeRuleLongTest {
         Randomizer randomizer = new RandomizerImpl();
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, randomizer);
 
-        randomUserBuilder
-                .randomFromRange("numberOfCards", 1L, 10L)
-                .randomFrom("firstname", "alice", "bob", "charlie")
+        randomUserBuilder.randomFromRange("numberOfCards", 1L, 10L).randomFrom("firstname", "alice", "bob", "charlie")
                 .toBeBuilt(1000);
 
         RandomBuilder<User> exclusiveBuilder = new RandomBuilder<User>(User.class, randomizer);
-        exclusiveBuilder
-            .exclusiveRandomFromRange("numberOfCards", 3L, 7L)
-            .randomFrom("firstname", "delta")
-            .toBeBuilt(500);
+        exclusiveBuilder.exclusiveRandomFromRange("numberOfCards", 3L, 7L).randomFrom("firstname", "delta")
+                .toBeBuilt(500);
 
         BuildRunner<User> runner = new BuildRunner<>();
 

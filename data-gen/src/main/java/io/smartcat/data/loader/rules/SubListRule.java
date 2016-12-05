@@ -7,9 +7,8 @@ import java.util.List;
 import io.smartcat.data.loader.util.Randomizer;
 
 /**
- * Rule for creating a list of random values that is a sublist of passed allowed values.
- * This class preserves the order of the elements, i.e. for a list (a,b,c,d,e), sublists are:
- * (a,b,c), (a,c,d), (b,d), but (b,a) is not sublist.
+ * Rule for creating a list of random values that is a sublist of passed allowed values. This class preserves the order
+ * of the elements, i.e. for a list (a,b,c,d,e), sublists are: (a,b,c), (a,c,d), (b,d), but (b,a) is not sublist.
  *
  * @param <T>
  */
@@ -25,6 +24,7 @@ public class SubListRule<T> implements Rule<List<T>> {
 
     /**
      * Set Randomizer for the Rule.
+     * 
      * @param random Randomizer impl.
      * @return SubListRule<T> with set Randomizer.
      */

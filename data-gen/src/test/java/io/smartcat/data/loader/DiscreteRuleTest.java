@@ -23,7 +23,7 @@ public class DiscreteRuleTest {
                 .randomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac")
                 .build(1000);
 
-        String[] usernames = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac"};
+        String[] usernames = { "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac" };
         List<String> allowedUsernames = new ArrayList<>(Arrays.asList(usernames));
         for (User u : builtUsers) {
             String message = "username can only be from allowed set, but was: " + u.getUsername();
@@ -39,14 +39,10 @@ public class DiscreteRuleTest {
 
         randomUserBuilder
                 .randomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac")
-                .randomFrom("firstname", "alice", "bob", "charlie")
-                .toBeBuilt(1000);
+                .randomFrom("firstname", "alice", "bob", "charlie").toBeBuilt(1000);
 
         RandomBuilder<User> exclusiveBuilder = new RandomBuilder<User>(User.class, randomizer);
-        exclusiveBuilder
-            .exclusiveRandomFrom("username", "krelac")
-            .randomFrom("firstname", "delta")
-            .toBeBuilt(500);
+        exclusiveBuilder.exclusiveRandomFrom("username", "krelac").randomFrom("firstname", "delta").toBeBuilt(500);
 
         BuildRunner<User> runner = new BuildRunner<>();
 
@@ -57,9 +53,9 @@ public class DiscreteRuleTest {
 
         for (User u : userList) {
             // because "krelac" is exclusive
-            String[] nonexclusiveUsernames = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero"};
+            String[] nonexclusiveUsernames = { "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero" };
             List<String> allowedUsernames = new ArrayList<>(Arrays.asList(nonexclusiveUsernames));
-            String[] firstnames = {"alice", "bob", "charlie"};
+            String[] firstnames = { "alice", "bob", "charlie" };
             List<String> allowedFirstnames = new ArrayList<>(Arrays.asList(firstnames));
 
             if (u.getUsername().equals("krelac")) {

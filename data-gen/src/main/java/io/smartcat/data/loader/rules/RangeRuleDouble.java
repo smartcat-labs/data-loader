@@ -24,6 +24,7 @@ public class RangeRuleDouble implements Rule<Double> {
 
     /**
      * Set Randomizer for the Rule.
+     * 
      * @param random Randomizer impl.
      * @return RangeRuleDouble with set Randomizer.
      */
@@ -34,6 +35,7 @@ public class RangeRuleDouble implements Rule<Double> {
 
     /**
      * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+     * 
      * @param rangeMarkers array of doubles that denote the ranges.
      * @return RangeRuleDouble with set ranges.
      */
@@ -63,6 +65,7 @@ public class RangeRuleDouble implements Rule<Double> {
 
     /**
      * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+     * 
      * @param rangeMarkers list of doubles that denote the ranges.
      * @return RangeRuleDouble with set ranges.
      */
