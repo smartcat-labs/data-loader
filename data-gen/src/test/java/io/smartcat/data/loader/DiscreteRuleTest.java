@@ -23,7 +23,7 @@ public class DiscreteRuleTest {
                 .randomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac")
                 .build(1000);
 
-        String[] usernames = { "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac" };
+        String[] usernames = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac" };
         List<String> allowedUsernames = new ArrayList<>(Arrays.asList(usernames));
         for (User u : builtUsers) {
             String message = "username can only be from allowed set, but was: " + u.getUsername();
@@ -53,9 +53,9 @@ public class DiscreteRuleTest {
 
         for (User u : userList) {
             // because "krelac" is exclusive
-            String[] nonexclusiveUsernames = { "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero" };
+            String[] nonexclusiveUsernames = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero" };
             List<String> allowedUsernames = new ArrayList<>(Arrays.asList(nonexclusiveUsernames));
-            String[] firstnames = { "alice", "bob", "charlie" };
+            String[] firstnames = {"alice", "bob", "charlie" };
             List<String> allowedFirstnames = new ArrayList<>(Arrays.asList(firstnames));
 
             if (u.getUsername().equals("krelac")) {

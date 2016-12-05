@@ -40,7 +40,7 @@ public class RandomBuilder<T> {
 
     /**
      * Creates RandomBuilder that is used with passed {@code objectType}.
-     * 
+     *
      * @param objectType type of the object to be built with this builder
      */
     public RandomBuilder(Class<T> objectType) {
@@ -49,7 +49,7 @@ public class RandomBuilder<T> {
 
     /**
      * Creates RandomBuilder that is used with passed {@code objectType} and randomizer.
-     * 
+     *
      * @param objectType type of the object to be built with this builder
      * @param random Randomizer impl.
      */
@@ -60,7 +60,7 @@ public class RandomBuilder<T> {
 
     /**
      * Sets the allowed ranges of dates for the field with {@code fieldName}.
-     * 
+     *
      * @param fieldName name of the field in the type <T>
      * @param startDate start of the range (inclusive)
      * @param endDate end of the range (exclusive)
@@ -95,7 +95,7 @@ public class RandomBuilder<T> {
 
     /**
      * Sets the allowed ranges of Longs for the field with {@code fieldName}.
-     * 
+     *
      * @param fieldName name of the field in the type <T>
      * @param lower start of the range (inclusive)
      * @param upper end of the range (exclusive)
@@ -122,7 +122,7 @@ public class RandomBuilder<T> {
 
     /**
      * Sets the allowed ranges of Doubles for the field with {@code fieldName}.
-     * 
+     *
      * @param fieldName name of the field in the type <T>
      * @param lower start of the range (inclusive)
      * @param upper end of the range (exclusive)
@@ -161,7 +161,7 @@ public class RandomBuilder<T> {
 
     /**
      * Sets the builder for the property for the field with {@code fieldName}.
-     * 
+     *
      * @param fieldName name of the field in the type <T>
      * @param builder instance of RandomBuilder<?> for the type of the field with passed {@code fieldName}
      * @return RandomBuilder<T>
@@ -228,7 +228,7 @@ public class RandomBuilder<T> {
 
     /**
      * Sets the number of entities of type {@code <T>} to be built.
-     * 
+     *
      * @param numberOfObjects number of objects to be built
      * @return RandomBuilder<T>
      */
@@ -239,7 +239,7 @@ public class RandomBuilder<T> {
 
     /**
      * Builds passed {@code numberOfObjects} of entities of type {@code <T>}.
-     * 
+     *
      * @param numberOfObjects number of entities to be built
      * @return List<T>
      */
@@ -276,7 +276,7 @@ public class RandomBuilder<T> {
 
     /**
      * Builds set {@code numberOfObjects} of entities of type {@code <T>}.
-     * 
+     *
      * @param numberOfEntitiesToBuild
      * @return List<T>
      */

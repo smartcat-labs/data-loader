@@ -14,7 +14,7 @@ public class RangeUtil {
 
     /**
      * Ranges [a,b) and [c,d) intersect if a<=c && dd <= b.
-     * 
+     *
      * @param <T> Type parameter
      * @param range1 range represented with List
      * @param range2 range represented with List
@@ -26,7 +26,7 @@ public class RangeUtil {
 
     /**
      * Recalculates the range when compared with exclusive range.
-     * 
+     *
      * @param <T> Type parameter
      * @param range represented with List
      * @param exclusiveRange represented with List

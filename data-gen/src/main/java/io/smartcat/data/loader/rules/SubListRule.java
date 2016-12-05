@@ -24,7 +24,7 @@ public class SubListRule<T> implements Rule<List<T>> {
 
     /**
      * Set Randomizer for the Rule.
-     * 
+     *
      * @param random Randomizer impl.
      * @return SubListRule<T> with set Randomizer.
      */

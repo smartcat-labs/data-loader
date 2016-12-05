@@ -22,7 +22,7 @@ public class DiscreteRule implements Rule<String> {
 
     /**
      * Set list of allowed String values for the rule.
-     * 
+     *
      * @param allowedValues array of allowed values
      * @return DiscreteRule with allowed values.
      */
@@ -36,7 +36,7 @@ public class DiscreteRule implements Rule<String> {
 
     /**
      * Set Randomizer for the Rule.
-     * 
+     *
      * @param random Randomizer impl.
      * @return DiscreteRule with set Randomizer.
      */
@@ -47,7 +47,7 @@ public class DiscreteRule implements Rule<String> {
 
     /**
      * Set list of allowed String values for the rule.
-     * 
+     *
      * @param allowedValues list of allowed values
      * @return DiscreteRule with list of allowed values.
      */

@@ -26,7 +26,7 @@ public class RangeRuleDate implements Rule<Date> {
 
     /**
      * Set Randomizer for the Rule.
-     * 
+     *
      * @param random Randomizer impl.
      * @return RangeRuleDate with set Randomizer.
      */
@@ -37,7 +37,7 @@ public class RangeRuleDate implements Rule<Date> {
 
     /**
      * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     * 
+     *
      * @param rangeMarkers array of Dates that denote the ranges.
      * @return RangeRuleDate with set ranges.
      */
@@ -67,7 +67,7 @@ public class RangeRuleDate implements Rule<Date> {
 
     /**
      * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     * 
+     *
      * @param rangeMarkers list of Dates that denote the ranges.
      * @return RangeRuleDate with set ranges.
      */

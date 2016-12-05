@@ -7,7 +7,7 @@ public interface Randomizer {
 
     /**
      * Next random int.
-     * 
+     *
      * @param bound the upper bound exclusive. Must be positive. Lower bound is zero.
      * @return random int from zero to bound.
      */
@@ -15,7 +15,7 @@ public interface Randomizer {
 
     /**
      * Next random long.
-     * 
+     *
      * @param bound upper bound exclusive. Lower bound is zero.
      * @return random long from zero (inclusive) to bound (exclusive);
      */
@@ -23,7 +23,7 @@ public interface Randomizer {
 
     /**
      * Next random long between {@code lower} (inclusive) and {@code upper} (exclusive).
-     * 
+     *
      * @param lower lower bound (inclusive).
      * @param upper upper bound (exclusive).
      * @return random long.
@@ -32,7 +32,7 @@ public interface Randomizer {
 
     /**
      * Next random double between {@code lower} (inclusive) and {@code upper} (exclusive).
-     * 
+     *
      * @param lower lower bound (inclusive).
      * @param upper upper bound (exclusive).
      * @return random double;
@@ -41,7 +41,7 @@ public interface Randomizer {
 
     /**
      * Random boolean.
-     * 
+     *
      * @return random boolean.
      */
     boolean nextBoolean();
