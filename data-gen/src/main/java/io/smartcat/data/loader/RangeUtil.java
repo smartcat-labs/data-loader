@@ -9,10 +9,14 @@ import java.util.List;
  */
 public class RangeUtil {
 
+    private RangeUtil() {
+    }
+
     /**
      * Ranges [a,b) and [c,d) intersect if a<=c && dd <= b.
-     * @param range1
-     * @param range2
+     * @param <T> Type parameter
+     * @param range1 range represented with List
+     * @param range2 range represented with List
      * @return true if ranges intersect, otherwise false
      */
     public static <T extends Comparable<T>> boolean rangesIntersects(List<T> range1, List<T> range2) {
@@ -21,16 +25,17 @@ public class RangeUtil {
 
     /**
      * Recalculates the range when compared with exclusive range.
-     * @param range
-     * @param exclusiveRanges
+     * @param <T> Type parameter
+     * @param range represented with List
+     * @param exclusiveRange represented with List
      * @return new range
      */
-    public static <T extends Comparable<T>> List<T> recalculateRanges(List<T> range, List<T> exclusiveRanges) {
+    public static <T extends Comparable<T>> List<T> recalculateRanges(List<T> range, List<T> exclusiveRange) {
 
         T x1 = range.get(0);
         T x2 = range.get(1);
-        T y1 = exclusiveRanges.get(0);
-        T y2 = exclusiveRanges.get(1);
+        T y1 = exclusiveRange.get(0);
+        T y2 = exclusiveRange.get(1);
 
         if (y1.compareTo(x1) < 1 && x2.compareTo(y2) < 1) { // 1.
             // ----x1----------x2----

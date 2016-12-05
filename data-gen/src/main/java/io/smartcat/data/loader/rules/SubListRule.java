@@ -23,17 +23,37 @@ public class SubListRule<T> implements Rule<List<T>> {
     private SubListRule() {
     }
 
+    /**
+     * Set Randomizer for the Rule.
+     * @param random Randomizer impl.
+     * @return SubListRule<T> with set Randomizer.
+     */
     public SubListRule<T> withRandom(Randomizer random) {
         this.random = random;
         return this;
     }
 
+    /**
+     * Set list of allowed values for the sublist rule from which the sub list of allowed values will be created.
+     *
+     * @param <T> type param
+     * @param allowedValues list
+     * @return SubListRule<T>
+     */
     public static <T> SubListRule<T> withValues(List<T> allowedValues) {
         SubListRule<T> subListRule = new SubListRule<>();
         subListRule.values.addAll(allowedValues);
         return subListRule;
     }
 
+    /**
+     * Set exclusive list of allowed values for the sublist rule from which the sub list of allowed values will be
+     * created.
+     *
+     * @param <T> type param
+     * @param allowedValues list of allowed values
+     * @return exclusive SubListRule
+     */
     public static <T> SubListRule<T> withValuesX(List<T> allowedValues) {
         SubListRule<T> subListRule = new SubListRule<>();
         subListRule.values.addAll(allowedValues);

@@ -22,11 +22,21 @@ public class RangeRuleDouble implements Rule<Double> {
     private RangeRuleDouble() {
     };
 
+    /**
+     * Set Randomizer for the Rule.
+     * @param random Randomizer impl.
+     * @return RangeRuleDouble with set Randomizer.
+     */
     public RangeRuleDouble withRandom(Randomizer random) {
         this.random = random;
         return this;
     }
 
+    /**
+     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+     * @param rangeMarkers array of doubles that denote the ranges.
+     * @return RangeRuleDouble with set ranges.
+     */
     public static RangeRuleDouble withRanges(Double... rangeMarkers) {
         RangeRuleDouble result = new RangeRuleDouble();
 
@@ -35,6 +45,13 @@ public class RangeRuleDouble implements Rule<Double> {
         return result;
     }
 
+    /**
+     * Set exclusive range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule, meaning that only builder that uses this
+     * instance of the rule can create value for the property in these ranges.
+     *
+     * @param rangeMarkers array of longs that denote the exclusive ranges.
+     * @return exclusive RangeRuleLong with set ranges.
+     */
     public static RangeRuleDouble withRangesX(Double... rangeMarkers) {
         RangeRuleDouble result = new RangeRuleDouble();
 
@@ -44,6 +61,11 @@ public class RangeRuleDouble implements Rule<Double> {
         return result;
     }
 
+    /**
+     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+     * @param rangeMarkers list of doubles that denote the ranges.
+     * @return RangeRuleDouble with set ranges.
+     */
     public static RangeRuleDouble withRanges(List<Double> rangeMarkers) {
         RangeRuleDouble result = new RangeRuleDouble();
 

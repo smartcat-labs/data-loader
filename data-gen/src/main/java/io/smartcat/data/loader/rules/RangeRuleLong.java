@@ -22,11 +22,21 @@ public final class RangeRuleLong implements Rule<Long> {
     private RangeRuleLong() {
     };
 
+    /**
+     * Set Randomizer for the Rule.
+     * @param random Randomizer impl.
+     * @return RangeRuleLong with set Randomizer.
+     */
     public RangeRuleLong withRandom(Randomizer random) {
         this.random = random;
         return this;
     }
 
+    /**
+     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+     * @param rangeMarkers array of longs that denote the ranges.
+     * @return RangeRuleLong with set ranges.
+     */
     public static RangeRuleLong withRanges(Long... rangeMarkers) {
         RangeRuleLong result = new RangeRuleLong();
 
@@ -35,6 +45,13 @@ public final class RangeRuleLong implements Rule<Long> {
         return result;
     }
 
+    /**
+     * Set exclusive range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule, meaning that only builder that uses this
+     * instance of the rule can create value for the property in these ranges.
+     *
+     * @param rangeMarkers array of longs that denote the exclusive ranges.
+     * @return exclusive RangeRuleLong with set ranges.
+     */
     public static RangeRuleLong withRangesX(Long... rangeMarkers) {
         RangeRuleLong result = new RangeRuleLong();
 
@@ -44,6 +61,11 @@ public final class RangeRuleLong implements Rule<Long> {
         return result;
     }
 
+    /**
+     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+     * @param rangeMarkers list of longs that denote the ranges.
+     * @return RangeRuleLong with set ranges.
+     */
     public static RangeRuleLong withRanges(List<Long> rangeMarkers) {
         RangeRuleLong result = new RangeRuleLong();
 

@@ -20,6 +20,11 @@ public class DiscreteRule implements Rule<String> {
     private DiscreteRule() {
     };
 
+    /**
+     * Set list of allowed String values for the rule.
+     * @param allowedValues array of allowed values
+     * @return DiscreteRule with allowed values.
+     */
     public static DiscreteRule newSet(String... allowedValues) {
         DiscreteRule result = new DiscreteRule();
 
@@ -28,11 +33,21 @@ public class DiscreteRule implements Rule<String> {
         return result;
     }
 
+    /**
+     * Set Randomizer for the Rule.
+     * @param random Randomizer impl.
+     * @return DiscreteRule with set Randomizer.
+     */
     public DiscreteRule withRandom(Randomizer random) {
         this.random = random;
         return this;
     }
 
+    /**
+     * Set list of allowed String values for the rule.
+     * @param allowedValues list of allowed values
+     * @return DiscreteRule with list of allowed values.
+     */
     public static DiscreteRule newSet(List<String> allowedValues) {
         DiscreteRule result = new DiscreteRule();
 
@@ -41,6 +56,13 @@ public class DiscreteRule implements Rule<String> {
         return result;
     }
 
+    /**
+     * Set exclusive list of values for the rule, meaning that only builder that uses this
+     * instance of the rule can create value for the property with any of these values.
+     *
+     * @param allowedValues array of Strings that denote the exclusive values.
+     * @return exclusive exclusive DiscreteRule with allowed values.
+     */
     public static DiscreteRule newSetExclusive(String... allowedValues) {
         DiscreteRule result = new DiscreteRule();
 

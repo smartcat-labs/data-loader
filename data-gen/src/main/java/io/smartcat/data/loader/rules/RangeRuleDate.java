@@ -24,11 +24,21 @@ public class RangeRuleDate implements Rule<Date> {
     private RangeRuleDate() {
     };
 
+    /**
+     * Set Randomizer for the Rule.
+     * @param random Randomizer impl.
+     * @return RangeRuleDate with set Randomizer.
+     */
     public RangeRuleDate withRandom(Randomizer random) {
         this.random = random;
         return this;
     }
 
+    /**
+     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+     * @param rangeMarkers array of Dates that denote the ranges.
+     * @return RangeRuleDate with set ranges.
+     */
     public static RangeRuleDate withRanges(Date... rangeMarkers) {
         RangeRuleDate result = new RangeRuleDate();
 
@@ -37,6 +47,13 @@ public class RangeRuleDate implements Rule<Date> {
         return result;
     }
 
+    /**
+     * Set exclusive range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule, meaning that only builder that uses this
+     * instance of the rule can create value for the property in these ranges.
+     *
+     * @param rangeMarkers array of dates that denote the exclusive ranges.
+     * @return exclusive RangeRuleDate with set ranges.
+     */
     public static RangeRuleDate withRangesX(Date... rangeMarkers) {
         RangeRuleDate result = new RangeRuleDate();
 
@@ -46,6 +63,11 @@ public class RangeRuleDate implements Rule<Date> {
         return result;
     }
 
+    /**
+     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+     * @param rangeMarkers list of Dates that denote the ranges.
+     * @return RangeRuleDate with set ranges.
+     */
     public static RangeRuleDate withRanges(List<Date> rangeMarkers) {
         RangeRuleDate result = new RangeRuleDate();
 
