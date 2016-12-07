@@ -202,7 +202,7 @@ public class RandomBuilder<T> {
      * should be chosen (including empty set).
      *
      * @param fieldName name of the field in the type <T>
-     * @param values list of allowed values
+     * @param values allowed values
      * @return RandomBuilder<T>
      */
     public RandomBuilder<T> exclusiveRandomSubsetFrom(String fieldName, String... values) {
@@ -215,11 +215,24 @@ public class RandomBuilder<T> {
      * be chosen (including empty list).
      *
      * @param fieldName name of the field in the type <T>
-     * @param values list of allowed values
+     * @param values allowed values
      * @return RandomBuilder<T>
      */
     public RandomBuilder<T> randomSubListFrom(String fieldName, String... values) {
         fieldRules.put(fieldName, SubListRule.withValues(Arrays.asList(values)).withRandom(random));
+        return this;
+    }
+
+    /**
+     * Sets the exclusive allowed list of String values for the field with {@code fieldName} from which a random sub
+     * list should be chosen (including empty list).
+     *
+     * @param fieldName name of the field in the type <T>
+     * @param values allowed values
+     * @return RandomBuilder<T>
+     */
+    public RandomBuilder<T> exclusiveRandomSubListFrom(String fieldName, String... values) {
+        fieldRules.put(fieldName, SubListRule.withValuesX(Arrays.asList(values)).withRandom(random));
         return this;
     }
 

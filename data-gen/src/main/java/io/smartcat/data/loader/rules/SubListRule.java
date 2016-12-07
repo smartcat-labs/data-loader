@@ -68,8 +68,22 @@ public class SubListRule<T> implements Rule<List<T>> {
 
     @Override
     public Rule<List<T>> recalculatePrecedance(Rule<?> exclusiveRule) {
-        // TODO
-        throw new UnsupportedOperationException();
+        if (!exclusiveRule.isExclusive()) {
+            throw new IllegalArgumentException("no need to calculate rule precedance with non exclusive rule");
+        }
+        if (!(exclusiveRule instanceof SubListRule)) {
+            throw new IllegalArgumentException("cannot compare discrete and range rules");
+        }
+
+        @SuppressWarnings("unchecked") // no way to ensure type safety
+        SubListRule<T> otherRule = (SubListRule<T>) exclusiveRule;
+
+        List<T> newList = new ArrayList<>();
+        newList.addAll(values);
+
+        newList.removeAll(otherRule.values);
+
+        return SubListRule.withValues(newList).withRandom(random);
     }
 
     @Override
