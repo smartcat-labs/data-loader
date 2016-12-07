@@ -107,8 +107,8 @@ public class RandomBuilder<T> {
     }
 
     /**
-     * Sets the allowed ranges of Longs for the field with {@code fieldName}. That means that only this instance of the
-     * builder is allowed to set property with passed name {@code fieldName} from these ranges.
+     * Sets the exclusive allowed ranges of Longs for the field with {@code fieldName}. That means that only this
+     * instance of the builder is allowed to set property with passed name {@code fieldName} from these ranges.
      *
      * @param fieldName name of the field in the type <T>
      * @param lower start of the range (inclusive)
@@ -134,8 +134,8 @@ public class RandomBuilder<T> {
     }
 
     /**
-     * Sets the allowed ranges of Doubles for the field with {@code fieldName}. That means that only this instance of
-     * the builder is allowed to set property with passed name {@code fieldName} from these ranges.
+     * Sets the exclusive allowed ranges of Doubles for the field with {@code fieldName}. That means that only this
+     * instance of the builder is allowed to set property with passed name {@code fieldName} from these ranges.
      *
      * @param fieldName name of the field in the type <T>
      * @param lower start of the range (inclusive)
@@ -172,8 +172,8 @@ public class RandomBuilder<T> {
     }
 
     /**
-     * Sets the allowed list of String values for the field with {@code fieldName}. That means that only this instance
-     * of the builder is allowed to set property with passed name {@code fieldName} with these values.
+     * Sets the exclusive allowed list of String values for the field with {@code fieldName}. That means that only this
+     * instance of the builder is allowed to set property with passed name {@code fieldName} with these values.
      *
      * @param fieldName name of the field in the type <T>
      * @param values list of allowed values
@@ -194,6 +194,19 @@ public class RandomBuilder<T> {
      */
     public RandomBuilder<T> randomSubsetFrom(String fieldName, String... values) {
         fieldRules.put(fieldName, SubSetRule.withValues(Arrays.asList(values)).withRandom(random));
+        return this;
+    }
+
+    /**
+     * Sets the exclusive allowed list of String values for the field with {@code fieldName} from which a random sub set
+     * should be chosen (including empty set).
+     *
+     * @param fieldName name of the field in the type <T>
+     * @param values list of allowed values
+     * @return RandomBuilder<T>
+     */
+    public RandomBuilder<T> exclusiveRandomSubsetFrom(String fieldName, String... values) {
+        fieldRules.put(fieldName, SubSetRule.withValuesX(Arrays.asList(values)).withRandom(random));
         return this;
     }
 

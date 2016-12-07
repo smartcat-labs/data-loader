@@ -1,6 +1,7 @@
 package io.smartcat.data.loader.rules;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -35,27 +36,27 @@ public class SubSetRule<T> implements Rule<Set<T>> {
     }
 
     /**
-     * Set list of allowed values for the subset rule from which the sub set of allowed values will be created.
+     * Set set of allowed values for the subset rule from which the sub set of allowed values will be created.
      *
      * @param <T> type param
-     * @param allowedValues list
+     * @param allowedValues collection (duplicate values will be removed)
      * @return SubSetRule<T>
      */
-    public static <T> SubSetRule<T> withValues(List<T> allowedValues) {
+    public static <T> SubSetRule<T> withValues(Collection<T> allowedValues) {
         SubSetRule<T> subSetRule = new SubSetRule<>();
         subSetRule.values.addAll(allowedValues);
         return subSetRule;
     }
 
     /**
-     * Set exclusive list of allowed values for the sub set rule from which the sub set of allowed values will be
+     * Set exclusive set of allowed values for the sub set rule from which the sub set of allowed values will be
      * created.
      *
      * @param <T> type param
-     * @param allowedValues list of allowed values
+     * @param allowedValues collection (duplicate values will be removed)
      * @return exclusive SubSetRule
      */
-    public static <T> SubSetRule<T> withValuesX(List<T> allowedValues) {
+    public static <T> SubSetRule<T> withValuesX(Collection<T> allowedValues) {
         SubSetRule<T> subSetRule = new SubSetRule<>();
         subSetRule.values.addAll(allowedValues);
         subSetRule.exclusive = true;
@@ -69,8 +70,23 @@ public class SubSetRule<T> implements Rule<Set<T>> {
 
     @Override
     public Rule<Set<T>> recalculatePrecedance(Rule<?> exclusiveRule) {
-        // TODO
-        throw new UnsupportedOperationException();
+        if (!exclusiveRule.isExclusive()) {
+            throw new IllegalArgumentException("no need to calculate rule precedance with non exclusive rule");
+        }
+        if (!(exclusiveRule instanceof SubSetRule)) {
+            throw new IllegalArgumentException("cannot compare discrete and range rules");
+        }
+
+        @SuppressWarnings("unchecked") // no way to ensure type safety
+        SubSetRule<T> otherRule = (SubSetRule<T>) exclusiveRule;
+
+        Set<T> newSet = new HashSet<>();
+        newSet.addAll(values);
+
+        newSet.removeAll(otherRule.values);
+
+        return SubSetRule.withValues(newSet).withRandom(random);
+
     }
 
     @Override
