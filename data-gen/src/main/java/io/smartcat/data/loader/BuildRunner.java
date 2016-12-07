@@ -82,7 +82,7 @@ public class BuildRunner<T> {
                     Rule<?> rule = existingFieldRules.get(fieldName);
 
                     if (rule != null && !rule.isExclusive()) {
-                        Rule<?> recalculatedRule = rule.recalculatePrecedance(entryFieldExclusiveRule.getValue());
+                        Rule<?> recalculatedRule = rule.recalculatePrecedence(entryFieldExclusiveRule.getValue());
                         existingFieldRules.put(fieldName, recalculatedRule);
                     }
 

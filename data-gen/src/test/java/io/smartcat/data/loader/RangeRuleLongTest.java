@@ -29,7 +29,7 @@ public class RangeRuleLongTest {
     }
 
     @Test
-    public void should_correctly_calculate_precedance_in_range_long_rules() {
+    public void should_correctly_calculate_precedence_in_range_long_rules() {
         Randomizer randomizer = new RandomizerImpl();
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, randomizer);
 

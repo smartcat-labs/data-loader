@@ -69,9 +69,9 @@ public class SubSetRule<T> implements Rule<Set<T>> {
     }
 
     @Override
-    public Rule<Set<T>> recalculatePrecedance(Rule<?> exclusiveRule) {
+    public Rule<Set<T>> recalculatePrecedence(Rule<?> exclusiveRule) {
         if (!exclusiveRule.isExclusive()) {
-            throw new IllegalArgumentException("no need to calculate rule precedance with non exclusive rule");
+            throw new IllegalArgumentException("no need to calculate rule precedence with non exclusive rule");
         }
         if (!(exclusiveRule instanceof SubSetRule)) {
             throw new IllegalArgumentException("cannot compare discrete and range rules");

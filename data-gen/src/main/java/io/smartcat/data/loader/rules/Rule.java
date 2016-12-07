@@ -26,7 +26,7 @@ public interface Rule<T> {
      * @param exclusiveRule exclusive rule
      * @return Resulting rule
      */
-    Rule<T> recalculatePrecedance(Rule<?> exclusiveRule);
+    Rule<T> recalculatePrecedence(Rule<?> exclusiveRule);
 
     /**
      * Get random allowed value.

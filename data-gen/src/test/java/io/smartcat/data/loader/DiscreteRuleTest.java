@@ -33,7 +33,7 @@ public class DiscreteRuleTest {
     }
 
     @Test
-    public void should_correctly_calculate_precedance_in_discrete_rules() {
+    public void should_correctly_calculate_precedence_in_discrete_rules() {
         Randomizer randomizer = new RandomizerImpl();
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, randomizer);
 

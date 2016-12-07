@@ -38,7 +38,7 @@ public class RangeRuleDateTest {
     }
 
     @Test
-    public void should_correctly_calculate_precedance() {
+    public void should_correctly_calculate_precedence() {
         Randomizer randomizer = new RandomizerImpl();
 
         LocalDateTime now = LocalDateTime.now();

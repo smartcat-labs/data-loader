@@ -85,9 +85,9 @@ public class DiscreteRule implements Rule<String> {
     }
 
     @Override
-    public Rule<String> recalculatePrecedance(Rule<?> exclusiveRule) {
+    public Rule<String> recalculatePrecedence(Rule<?> exclusiveRule) {
         if (!exclusiveRule.isExclusive()) {
-            throw new IllegalArgumentException("no need to calculate rule precedance with non exclusive rule");
+            throw new IllegalArgumentException("no need to calculate rule precedence with non exclusive rule");
         }
         if (!(exclusiveRule instanceof DiscreteRule)) {
             throw new IllegalArgumentException("cannot compare discrete and range rules");
