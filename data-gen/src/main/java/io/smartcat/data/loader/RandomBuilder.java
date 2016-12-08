@@ -65,8 +65,11 @@ public class RandomBuilder<T> {
      * @param startDate start of the range (inclusive)
      * @param endDate end of the range (exclusive)
      * @return RandomBuilder<T>
+     *
+     * @throws IllegalArgumentException if {@code startDate} is greater than <i>or equal to</i> {@code endDate}
      */
     public RandomBuilder<T> randomFromRange(String fieldName, LocalDateTime startDate, LocalDateTime endDate) {
+        checkRangeInput(startDate, endDate);
         Instant lower = startDate.toInstant(ZoneOffset.UTC);
         Instant upper = endDate.toInstant(ZoneOffset.UTC);
 
@@ -83,8 +86,11 @@ public class RandomBuilder<T> {
      * @param startDate start of the range (inclusive)
      * @param endDate end of the range (exclusive)
      * @return RandomBuilder<T>
+     *
+     * @throws IllegalArgumentException if {@code startDate} is greater than <i>or equal to</i> {@code endDate}
      */
     public RandomBuilder<T> exclusiveRandomFromRange(String fieldName, LocalDateTime startDate, LocalDateTime endDate) {
+        checkRangeInput(startDate, endDate);
         Instant lower = startDate.toInstant(ZoneOffset.UTC);
         Instant upper = endDate.toInstant(ZoneOffset.UTC);
 
@@ -100,8 +106,11 @@ public class RandomBuilder<T> {
      * @param lower start of the range (inclusive)
      * @param upper end of the range (exclusive)
      * @return RandomBuilder<T>
+     *
+     * @throws IllegalArgumentException if {@code lower} is greater than <i>or equal to</i> {@code upper}
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Long lower, Long upper) {
+        checkRangeInput(lower, upper);
         fieldRules.put(fieldName, RangeRuleLong.withRanges(lower, upper).withRandom(random));
         return this;
     }
@@ -114,8 +123,11 @@ public class RandomBuilder<T> {
      * @param lower start of the range (inclusive)
      * @param upper end of the range (exclusive)
      * @return RandomBuilder<T>
+     *
+     * @throws IllegalArgumentException if {@code lower} is greater than <i>or equal to</i> {@code upper}
      */
     public RandomBuilder<T> exclusiveRandomFromRange(String fieldName, Long lower, Long upper) {
+        checkRangeInput(lower, upper);
         fieldRules.put(fieldName, RangeRuleLong.withRangesX(lower, upper).withRandom(random));
         return this;
     }
@@ -127,8 +139,11 @@ public class RandomBuilder<T> {
      * @param lower start of the range (inclusive)
      * @param upper end of the range (exclusive)
      * @return RandomBuilder<T>
+     *
+     * @throws IllegalArgumentException if {@code lower} is greater than <i>or equal to</i> {@code upper}
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Double lower, Double upper) {
+        checkRangeInput(lower, upper);
         fieldRules.put(fieldName, RangeRuleDouble.withRanges(lower, upper).withRandom(random));
         return this;
     }
@@ -141,8 +156,11 @@ public class RandomBuilder<T> {
      * @param lower start of the range (inclusive)
      * @param upper end of the range (exclusive)
      * @return RandomBuilder<T>
+     *
+     * @throws IllegalArgumentException if {@code lower} is greater than <i>or equal to</i> {@code upper}
      */
     public RandomBuilder<T> exclusiveRandomFromRange(String fieldName, Double lower, Double upper) {
+        checkRangeInput(lower, upper);
         fieldRules.put(fieldName, RangeRuleDouble.withRangesX(lower, upper).withRandom(random));
         return this;
     }
@@ -345,7 +363,13 @@ public class RandomBuilder<T> {
                 throw new IllegalStateException(e);
             }
         }
-        return false;
+        throw new IllegalArgumentException("Unexisting field: " + fieldName);
+    }
+
+    private static <C extends Comparable<C>> void checkRangeInput(C lower, C upper) {
+        if (lower.compareTo(upper) >= 0) {
+            throw new IllegalArgumentException("Invalid range bounds");
+        }
     }
 
 }

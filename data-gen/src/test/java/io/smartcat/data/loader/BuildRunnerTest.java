@@ -17,17 +17,13 @@ public class BuildRunnerTest {
         Randomizer randomizer = new RandomizerImpl();
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, randomizer);
 
-        String[] usernameArray = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero" };
+        String[] usernameArray = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero"};
         String[] firstNameArray = {"alice", "bob", "charlie"};
 
-        randomUserBuilder
-                .randomFrom("username", usernameArray)
-                .randomFrom("firstname", firstNameArray).toBeBuilt(100);
+        randomUserBuilder.randomFrom("username", usernameArray).randomFrom("firstname", firstNameArray).toBeBuilt(100);
 
         RandomBuilder<User> userBuilderUsernameOnly = new RandomBuilder<User>(User.class, randomizer);
-        userBuilderUsernameOnly
-                .randomFrom("username", usernameArray)
-                .toBeBuilt(10);
+        userBuilderUsernameOnly.randomFrom("username", usernameArray).toBeBuilt(10);
 
         BuildRunner<User> runner = new BuildRunner<>();
 
@@ -60,19 +56,15 @@ public class BuildRunnerTest {
         Randomizer randomizer = new RandomizerImpl();
         RandomBuilder<User> builderUsernameAndFirstName = new RandomBuilder<User>(User.class, randomizer);
 
-        String[] usernameArray = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero" };
+        String[] usernameArray = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero"};
         String[] firstNameArray = {"alice", "bob", "charlie"};
         String[] lastNameArray = {"delta", "eta", "feta"};
 
-        builderUsernameAndFirstName
-                .randomFrom("username", usernameArray)
-                .randomFrom("firstname", firstNameArray)
+        builderUsernameAndFirstName.randomFrom("username", usernameArray).randomFrom("firstname", firstNameArray)
                 .toBeBuilt(5);
 
         RandomBuilder<User> builderUsernameLastName = new RandomBuilder<User>(User.class, randomizer);
-        builderUsernameLastName
-                .randomFrom("username", usernameArray)
-                .randomFrom("lastname", lastNameArray)
+        builderUsernameLastName.randomFrom("username", usernameArray).randomFrom("lastname", lastNameArray)
                 .toBeBuilt(3);
 
         BuildRunner<User> runner = new BuildRunner<>();
@@ -108,18 +100,14 @@ public class BuildRunnerTest {
         Randomizer randomizer = new RandomizerImpl();
         RandomBuilder<User> builderUsernameBalance = new RandomBuilder<User>(User.class, randomizer);
 
-        String[] usernameArray = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero" };
+        String[] usernameArray = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero"};
         String[] firstNameArray = {"alice", "bob", "charlie"};
 
-        builderUsernameBalance
-                .randomFrom("username", usernameArray)
-                .randomFromRange("accountBalance", -5.2, 3.14)
+        builderUsernameBalance.randomFrom("username", usernameArray).randomFromRange("accountBalance", -5.2, 3.14)
                 .toBeBuilt(5);
 
         RandomBuilder<User> builderFirstNameNumberOfCards = new RandomBuilder<User>(User.class, randomizer);
-        builderFirstNameNumberOfCards
-                .randomFrom("firstname", firstNameArray)
-                .randomFromRange("numberOfCards", 1L, 10L)
+        builderFirstNameNumberOfCards.randomFrom("firstname", firstNameArray).randomFromRange("numberOfCards", 1L, 10L)
                 .toBeBuilt(3);
 
         BuildRunner<User> runner = new BuildRunner<>();
@@ -150,6 +138,25 @@ public class BuildRunnerTest {
         }
         Assert.assertEquals(5, numberOfUsersWithUsernameAndAccountBalance);
         Assert.assertEquals(3, numberOfUsersWithFirstNameAndNumberOfCards);
+    }
+
+    @Test
+    public void should_throw_exception_for_unexisting_field() {
+        RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class);
+        randomUserBuilder.randomFrom("unexistingField", "something").toBeBuilt(100);
+
+        BuildRunner<User> runner = new BuildRunner<>();
+
+        runner.addBuilder(randomUserBuilder);
+
+        try {
+            runner.build();
+            Assert.fail("should fail silently when trying to set unexiting field.");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e != null);
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception");
+        }
     }
 
 }
