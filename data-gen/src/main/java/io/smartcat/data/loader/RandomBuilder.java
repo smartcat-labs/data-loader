@@ -18,6 +18,7 @@ import io.smartcat.data.loader.rules.RangeRuleLong;
 import io.smartcat.data.loader.rules.Rule;
 import io.smartcat.data.loader.rules.SubListRule;
 import io.smartcat.data.loader.rules.SubSetRule;
+import io.smartcat.data.loader.rules.UUIDRule;
 import io.smartcat.data.loader.util.Randomizer;
 import io.smartcat.data.loader.util.RandomizerImpl;
 
@@ -268,6 +269,17 @@ public class RandomBuilder<T> {
             long upper) {
         // TODO as part of issue #37
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    /**
+     * Declares that field with passed {@code fieldName} is UUID string.
+     *
+     * @param fieldName name of the field in the type <T>
+     * @return RandomBuilder<T>
+     */
+    public RandomBuilder<T> randomUUID(String fieldName) {
+        fieldRules.put(fieldName, new UUIDRule());
+        return this;
     }
 
     /**
