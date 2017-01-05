@@ -48,8 +48,8 @@ public class UserTest {
                 || (u.getFavoriteMovies().size() == 1 && u.getFavoriteMovies().get(0).equals("Predator")));
         Assert.assertTrue(
                 u.getNicknames().isEmpty() || (u.getNicknames().size() == 1 && u.getNicknames().contains("al")));
-        Assert.assertTrue("birthdate should be after May 1, 1975",
-                u.getBirthDate().compareTo(Date.from(mayTheFirst.toInstant(ZoneOffset.UTC))) > 0);
+        Assert.assertTrue("birthdate should be equals or after the May 1, 1975",
+                u.getBirthDate().compareTo(Date.from(mayTheFirst.toInstant(ZoneOffset.UTC))) >= 0);
         Assert.assertTrue("birthdate should be before May 2, 1975",
                 u.getBirthDate().compareTo(Date.from(mayTheSecond.toInstant(ZoneOffset.UTC))) < 0);
         Assert.assertEquals(u.getAddress().getCity(), "Isengard");

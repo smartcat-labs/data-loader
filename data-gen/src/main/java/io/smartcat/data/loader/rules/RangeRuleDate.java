@@ -21,6 +21,11 @@ public class RangeRuleDate implements Rule<Date> {
 
     private Randomizer random;
 
+    private boolean servedLowestValue;
+    private boolean servedLowestValue2;
+    private boolean servedLargestValue;
+    private boolean servedLargestValue2;
+
     private RangeRuleDate() {
     };
 
@@ -112,15 +117,45 @@ public class RangeRuleDate implements Rule<Date> {
         // =>
         // (a,b],(c,d]
         // 0 , 1
+
+        // ensure corner cases are generated first
+        if (!servedLowestValue) {
+            long lowestValue = ranges.get(0).getTime();
+            Instant lowestInstant = Instant.ofEpochMilli(lowestValue);
+            servedLowestValue = true;
+            return Date.from(lowestInstant);
+        }
+
+        if (!servedLowestValue2 && ranges.size() > 2) {
+            long lowestValue = ranges.get(2).getTime();
+            Instant lowestInstant = Instant.ofEpochMilli(lowestValue);
+            servedLowestValue2 = true;
+            return Date.from(lowestInstant);
+        }
+
+        if (!servedLargestValue) {
+            long largestValue = ranges.get(1).getTime() - 1;
+            Instant largestInstant = Instant.ofEpochMilli(largestValue);
+            servedLargestValue = true;
+            return Date.from(largestInstant);
+        }
+
+        if (!servedLargestValue2 && ranges.size() > 2) {
+            long largestValue = ranges.get(3).getTime() - 1;
+            Instant largestInstant = Instant.ofEpochMilli(largestValue);
+            servedLargestValue2 = true;
+            return Date.from(largestInstant);
+        }
+
+        // generate random values
         int randomRangeIndex = 0;
         if (ranges.size() > 2) {
             randomRangeIndex = random.nextInt(ranges.size() / 2);
         }
         Long randomValue = random.nextLong(ranges.get(randomRangeIndex * 2).getTime(),
                 ranges.get((randomRangeIndex * 2) + 1).getTime());
-        Instant radnomInstant = Instant.ofEpochMilli(randomValue);
+        Instant randomInstant = Instant.ofEpochMilli(randomValue);
 
-        return Date.from(radnomInstant);
+        return Date.from(randomInstant);
     }
-
 }
