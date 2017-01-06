@@ -62,10 +62,10 @@ public class RandomBuilder<T> {
     /**
      * Sets the allowed ranges of dates for the field with {@code fieldName}.
      *
-     * Note that the corner cases will always be generated first in order to ensure protection against off-by-one errors.
-     * For example, if startDate is 2000-01-01 and endDate is 2000-01-04
-     * the generator will first create two corner cases, that is: 2000-01-01 00:00:00:000 and 2000-01-03 23:59:59:999.
-     * The end of the range is calculated with millisecond granularity.
+     * Note that the corner cases will always be generated first in order to ensure protection against off-by-one
+     * errors. For example, if startDate is 2000-01-01 and endDate is 2000-01-04 the generator will first create two
+     * corner cases, that is: 2000-01-01 00:00:00:000 and 2000-01-03 23:59:59:999. The end of the range is calculated
+     * with millisecond granularity.
      *
      * @param fieldName name of the field in the type <T>
      * @param startDate start of the range (inclusive)
@@ -88,10 +88,10 @@ public class RandomBuilder<T> {
      * Sets the exclusive allowed ranges of dates for the field with {@code fieldName}. That means that only this
      * instance of the builder is allowed to set property with passed name {@code fieldName} from these ranges.
      *
-     * Note that the corner cases will always be generated first in order to ensure protection against off-by-one errors.
-     * For example, if startDate is 2000-01-01 and endDate is 2000-01-04
-     * the generator will first create two corner cases, that is: 2000-01-01 00:00:00:000 and 2000-01-03 23:59:59:999.
-     * The end of the range is calculated with millisecond granularity.
+     * Note that the corner cases will always be generated first in order to ensure protection against off-by-one
+     * errors. For example, if startDate is 2000-01-01 and endDate is 2000-01-04 the generator will first create two
+     * corner cases, that is: 2000-01-01 00:00:00:000 and 2000-01-03 23:59:59:999. The end of the range is calculated
+     * with millisecond granularity.
      *
      * @param fieldName name of the field in the type <T>
      * @param startDate start of the range (inclusive)
