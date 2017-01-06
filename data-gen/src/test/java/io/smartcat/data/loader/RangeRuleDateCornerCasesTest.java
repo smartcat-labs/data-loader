@@ -1,9 +1,7 @@
 package io.smartcat.data.loader;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.junit.Assert;
@@ -33,11 +31,6 @@ public class RangeRuleDateCornerCasesTest {
         boolean oneExactlyAtTheBeginingOfTheRange = false;
         boolean oneExactlyAtTheEndOfTheRange = false;
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-        System.out.println("ten days ago:   " + tenDaysAgo.format(formatter));
-        System.out.println("three days ago: " + threeDaysAgo.format(formatter));
-
         for (User u : builtUsers) {
 
             long timeDiffBeginingOfTheRange = u.getBirthDate().getTime()
@@ -51,9 +44,6 @@ public class RangeRuleDateCornerCasesTest {
             if (timeDiffEndOfRange == -1) {
                 oneExactlyAtTheEndOfTheRange = true;
             }
-
-            System.out.println("birthDate:      "
-                    + formatter.format(LocalDateTime.ofInstant(u.getBirthDate().toInstant(), ZoneId.systemDefault())));
 
         }
 
@@ -94,11 +84,6 @@ public class RangeRuleDateCornerCasesTest {
 
         boolean scorpionExactly7DaysAgo = false;
         boolean scorpion5DaysAgoMinusMillisecond = false;
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-        System.out.println("ten days ago:   " + tenDaysAgo.format(formatter));
-        System.out.println("three days ago: " + threeDaysAgo.format(formatter));
 
         for (User u : builtUsers) {
 
@@ -143,10 +128,6 @@ public class RangeRuleDateCornerCasesTest {
                 Assert.assertEquals("subzero", u.getUsername());
                 subzero3DaysAgoMinusMillisecond = true;
             }
-
-            System.out.println(u.getUsername() + " "
-                    + formatter.format(LocalDateTime.ofInstant(u.getBirthDate().toInstant(), ZoneId.systemDefault())));
-
         }
 
         Assert.assertTrue("One subzero user must be born exactly 10 days ago", subzeroExactly10DaysAgo);
