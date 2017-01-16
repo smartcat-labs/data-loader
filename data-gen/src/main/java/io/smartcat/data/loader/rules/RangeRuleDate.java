@@ -18,6 +18,7 @@ public class RangeRuleDate implements Rule<Date> {
 
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
     private List<Date> ranges = new ArrayList<>();
+    private List<Date> rangeEdges = new ArrayList<>();
 
     private Randomizer random;
 
@@ -50,6 +51,7 @@ public class RangeRuleDate implements Rule<Date> {
         RangeRuleDate result = new RangeRuleDate();
 
         result.ranges.addAll(Arrays.asList(rangeMarkers));
+        result.rangeEdges.addAll(Arrays.asList(rangeMarkers));
 
         return result;
     }
@@ -66,6 +68,7 @@ public class RangeRuleDate implements Rule<Date> {
 
         result.exclusive = true;
         result.ranges.addAll(Arrays.asList(rangeMarkers));
+        result.rangeEdges.addAll(Arrays.asList(rangeMarkers));
 
         return result;
     }
@@ -80,6 +83,7 @@ public class RangeRuleDate implements Rule<Date> {
         RangeRuleDate result = new RangeRuleDate();
 
         result.ranges.addAll(rangeMarkers);
+        result.rangeEdges.addAll(rangeMarkers);
 
         return result;
     }
@@ -118,33 +122,8 @@ public class RangeRuleDate implements Rule<Date> {
         // (a,b],(c,d]
         // 0 , 1
 
-        // ensure corner cases are generated first
-        if (!servedLowestValue) {
-            long lowestValue = ranges.get(0).getTime();
-            Instant lowestInstant = Instant.ofEpochMilli(lowestValue);
-            servedLowestValue = true;
-            return Date.from(lowestInstant);
-        }
-
-        if (!servedLowestValue2 && ranges.size() > 2) {
-            long lowestValue = ranges.get(2).getTime();
-            Instant lowestInstant = Instant.ofEpochMilli(lowestValue);
-            servedLowestValue2 = true;
-            return Date.from(lowestInstant);
-        }
-
-        if (!servedLargestValue) {
-            long largestValue = ranges.get(1).getTime() - 1;
-            Instant largestInstant = Instant.ofEpochMilli(largestValue);
-            servedLargestValue = true;
-            return Date.from(largestInstant);
-        }
-
-        if (!servedLargestValue2 && ranges.size() > 2) {
-            long largestValue = ranges.get(3).getTime() - 1;
-            Instant largestInstant = Instant.ofEpochMilli(largestValue);
-            servedLargestValue2 = true;
-            return Date.from(largestInstant);
+        if (!rangeEdges.isEmpty()) {
+            return nextEdgeCase();
         }
 
         // generate random values
@@ -157,5 +136,19 @@ public class RangeRuleDate implements Rule<Date> {
         Instant randomInstant = Instant.ofEpochMilli(randomValue);
 
         return Date.from(randomInstant);
+    }
+
+    // Since the definition of the range is inclusive at the beginning and end of the range is exclusive,
+    // this method will subtract one millisecond from the end of the range.
+    // Ranges are defined with a list and there can be several ranges defined in one list, e.g. [a,b),[c,d),[e,f),
+    // therefore ends of the ranges are on odd positions.
+    private Date nextEdgeCase() {
+        if (rangeEdges.size() % 2 == 0) {
+            return rangeEdges.remove(0);
+        } else {
+            long edge = rangeEdges.remove(0).getTime() - 1;
+            Instant largestInstant = Instant.ofEpochMilli(edge);
+            return Date.from(largestInstant);
+        }
     }
 }

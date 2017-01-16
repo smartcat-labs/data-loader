@@ -20,8 +20,10 @@ public class RangeRuleDateCornerCasesTest {
         LocalDateTime tenDaysAgo = now.minusDays(10);
         LocalDateTime threeDaysAgo = now.minusDays(3);
 
-        randomUserBuilder.randomFrom("username", "subzero").randomFromRange("birthDate", tenDaysAgo, threeDaysAgo)
-                .toBeBuilt(3);
+        randomUserBuilder
+            .randomFrom("username", "subzero")
+            .randomFromRange("birthDate", tenDaysAgo, threeDaysAgo)
+            .toBeBuilt(3);
 
         BuildRunner<User> runner = new BuildRunner<>();
 
