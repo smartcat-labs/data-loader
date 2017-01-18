@@ -31,18 +31,18 @@ public class RangeRuleDoubleTest {
         boolean oneExactlyAtTheEndOfTheRange = false;
 
         for (User u : builtUsers) {
-            System.out.println("accBAl: " + u.getAccountBalance() + " , == :" + (endOfRange - u.getAccountBalance()));
-
             if (u.getAccountBalance() == beginingOfRange) {
                 oneExactlyAtTheBeginingOfTheRange = true;
             }
-            if (endOfRange - u.getAccountBalance() < RangeRuleDouble.EPSILON) {
+            if (Math.abs(endOfRange - u.getAccountBalance() - RangeRuleDouble.EPSILON) <= RangeRuleDouble.EPSILON) {
                 oneExactlyAtTheEndOfTheRange = true;
             }
         }
 
-        Assert.assertTrue("One user must have numberOfCards property with value 0", oneExactlyAtTheBeginingOfTheRange);
-        Assert.assertTrue("One user must have numberOfCards property with value 9", oneExactlyAtTheEndOfTheRange);
+        Assert.assertTrue("One user must have accountBalance with value from the begining of the defined range.",
+                oneExactlyAtTheBeginingOfTheRange);
+        Assert.assertTrue("One user must have accountBalance with value from the end of the defined range.",
+                oneExactlyAtTheEndOfTheRange);
     }
 
 }
