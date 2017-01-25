@@ -1,12 +1,19 @@
 package io.smartcat.data.loader;
 
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.smartcat.data.loader.api.DataSource;
+import io.smartcat.data.loader.api.WorkTask;
+import io.smartcat.data.loader.util.AtomicCounter;
+import io.smartcat.data.loader.util.NoOpDataSource;
+import io.smartcat.data.loader.util.NoOpWorkTask;
+import io.smartcat.data.loader.util.RateLimiter;
 
 /**
  * Impulse generator based on scheduler generating targeted rate.
@@ -27,12 +34,15 @@ public class ImpulseGenerator {
 
     private boolean collectMetrics;
 
+    private DataCollector dataCollector;
+
     private ImpulseGenerator(ImpulseGeneratorBuilder builder) {
 
         this.collectMetrics = builder.collectMetrics;
+        this.dataCollector = new DataCollector(builder.dataSource);
 
         workerExecutor = new ThreadPoolExecutor(builder.workerThreadPoolCoreSize, builder.workerThreadPoolMaxSize, 100L,
-                TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(), (runnable) -> {
+                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), (runnable) -> {
             Thread thread = new Thread(runnable);
             thread.setName("load-gen-worker-thread-" + COUNTER_THREAD_COUNT.getAndIncrement());
             thread.setDaemon(true);
@@ -42,7 +52,7 @@ public class ImpulseGenerator {
 
         limiter = new RateLimiter(1000, builder.targetRate);
 
-        impulseGenerator = new Thread(new Impulse());
+        impulseGenerator = new Thread(new Impulse(builder.workTask));
     }
 
     /**
@@ -50,18 +60,20 @@ public class ImpulseGenerator {
      *
      * @param targetRate target rate
      */
-    public void start(long targetRate) {
-        limiter.setRate(targetRate);
-        impulseGenerator.start();
+    public void start(double targetRate) {
+        this.limiter.setRate(targetRate);
+        this.dataCollector.start();
+        this.impulseGenerator.start();
     }
 
     /**
      * Stop impulse generator.
      *
-     * @throws InterruptedException exception
+     * @throws InterruptedException Interrupted exception
      */
     public void stop() throws InterruptedException {
-        impulseGenerator.join();
+        this.dataCollector.stop();
+        this.impulseGenerator.join();
     }
 
     /**
@@ -74,13 +86,25 @@ public class ImpulseGenerator {
     }
 
     private class Impulse implements Runnable {
+
+        private WorkTask workTask;
+
+        public Impulse(WorkTask workTask) {
+            this.workTask = workTask;
+        }
+
         @Override
         public void run() {
             while (true) {
                 limiter.limit();
-                workerExecutor.submit(new Worker());
-                if (collectMetrics) {
-                    impulseCounter.increment();
+                if (dataCollector.queueSize() > 0) {
+
+                    int value = dataCollector.poll();
+                    workerExecutor.submit(new Worker(workTask, value));
+
+                    if (collectMetrics) {
+                        impulseCounter.increment();
+                    }
                 }
             }
         }
@@ -102,11 +126,15 @@ public class ImpulseGenerator {
 
         private int workerThreadPoolCoreSize = 10;
 
-        private int workerThreadPoolMaxSize = 250;
+        private int workerThreadPoolMaxSize = 500;
 
         private double targetRate = 1000;
 
         private boolean collectMetrics = false;
+
+        private DataSource dataSource = new NoOpDataSource();
+
+        private WorkTask workTask = new NoOpWorkTask();
 
         public ImpulseGeneratorBuilder withWorkerThreadPoolCoreSize(int workerThreadPoolCoreSize) {
             this.workerThreadPoolCoreSize = workerThreadPoolCoreSize;
@@ -125,6 +153,16 @@ public class ImpulseGenerator {
 
         public ImpulseGeneratorBuilder withMetrics(boolean collectMetrics) {
             this.collectMetrics = collectMetrics;
+            return this;
+        }
+
+        public ImpulseGeneratorBuilder withDataSource(DataSource dataSource) {
+            this.dataSource = dataSource;
+            return this;
+        }
+
+        public ImpulseGeneratorBuilder withWorkTask(WorkTask workTask) {
+            this.workTask = workTask;
             return this;
         }
 

@@ -4,7 +4,7 @@ import java.util.Random;
 
 import io.smartcat.data.loader.api.DataSource;
 
-public class NoOpDataSource implements DataSource<Integer> {
+public class NoOpDataSource implements DataSource {
 
     private Random random = new Random();
 
