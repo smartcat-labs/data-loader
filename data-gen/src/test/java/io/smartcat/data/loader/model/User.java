@@ -16,6 +16,7 @@ public class User {
 
     private Long numberOfCards;
     private Short numberOfShorts;
+    private Integer numberOfInts;
 
     private Double accountBalance;
 
@@ -127,6 +128,14 @@ public class User {
 
     public void setNumberOfShorts(Short numberOfShorts) {
         this.numberOfShorts = numberOfShorts;
+    }
+
+    public Integer getNumberOfInts() {
+        return numberOfInts;
+    }
+
+    public void setNumberOfInts(Integer numberOfInts) {
+        this.numberOfInts = numberOfInts;
     }
 
 }

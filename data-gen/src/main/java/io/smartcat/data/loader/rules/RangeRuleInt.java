@@ -8,13 +8,13 @@ import java.util.List;
 import io.smartcat.data.loader.util.Randomizer;
 
 /**
- * Rule for creating random range values of type Short.
+ * Rule for creating random range values of type Integer.
  */
-public class RangeRuleShort implements Rule<Short> {
+public class RangeRuleInt implements Rule<Integer> {
 
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
-    private final List<Short> ranges = new ArrayList<>();
-    private final List<Short> rangeEdges = new LinkedList<>();
+    private final List<Integer> ranges = new ArrayList<>();
+    private final List<Integer> rangeEdges = new LinkedList<>();
 
     private Randomizer random;
 
@@ -22,9 +22,9 @@ public class RangeRuleShort implements Rule<Short> {
      * Set Randomizer for the Rule.
      *
      * @param random Randomizer impl.
-     * @return RangeRuleLong with set Randomizer.
+     * @return RangeRuleInt with set Randomizer.
      */
-    public RangeRuleShort withRandom(Randomizer random) {
+    public RangeRuleInt withRandom(Randomizer random) {
         this.random = random;
         return this;
     }
@@ -32,11 +32,11 @@ public class RangeRuleShort implements Rule<Short> {
     /**
      * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
      *
-     * @param rangeMarkers array of shorts that denote the ranges.
-     * @return RangeRuleShort with set ranges.
+     * @param rangeMarkers array of ints that denote the ranges.
+     * @return RangeRuleInt with set ranges.
      */
-    public static RangeRuleShort withRanges(Short... rangeMarkers) {
-        RangeRuleShort result = new RangeRuleShort();
+    public static RangeRuleInt withRanges(Integer... rangeMarkers) {
+        RangeRuleInt result = new RangeRuleInt();
 
         result.ranges.addAll(Arrays.asList(rangeMarkers));
         result.rangeEdges.addAll(Arrays.asList(rangeMarkers));
@@ -51,13 +51,13 @@ public class RangeRuleShort implements Rule<Short> {
     }
 
     @Override
-    public Rule<Short> recalculatePrecedence(Rule<?> exclusiveRule) {
+    public Rule<Integer> recalculatePrecedence(Rule<?> exclusiveRule) {
         // TODO considering removing exclusive rules altogether
         return null;
     }
 
     @Override
-    public Short getRandomAllowedValue() {
+    public Integer getRandomAllowedValue() {
         if (!rangeEdges.isEmpty()) {
             return nextEdgeCase();
         }
@@ -67,7 +67,7 @@ public class RangeRuleShort implements Rule<Short> {
             randomRangeIndex = random.nextInt(ranges.size() / 2);
         }
 
-        Short randomValue = (short) random.nextLong(ranges.get(randomRangeIndex * 2), ranges.get((randomRangeIndex * 2) + 1));
+        int randomValue = (int) random.nextLong(ranges.get(randomRangeIndex * 2), ranges.get((randomRangeIndex * 2) + 1));
 
         return randomValue;
     }
@@ -76,11 +76,11 @@ public class RangeRuleShort implements Rule<Short> {
     // this method will subtract 1 from the end of the range.
     // Ranges are defined with a list and there can be several ranges defined in one list, e.g. [a,b),[c,d),[e,f),
     // therefore ends of the ranges are on odd positions.
-    private Short nextEdgeCase() {
+    private Integer nextEdgeCase() {
         if (rangeEdges.size() % 2 == 0) {
             return rangeEdges.remove(0);
         } else {
-            return (short) (rangeEdges.remove(0) - 1);
+            return rangeEdges.remove(0) - 1;
         }
     }
 
