@@ -15,6 +15,7 @@ import java.util.Map;
 import io.smartcat.data.loader.rules.DiscreteRule;
 import io.smartcat.data.loader.rules.RangeRuleDate;
 import io.smartcat.data.loader.rules.RangeRuleDouble;
+import io.smartcat.data.loader.rules.RangeRuleFloat;
 import io.smartcat.data.loader.rules.RangeRuleInt;
 import io.smartcat.data.loader.rules.RangeRuleLong;
 import io.smartcat.data.loader.rules.RangeRuleShort;
@@ -97,6 +98,25 @@ public class RandomBuilder<T> {
     public RandomBuilder<T> randomFromRange(String fieldName, Integer... rangeMarkers) {
         checkRangeInput(rangeMarkers);
         fieldRules.put(fieldName, RangeRuleInt.withRanges(rangeMarkers).withRandom(random));
+        return this;
+    }
+
+    /**
+     * Sets the allowed ranges of Float for the field with {@code fieldName}.
+     * The ranges are defined by an array of Floats F1,F2, ... ,Fn
+     * such that F1 < F2 < ... < Fn and (n % 2) = 0;
+     *
+     * The ranges defined by F1,F2, ... ,Fn are: [F1,F2), [F3,F4), ... , [Fn-1, Fn).
+     * In each range [Fj,Fk) Fj denotes inclusive start of the range and Fk denotes exclusive end of the range.
+     *
+     *
+     * @param fieldName name of the field in the type <T>
+     * @param rangeMarkers array of Floats that denotes the ranges.
+     * @return RandomBuilder<T>
+     */
+    public RandomBuilder<T> randomFromRange(String fieldName, Float... rangeMarkers) {
+        checkRangeInput(rangeMarkers);
+        fieldRules.put(fieldName, RangeRuleFloat.withRanges(rangeMarkers).withRandom(random));
         return this;
     }
 

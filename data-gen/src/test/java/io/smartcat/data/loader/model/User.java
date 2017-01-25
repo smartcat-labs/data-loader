@@ -19,6 +19,7 @@ public class User {
     private Integer numberOfInts;
 
     private Double accountBalance;
+    private Float balanceInFloat;
 
     private List<String> favoriteMovies;
 
@@ -137,5 +138,14 @@ public class User {
     public void setNumberOfInts(Integer numberOfInts) {
         this.numberOfInts = numberOfInts;
     }
+
+    public Float getBalanceInFloat() {
+        return balanceInFloat;
+    }
+
+    public void setBalanceInFloat(Float balanceInFloat) {
+        this.balanceInFloat = balanceInFloat;
+    }
+
 
 }
