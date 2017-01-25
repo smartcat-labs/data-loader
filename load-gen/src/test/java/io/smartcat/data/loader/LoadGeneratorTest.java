@@ -1,7 +1,9 @@
 package io.smartcat.data.loader;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class LoadGeneratorTest {
 
     @Test

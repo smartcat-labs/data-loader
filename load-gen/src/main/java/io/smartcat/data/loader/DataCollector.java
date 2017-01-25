@@ -16,6 +16,8 @@ public class DataCollector {
 
     private static final int DEFAULT_DATA_QUEUE_CAPACITY = 1024;
 
+    private volatile boolean isRunning = false;
+
     private DataSource<Integer> dataSource;
 
     private LinkedBlockingQueue<Integer> dataQueue;
@@ -70,6 +72,7 @@ public class DataCollector {
      * Start data collector. Will initialize data collection thread and prime data queue to 75% of its capacity.
      */
     public void start() {
+        this.isRunning = true;
         this.dataQueueThread.start();
 
         LOGGER.debug("Priming data queue from data source to 75% of capacity.");
@@ -89,6 +92,7 @@ public class DataCollector {
      * @throws InterruptedException Interrupted exception
      */
     public void stop() throws InterruptedException {
+        this.isRunning = false;
         this.dataQueueThread.join();
     }
 
@@ -98,7 +102,7 @@ public class DataCollector {
     private class Collector implements Runnable {
         @Override
         public void run() {
-            while (true) {
+            while (isRunning) {
                 if (dataSource.hasNext() && dataQueue.size() < dataQueueCapacity) {
                     dataQueue.offer(dataSource.next());
                 } else {
