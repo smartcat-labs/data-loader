@@ -92,6 +92,9 @@ public class DataCollector {
         this.dataQueueThread.join();
     }
 
+    /**
+     * Data collector thread collecting data from data source and pushing it into data queue.
+     */
     private class Collector implements Runnable {
         @Override
         public void run() {

@@ -4,6 +4,9 @@ import java.util.Random;
 
 import io.smartcat.data.loader.api.DataSource;
 
+/**
+ * NoOp data source implementation. Returns random integers as data.
+ */
 public class NoOpDataSource implements DataSource {
 
     private Random random = new Random();

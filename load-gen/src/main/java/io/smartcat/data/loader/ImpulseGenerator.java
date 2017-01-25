@@ -85,6 +85,9 @@ public class ImpulseGenerator {
         limiter.setRate(targetRate);
     }
 
+    /**
+     * Load generator impulse which triggers work task execution.
+     */
     private class Impulse implements Runnable {
 
         private WorkTask workTask;
@@ -120,7 +123,7 @@ public class ImpulseGenerator {
     }
 
     /**
-     * Impulse generator builder class
+     * Impulse generator builder class.
      */
     public static class ImpulseGeneratorBuilder {
 
@@ -136,36 +139,77 @@ public class ImpulseGenerator {
 
         private WorkTask workTask = new NoOpWorkTask();
 
+        /**
+         * Define a worker thread pool core size.
+         *
+         * @param workerThreadPoolCoreSize worker thread pool core size
+         * @return {@code io.smartcat.data.loader.ImpulseGeneratorBuilder} instance
+         */
         public ImpulseGeneratorBuilder withWorkerThreadPoolCoreSize(int workerThreadPoolCoreSize) {
             this.workerThreadPoolCoreSize = workerThreadPoolCoreSize;
             return this;
         }
 
+        /**
+         * Define a worker thread pool max size.
+         *
+         * @param workerThreadPoolMaxSize worker thread pool max size
+         * @return {@code io.smartcat.data.loader.ImpulseGeneratorBuilder} instance
+         */
         public ImpulseGeneratorBuilder withWorkerThreadPoolMaxSize(int workerThreadPoolMaxSize) {
             this.workerThreadPoolMaxSize = workerThreadPoolMaxSize;
             return this;
         }
 
+        /**
+         * Define a target rate.
+         *
+         * @param targetRate target rate
+         * @return {@code io.smartcat.data.loader.ImpulseGeneratorBuilder} instance
+         */
         public ImpulseGeneratorBuilder withTargetRate(double targetRate) {
             this.targetRate = targetRate;
             return this;
         }
 
+        /**
+         * Define if metrics are being collected.
+         *
+         * @param collectMetrics collect metrics
+         * @return {@code io.smartcat.data.loader.ImpulseGeneratorBuilder} instance
+         */
         public ImpulseGeneratorBuilder withMetrics(boolean collectMetrics) {
             this.collectMetrics = collectMetrics;
             return this;
         }
 
+        /**
+         * Define a DataSource implementation providing data for WorkTask execution.
+         *
+         * @param dataSource {@code io.smartcat.data.loader.api.DataSource} implementation
+         * @return {@code io.smartcat.data.loader.ImpulseGeneratorBuilder} instance
+         */
         public ImpulseGeneratorBuilder withDataSource(DataSource dataSource) {
             this.dataSource = dataSource;
             return this;
         }
 
+        /**
+         * Define a WorkTask implementation that will be executed at a given rate.
+         *
+         * @param workTask {@code io.smartcat.data.loader.api.WorkTask} implementation
+         * @return {@code io.smartcat.data.loader.ImpulseGeneratorBuilder} instance
+         */
         public ImpulseGeneratorBuilder withWorkTask(WorkTask workTask) {
             this.workTask = workTask;
             return this;
         }
 
+        /**
+         * Build {@code io.smartcat.data.loader.ImpulseGenerator} instance.
+         *
+         * @return {@code io.smartcat.data.loader.ImpulseGenerator} instance
+         */
         public ImpulseGenerator build() {
             return new ImpulseGenerator(this);
         }

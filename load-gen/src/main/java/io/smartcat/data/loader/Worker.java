@@ -5,6 +5,11 @@ import org.slf4j.LoggerFactory;
 
 import io.smartcat.data.loader.api.WorkTask;
 
+/**
+ * Worker runnable executing work tasks.
+ *
+ * @param <T> work task parameter type
+ */
 public final class Worker<T> implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Worker.class);
@@ -12,6 +17,12 @@ public final class Worker<T> implements Runnable {
     private WorkTask workTask;
     private T parameter;
 
+    /**
+     * Constructor.
+     *
+     * @param workTask  work task to be executed
+     * @param parameter work task parameter
+     */
     public Worker(WorkTask workTask, T parameter) {
         this.workTask = workTask;
         this.parameter = parameter;

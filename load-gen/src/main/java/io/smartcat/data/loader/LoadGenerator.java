@@ -6,6 +6,9 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Load generator used to execute work tasks with data from provided data source.
+ */
 public class LoadGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadGenerator.class);
@@ -14,6 +17,9 @@ public class LoadGenerator {
 
     private Timer impulseTimer;
 
+    /**
+     * Constructor.
+     */
     public LoadGenerator() {
 
         impulseGenerator = new ImpulseGenerator.ImpulseGeneratorBuilder().withMetrics(true).build();
@@ -22,10 +28,18 @@ public class LoadGenerator {
         impulseTimer.scheduleAtFixedRate(new Counter(), 0, 1000);
     }
 
+    /**
+     * Start load generator.
+     *
+     * @param targetRate target load rate
+     */
     public void start(double targetRate) {
         impulseGenerator.start(targetRate);
     }
 
+    /**
+     * Impulse metrics counter.
+     */
     private class Counter extends TimerTask {
         @Override
         public void run() {

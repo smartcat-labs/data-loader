@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple tocket bucket rate limiter implementation
+ * A simple tocket bucket rate limiter implementation.
  */
 public class RateLimiter {
 
@@ -20,7 +20,7 @@ public class RateLimiter {
     private long lastFill;
 
     /**
-     * Create a new rate limiter
+     * Create a new rate limiter.
      *
      * @param capacity the maximum capacity
      * @param rate     the maximum rate
@@ -51,7 +51,7 @@ public class RateLimiter {
     }
 
     /**
-     * Wait until execution possible
+     * Wait until execution possible.
      */
     public void limit() {
         while (true) {
@@ -77,7 +77,7 @@ public class RateLimiter {
     }
 
     /**
-     * Check if the rate is available
+     * Check if the rate is available.
      *
      * @return rate available
      */
