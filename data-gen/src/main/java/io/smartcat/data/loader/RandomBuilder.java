@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.smartcat.data.loader.rules.DiscreteRule;
+import io.smartcat.data.loader.rules.DiscreteRuleBoolean;
 import io.smartcat.data.loader.rules.RangeRuleDate;
 import io.smartcat.data.loader.rules.RangeRuleDouble;
 import io.smartcat.data.loader.rules.RangeRuleFloat;
@@ -243,6 +244,17 @@ public class RandomBuilder<T> {
      */
     public RandomBuilder<T> randomFrom(String fieldName, String... values) {
         fieldRules.put(fieldName, DiscreteRule.newSet(values).withRandom(random));
+        return this;
+    }
+
+    /**
+     * Declares that the field with {@code fieldName} should be assigned random boolean value.
+     *
+     * @param fieldName name of the field in the type <T>
+     * @return RandomBuilder<T>
+     */
+    public RandomBuilder<T> randomBoolean(String fieldName) {
+        fieldRules.put(fieldName, DiscreteRuleBoolean.withRandom(random));
         return this;
     }
 

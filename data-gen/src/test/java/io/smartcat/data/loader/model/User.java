@@ -29,26 +29,21 @@ public class User {
 
     private List<Address> otherAddresses;
 
-    // getters and setters
+    private boolean maried;
 
     @Override
     public String toString() {
         return "User [username=" + username + ", firstname=" + firstname + ", lastname=" + lastname + ", birthDate="
-                + birthDate + ", numberOfCards=" + numberOfCards + ", accountBalance=" + accountBalance
-                + ", favoriteMovies=" + favoriteMovies + ", nicknames=" + nicknames + ", address=" + address
-                + ", otherAddresses=" + otherAddresses + "]";
+                + birthDate + ", numberOfCards=" + numberOfCards + ", numberOfShorts=" + numberOfShorts
+                + ", numberOfInts=" + numberOfInts + ", accountBalance=" + accountBalance + ", balanceInFloat="
+                + balanceInFloat + ", favoriteMovies=" + favoriteMovies + ", nicknames=" + nicknames + ", address="
+                + address + ", otherAddresses=" + otherAddresses + ", maried=" + maried + "]";
     }
+
+    // getters and setters
 
     public String getUsername() {
         return username;
-    }
-
-    public Double getAccountBalance() {
-        return accountBalance;
-    }
-
-    public void setAccountBalance(Double accountBalance) {
-        this.accountBalance = accountBalance;
     }
 
     public void setUsername(String username) {
@@ -79,48 +74,12 @@ public class User {
         this.birthDate = birthDate;
     }
 
-    public long getNumberOfCards() {
+    public Long getNumberOfCards() {
         return numberOfCards;
-    }
-
-    public void setNumberOfCards(long numberOfCards) {
-        this.numberOfCards = numberOfCards;
-    }
-
-    public List<String> getFavoriteMovies() {
-        return favoriteMovies;
-    }
-
-    public void setFavoriteMovies(List<String> favoriteMovies) {
-        this.favoriteMovies = favoriteMovies;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
     }
 
     public void setNumberOfCards(Long numberOfCards) {
         this.numberOfCards = numberOfCards;
-    }
-
-    public List<Address> getOtherAddresses() {
-        return otherAddresses;
-    }
-
-    public void setOtherAddresses(List<Address> otherAddresses) {
-        this.otherAddresses = otherAddresses;
-    }
-
-    public Set<String> getNicknames() {
-        return nicknames;
-    }
-
-    public void setNicknames(Set<String> nicknames) {
-        this.nicknames = nicknames;
     }
 
     public Short getNumberOfShorts() {
@@ -139,6 +98,14 @@ public class User {
         this.numberOfInts = numberOfInts;
     }
 
+    public Double getAccountBalance() {
+        return accountBalance;
+    }
+
+    public void setAccountBalance(Double accountBalance) {
+        this.accountBalance = accountBalance;
+    }
+
     public Float getBalanceInFloat() {
         return balanceInFloat;
     }
@@ -147,5 +114,43 @@ public class User {
         this.balanceInFloat = balanceInFloat;
     }
 
+    public List<String> getFavoriteMovies() {
+        return favoriteMovies;
+    }
 
+    public void setFavoriteMovies(List<String> favoriteMovies) {
+        this.favoriteMovies = favoriteMovies;
+    }
+
+    public Set<String> getNicknames() {
+        return nicknames;
+    }
+
+    public void setNicknames(Set<String> nicknames) {
+        this.nicknames = nicknames;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public List<Address> getOtherAddresses() {
+        return otherAddresses;
+    }
+
+    public void setOtherAddresses(List<Address> otherAddresses) {
+        this.otherAddresses = otherAddresses;
+    }
+
+    public boolean isMaried() {
+        return maried;
+    }
+
+    public void setMaried(boolean maried) {
+        this.maried = maried;
+    }
 }

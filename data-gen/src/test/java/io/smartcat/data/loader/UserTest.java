@@ -42,7 +42,8 @@ public class UserTest {
         Assert.assertEquals("destroyerOfW0rldz", u.getUsername());
         Assert.assertEquals("alice", u.getFirstname());
         Assert.assertEquals("annison", u.getLastname());
-        Assert.assertEquals(1L, u.getNumberOfCards());
+        Long expectedNumberOfCards = 1L;
+        Assert.assertEquals(expectedNumberOfCards, u.getNumberOfCards());
         Assert.assertTrue(u.getAccountBalance() - 2.72 < 0.1);
         Assert.assertTrue(u.getFavoriteMovies().isEmpty()
                 || (u.getFavoriteMovies().size() == 1 && u.getFavoriteMovies().get(0).equals("Predator")));
