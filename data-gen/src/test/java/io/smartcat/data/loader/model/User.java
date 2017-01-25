@@ -15,6 +15,7 @@ public class User {
     private Date birthDate;
 
     private Long numberOfCards;
+    private Short numberOfShorts;
 
     private Double accountBalance;
 
@@ -118,6 +119,14 @@ public class User {
 
     public void setNicknames(Set<String> nicknames) {
         this.nicknames = nicknames;
+    }
+
+    public Short getNumberOfShorts() {
+        return numberOfShorts;
+    }
+
+    public void setNumberOfShorts(Short numberOfShorts) {
+        this.numberOfShorts = numberOfShorts;
     }
 
 }

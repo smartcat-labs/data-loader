@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import io.smartcat.data.loader.rules.DiscreteRule;
 import io.smartcat.data.loader.rules.RangeRuleDate;
 import io.smartcat.data.loader.rules.RangeRuleDouble;
 import io.smartcat.data.loader.rules.RangeRuleLong;
+import io.smartcat.data.loader.rules.RangeRuleShort;
 import io.smartcat.data.loader.rules.Rule;
 import io.smartcat.data.loader.rules.SubListRule;
 import io.smartcat.data.loader.rules.SubSetRule;
@@ -57,6 +59,25 @@ public class RandomBuilder<T> {
     public RandomBuilder(Class<T> objectType, Randomizer random) {
         this.objectType = objectType;
         this.random = random;
+    }
+
+    /**
+     * Sets the allowed ranges of Shorts for the field with {@code fieldName}.
+     * The ranges are defined by array of Shorts S1,S2, ... ,Sn
+     * such that S1 < S2 < ... < Sn and (n % 2) = 0;
+     *
+     * The ranges defined by S1,S2, ... ,Sn are: [S1,S2), [S3,S4), ... , [Sn-1, Sn).
+     * In each range [Sj,Sk) Sj denotes inclusive start of the range and Sk denotes exclusive end of the range.
+     *
+     *
+     * @param fieldName name of the field in the type <T>
+     * @param rangeMarkers array of Short that denotes the ranges.
+     * @return RandomBuilder<T>
+     */
+    public RandomBuilder<T> randomFromRange(String fieldName, Short... rangeMarkers) {
+        checkRangeInput(rangeMarkers);
+        fieldRules.put(fieldName, RangeRuleShort.withRanges(rangeMarkers).withRandom(random));
+        return this;
     }
 
     /**
@@ -388,9 +409,17 @@ public class RandomBuilder<T> {
         throw new IllegalArgumentException("Unexisting field: " + fieldName);
     }
 
-    private static <C extends Comparable<C>> void checkRangeInput(C lower, C upper) {
-        if (lower.compareTo(upper) >= 0) {
-            throw new IllegalArgumentException("Invalid range bounds");
+    private static <C extends Comparable<C>> void checkRangeInput(C... markers) {
+        List<C> markersList = new LinkedList<>(Arrays.asList(markers));
+        if (markersList.size() % 2 != 0) {
+            throw new IllegalArgumentException("Invalid ranges definition. Ranges must be defined with even number of elements.");
+        }
+        C firstElement = markersList.remove(0);
+        for (C c : markersList) {
+            if (c.compareTo(firstElement) <= 0) {
+                throw new IllegalArgumentException("Invalid range bounds. Range definition must be stricly increasing.");
+            }
+            firstElement = c;
         }
     }
 
