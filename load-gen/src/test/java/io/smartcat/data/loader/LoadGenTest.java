@@ -6,11 +6,11 @@ public class LoadGenTest {
 
     @Test
     public void should_initialize() {
-        final ImpulseGenerator impulseGenerator = new ImpulseGenerator();
+        final LoadGen loadGen = new LoadGen();
 
         while (true) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

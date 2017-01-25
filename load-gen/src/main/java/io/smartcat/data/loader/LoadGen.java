@@ -7,7 +7,20 @@ public class LoadGen {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadGen.class);
 
+    private ImpulseGenerator impulseGenerator;
+
     public LoadGen() {
+
+        impulseGenerator = new ImpulseGenerator();
+        impulseGenerator.start(10000);
+        try {
+            Thread.sleep(3000);
+            impulseGenerator.setTargetRate(1000);
+            Thread.sleep(3000);
+            impulseGenerator.setTargetRate(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 
