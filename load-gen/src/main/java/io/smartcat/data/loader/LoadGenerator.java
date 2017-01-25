@@ -6,22 +6,24 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoadGen {
+public class LoadGenerator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoadGen.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoadGenerator.class);
 
     private ImpulseGenerator impulseGenerator;
 
     private Timer impulseTimer;
 
-    public LoadGen() {
+    public LoadGenerator() {
 
         impulseGenerator = new ImpulseGenerator.ImpulseGeneratorBuilder().withMetrics(true).build();
 
         impulseTimer = new Timer("impulse-generator-timer");
         impulseTimer.scheduleAtFixedRate(new Counter(), 0, 1000);
+    }
 
-        impulseGenerator.start(10000);
+    public void start(double targetRate) {
+        impulseGenerator.start(targetRate);
     }
 
     private class Counter extends TimerTask {

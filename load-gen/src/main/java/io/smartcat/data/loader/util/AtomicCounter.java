@@ -1,4 +1,4 @@
-package io.smartcat.data.loader;
+package io.smartcat.data.loader.util;
 
 import java.util.concurrent.atomic.AtomicLong;
 

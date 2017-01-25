@@ -1,4 +1,4 @@
-package io.smartcat.data.loader;
+package io.smartcat.data.loader.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -2,11 +2,12 @@ package io.smartcat.data.loader;
 
 import org.junit.Test;
 
-public class LoadGenTest {
+public class LoadGeneratorTest {
 
     @Test
     public void should_initialize() {
-        final LoadGen loadGen = new LoadGen();
+        final LoadGenerator loadGenerator = new LoadGenerator();
+        loadGenerator.start(10000);
 
         while (true) {
             try {
