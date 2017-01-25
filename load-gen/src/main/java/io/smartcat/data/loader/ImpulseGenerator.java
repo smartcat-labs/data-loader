@@ -24,17 +24,19 @@ public class ImpulseGenerator {
 
     private static final AtomicLong COUNTER_THREAD_COUNT = new AtomicLong(0);
 
+    private volatile boolean isRunning = false;
+
     private final AtomicCounter impulseCounter = new AtomicCounter();
 
-    private ThreadPoolExecutor workerExecutor;
+    private final ThreadPoolExecutor workerExecutor;
 
-    private RateLimiter limiter;
+    private final RateLimiter limiter;
 
-    private Thread impulseGenerator;
+    private final Thread impulseGenerator;
+
+    private final DataCollector dataCollector;
 
     private boolean collectMetrics;
-
-    private DataCollector dataCollector;
 
     private ImpulseGenerator(ImpulseGeneratorBuilder builder) {
 
@@ -61,6 +63,7 @@ public class ImpulseGenerator {
      * @param targetRate target rate
      */
     public void start(double targetRate) {
+        this.isRunning = true;
         this.limiter.setRate(targetRate);
         this.dataCollector.start();
         this.impulseGenerator.start();
@@ -72,8 +75,10 @@ public class ImpulseGenerator {
      * @throws InterruptedException Interrupted exception
      */
     public void stop() throws InterruptedException {
+        this.isRunning = false;
         this.dataCollector.stop();
         this.impulseGenerator.join();
+        this.workerExecutor.shutdown();
     }
 
     /**
@@ -98,7 +103,7 @@ public class ImpulseGenerator {
 
         @Override
         public void run() {
-            while (true) {
+            while (isRunning) {
                 limiter.limit();
                 if (dataCollector.queueSize() > 0) {
 
