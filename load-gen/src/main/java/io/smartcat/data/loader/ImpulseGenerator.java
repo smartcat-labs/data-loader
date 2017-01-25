@@ -1,10 +1,6 @@
 package io.smartcat.data.loader;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -21,28 +17,21 @@ public class ImpulseGenerator {
 
     private static final AtomicLong COUNTER_THREAD_COUNT = new AtomicLong(0);
 
-    private static final int WORKER_THREAD_POOL_CORE_SIZE = 10;
-
-    private static final int WORKER_THREAD_POOL_MAX_SIZE = 250;
-
-    private static final long DEFAULT_TARGET_RATE = 1000;
-
     private final AtomicCounter impulseCounter = new AtomicCounter();
 
     private ThreadPoolExecutor workerExecutor;
-
-    private Timer impulseTimer;
 
     private RateLimiter limiter;
 
     private Thread impulseGenerator;
 
-    public ImpulseGenerator() {
+    private boolean collectMetrics;
 
-        impulseTimer = new Timer("impulse-generator-timer");
-        impulseTimer.scheduleAtFixedRate(new Counter(), 0, 1000);
+    private ImpulseGenerator(ImpulseGeneratorBuilder builder) {
 
-        workerExecutor = new ThreadPoolExecutor(WORKER_THREAD_POOL_CORE_SIZE, WORKER_THREAD_POOL_MAX_SIZE, 100L,
+        this.collectMetrics = builder.collectMetrics;
+
+        workerExecutor = new ThreadPoolExecutor(builder.workerThreadPoolCoreSize, builder.workerThreadPoolMaxSize, 100L,
                 TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(), (runnable) -> {
             Thread thread = new Thread(runnable);
             thread.setName("load-gen-worker-thread-" + COUNTER_THREAD_COUNT.getAndIncrement());
@@ -51,22 +40,35 @@ public class ImpulseGenerator {
             return thread;
         });
 
-        limiter = new RateLimiter(1000, DEFAULT_TARGET_RATE);
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(() -> limiter.tick(), 0, 100, TimeUnit.MICROSECONDS);
+        limiter = new RateLimiter(1000, builder.targetRate);
 
         impulseGenerator = new Thread(new Impulse());
     }
 
+    /**
+     * Start impulse generator.
+     *
+     * @param targetRate target rate
+     */
     public void start(long targetRate) {
         limiter.setRate(targetRate);
         impulseGenerator.start();
     }
 
+    /**
+     * Stop impulse generator.
+     *
+     * @throws InterruptedException exception
+     */
     public void stop() throws InterruptedException {
         impulseGenerator.join();
     }
 
+    /**
+     * Set target rate.
+     *
+     * @param targetRate target rate
+     */
     public void setTargetRate(long targetRate) {
         limiter.setRate(targetRate);
     }
@@ -76,17 +78,60 @@ public class ImpulseGenerator {
         public void run() {
             while (true) {
                 limiter.limit();
-                impulseCounter.increment();
                 workerExecutor.submit(new Worker());
+                if (collectMetrics) {
+                    impulseCounter.increment();
+                }
             }
         }
     }
 
-    private class Counter extends TimerTask {
-        @Override
-        public void run() {
-            LOGGER.debug("Generated {} impulses", impulseCounter.getAndReset());
+    /**
+     * Get impulse count and reset counter.
+     *
+     * @return impulse count since last reset
+     */
+    public long getImpulseCount() {
+        return impulseCounter.getAndReset();
+    }
+
+    /**
+     * Impulse generator builder class
+     */
+    public static class ImpulseGeneratorBuilder {
+
+        private int workerThreadPoolCoreSize = 10;
+
+        private int workerThreadPoolMaxSize = 250;
+
+        private double targetRate = 1000;
+
+        private boolean collectMetrics = false;
+
+        public ImpulseGeneratorBuilder withWorkerThreadPoolCoreSize(int workerThreadPoolCoreSize) {
+            this.workerThreadPoolCoreSize = workerThreadPoolCoreSize;
+            return this;
         }
+
+        public ImpulseGeneratorBuilder withWorkerThreadPoolMaxSize(int workerThreadPoolMaxSize) {
+            this.workerThreadPoolMaxSize = workerThreadPoolMaxSize;
+            return this;
+        }
+
+        public ImpulseGeneratorBuilder withTargetRate(double targetRate) {
+            this.targetRate = targetRate;
+            return this;
+        }
+
+        public ImpulseGeneratorBuilder withMetrics(boolean collectMetrics) {
+            this.collectMetrics = collectMetrics;
+            return this;
+        }
+
+        public ImpulseGenerator build() {
+            return new ImpulseGenerator(this);
+        }
+
     }
 
 }

@@ -1,79 +1,113 @@
 package io.smartcat.data.loader;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A simple BlockingQueue based rate limiter.
- * Usage: call limit() to throttle the current thread (blocks)
- * and call tick() at regular intervals from a separate thread.
+ * A simple tocket bucket rate limiter implementation
  */
 public class RateLimiter {
-    private long fillPeriod;
-    private final BlockingQueue<Object> queue;
-    private long timer;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RateLimiter.class);
+
+    private static final double MIN_WAIT_S = 0.005;
+    private static final double MAX_WAIT_S = 0.1;
+
+    private double capacity;
+    private double rate;
+
+    private double bucket;
+    private long lastFill;
 
     /**
-     * Create a simple blocking queue based rate limiter with a
-     * certain capacity and fill rate. Be careful when handling
-     * lots of requests with a high capacity as memory usage
-     * scales with capacity.
+     * Create a new rate limiter
      *
-     * @param capacity capacity before rate limiting kicks in
-     * @param rate     rate limit in allowed calls per second
+     * @param capacity the maximum capacity
+     * @param rate     the maximum rate
      */
     public RateLimiter(int capacity, double rate) {
-        if (rate <= 0) {
-            this.fillPeriod = Long.MAX_VALUE;
-        } else {
-            this.fillPeriod = (long) (1000000000L / rate);
-        }
-        this.queue = new ArrayBlockingQueue<Object>(capacity);
-        this.timer = System.nanoTime();
+        this.rate = rate;
+        this.capacity = capacity;
+
+        bucket = 0;
+        lastFill = System.currentTimeMillis();
     }
 
     /**
-     * Set rate
+     * Update the bucket fill level.
+     */
+    private synchronized void updateBucket() {
+        long time = System.currentTimeMillis();
+
+        if (rate == 0) {
+            bucket = capacity;
+        } else {
+            bucket += rate * (time - lastFill) / 1000;
+            if (bucket > capacity) {
+                bucket = capacity;
+            }
+        }
+        lastFill = time;
+    }
+
+    /**
+     * Wait until execution possible
+     */
+    public void limit() {
+        while (true) {
+            updateBucket();
+            synchronized (this) {
+                if (bucket >= 0) {
+                    break;
+                }
+            }
+            double waitTime = -bucket / rate;
+            if (waitTime < MIN_WAIT_S || waitTime > MAX_WAIT_S) {
+                waitTime = MIN_WAIT_S;
+            }
+            try {
+                Thread.sleep((long) (waitTime * 1000));
+            } catch (InterruptedException ex) {
+                LOGGER.error("Error in rate limiter", ex);
+            }
+        }
+        synchronized (this) {
+            bucket -= 1;
+        }
+    }
+
+    /**
+     * Check if the rate is available
      *
-     * @param rate rate limit in allowed calls per second
+     * @return rate available
+     */
+    public boolean rateAvailable() {
+        updateBucket();
+        synchronized (this) {
+            if (bucket >= 0) {
+                bucket -= 1;
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Set the maximum rate.
+     *
+     * @param rate the rate in req/s
      */
     public synchronized void setRate(double rate) {
-        if (rate <= 0) {
-            this.fillPeriod = Long.MAX_VALUE;
-        } else {
-            this.fillPeriod = (long) (1000000000L / rate);
-        }
+        this.rate = rate;
     }
 
     /**
-     * Tick the rate limiter, advancing the timer and possibly
-     * unblocking calls to limit()
-     */
-    public synchronized void tick() {
-        long elapsedTime = System.nanoTime() - timer;
-        int numToRemove = (int) (elapsedTime / fillPeriod);
-
-        // advance timer
-        timer += fillPeriod * numToRemove;
-
-        List<Object> discardedObjects = new ArrayList<Object>(numToRemove);
-        queue.drainTo(discardedObjects, numToRemove);
-    }
-
-    /**
-     * A call to this method blocks when it is called too often
-     * (depleted capacity).
+     * Get maximum rate.
      *
-     * @return false when interrupted, otherwise true
+     * @return maximum rate in req/s
      */
-    public boolean limit() {
-        try {
-            queue.put(new Object());
-        } catch (InterruptedException e) {
-            return false;
-        }
-        return true;
+    public double getRate() {
+        return this.rate;
     }
 }

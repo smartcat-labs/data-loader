@@ -1,5 +1,8 @@
 package io.smartcat.data.loader;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,19 +12,23 @@ public class LoadGen {
 
     private ImpulseGenerator impulseGenerator;
 
+    private Timer impulseTimer;
+
     public LoadGen() {
 
-        impulseGenerator = new ImpulseGenerator();
-        impulseGenerator.start(10000);
-        try {
-            Thread.sleep(3000);
-            impulseGenerator.setTargetRate(1000);
-            Thread.sleep(3000);
-            impulseGenerator.setTargetRate(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        impulseGenerator = new ImpulseGenerator.ImpulseGeneratorBuilder().withMetrics(true).build();
 
+        impulseTimer = new Timer("impulse-generator-timer");
+        impulseTimer.scheduleAtFixedRate(new Counter(), 0, 1000);
+
+        impulseGenerator.start(10000);
+    }
+
+    private class Counter extends TimerTask {
+        @Override
+        public void run() {
+            LOGGER.debug("Generated {} impulses", impulseGenerator.getImpulseCount());
+        }
     }
 
 }
