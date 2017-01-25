@@ -64,12 +64,11 @@ public class RandomBuilder<T> {
     }
 
     /**
-     * Sets the allowed ranges of Shorts for the field with {@code fieldName}.
-     * The ranges are defined by array of Shorts S1,S2, ... ,Sn
-     * such that S1 < S2 < ... < Sn and (n % 2) = 0;
+     * Sets the allowed ranges of Shorts for the field with {@code fieldName}. The ranges are defined by array of Shorts
+     * S1,S2, ... ,Sn such that S1 < S2 < ... < Sn and (n % 2) = 0;
      *
-     * The ranges defined by S1,S2, ... ,Sn are: [S1,S2), [S3,S4), ... , [Sn-1, Sn).
-     * In each range [Sj,Sk) Sj denotes inclusive start of the range and Sk denotes exclusive end of the range.
+     * The ranges defined by S1,S2, ... ,Sn are: [S1,S2), [S3,S4), ... , [Sn-1, Sn). In each range [Sj,Sk) Sj denotes
+     * inclusive start of the range and Sk denotes exclusive end of the range.
      *
      *
      * @param fieldName name of the field in the type <T>
@@ -83,12 +82,11 @@ public class RandomBuilder<T> {
     }
 
     /**
-     * Sets the allowed ranges of Integers for the field with {@code fieldName}.
-     * The ranges are defined by an array of Integers S1,S2, ... ,Sn
-     * such that S1 < S2 < ... < Sn and (n % 2) = 0;
+     * Sets the allowed ranges of Integers for the field with {@code fieldName}. The ranges are defined by an array of
+     * Integers S1,S2, ... ,Sn such that S1 < S2 < ... < Sn and (n % 2) = 0;
      *
-     * The ranges defined by S1,S2, ... ,Sn are: [S1,S2), [S3,S4), ... , [Sn-1, Sn).
-     * In each range [Sj,Sk) Sj denotes inclusive start of the range and Sk denotes exclusive end of the range.
+     * The ranges defined by S1,S2, ... ,Sn are: [S1,S2), [S3,S4), ... , [Sn-1, Sn). In each range [Sj,Sk) Sj denotes
+     * inclusive start of the range and Sk denotes exclusive end of the range.
      *
      *
      * @param fieldName name of the field in the type <T>
@@ -102,12 +100,11 @@ public class RandomBuilder<T> {
     }
 
     /**
-     * Sets the allowed ranges of Float for the field with {@code fieldName}.
-     * The ranges are defined by an array of Floats F1,F2, ... ,Fn
-     * such that F1 < F2 < ... < Fn and (n % 2) = 0;
+     * Sets the allowed ranges of Float for the field with {@code fieldName}. The ranges are defined by an array of
+     * Floats F1,F2, ... ,Fn such that F1 < F2 < ... < Fn and (n % 2) = 0;
      *
-     * The ranges defined by F1,F2, ... ,Fn are: [F1,F2), [F3,F4), ... , [Fn-1, Fn).
-     * In each range [Fj,Fk) Fj denotes inclusive start of the range and Fk denotes exclusive end of the range.
+     * The ranges defined by F1,F2, ... ,Fn are: [F1,F2), [F3,F4), ... , [Fn-1, Fn). In each range [Fj,Fk) Fj denotes
+     * inclusive start of the range and Fk denotes exclusive end of the range.
      *
      *
      * @param fieldName name of the field in the type <T>
@@ -452,12 +449,14 @@ public class RandomBuilder<T> {
     private static <C extends Comparable<C>> void checkRangeInput(C... markers) {
         List<C> markersList = new LinkedList<>(Arrays.asList(markers));
         if (markersList.size() % 2 != 0) {
-            throw new IllegalArgumentException("Invalid ranges definition. Ranges must be defined with even number of elements.");
+            throw new IllegalArgumentException(
+                    "Invalid ranges definition. Ranges must be defined with even number of elements.");
         }
         C firstElement = markersList.remove(0);
         for (C c : markersList) {
             if (c.compareTo(firstElement) <= 0) {
-                throw new IllegalArgumentException("Invalid range bounds. Range definition must be stricly increasing.");
+                throw new IllegalArgumentException(
+                        "Invalid range bounds. Range definition must be stricly increasing.");
             }
             firstElement = c;
         }

@@ -75,7 +75,8 @@ public class RandomBuilderTest {
         short lower3 = upper2;
         short upper3 = 20;
         try {
-            randomUserBuilder.randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3, upper3).build(1000);
+            randomUserBuilder.randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3, upper3)
+                    .build(1000);
             Assert.fail();
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Invalid range bounds. Range definition must be stricly increasing.", e.getMessage());
@@ -97,7 +98,8 @@ public class RandomBuilderTest {
             randomUserBuilder.randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3).build(1000);
             Assert.fail();
         } catch (IllegalArgumentException e) {
-            Assert.assertEquals("Invalid ranges definition. Ranges must be defined with even number of elements.", e.getMessage());
+            Assert.assertEquals("Invalid ranges definition. Ranges must be defined with even number of elements.",
+                    e.getMessage());
         }
     }
 

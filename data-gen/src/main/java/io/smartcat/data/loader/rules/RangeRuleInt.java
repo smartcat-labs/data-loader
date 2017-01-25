@@ -67,7 +67,8 @@ public class RangeRuleInt implements Rule<Integer> {
             randomRangeIndex = random.nextInt(ranges.size() / 2);
         }
 
-        int randomValue = (int) random.nextLong(ranges.get(randomRangeIndex * 2), ranges.get((randomRangeIndex * 2) + 1));
+        int randomValue = (int) random.nextLong(ranges.get(randomRangeIndex * 2),
+                ranges.get((randomRangeIndex * 2) + 1));
 
         return randomValue;
     }

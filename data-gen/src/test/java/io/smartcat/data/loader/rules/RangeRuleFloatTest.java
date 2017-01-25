@@ -1,12 +1,13 @@
-package io.smartcat.data.loader;
+package io.smartcat.data.loader.rules;
 
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import io.smartcat.data.loader.BuildRunner;
+import io.smartcat.data.loader.RandomBuilder;
 import io.smartcat.data.loader.model.User;
-import io.smartcat.data.loader.rules.RangeRuleFloat;
 
 public class RangeRuleFloatTest {
 
@@ -63,7 +64,8 @@ public class RangeRuleFloatTest {
         boolean atLeastOneInSecondRange = false;
         boolean atLeastOneInThirdRange = false;
         for (User u : builtUsers) {
-            String message = "user should have balanceInFloat in range [0.1, 5.0) or [10.1, 15.2) or [20.3, 25.4), but it was: "
+            String message = "user should have balanceInFloat in range:"
+                    + " [0.1, 5.0) or [10.1, 15.2) or [20.3, 25.4), but it was: "
                     + u.getBalanceInFloat();
             boolean inFirstRange = u.getBalanceInFloat() >= lower1 && u.getBalanceInFloat() < upper1;
             if (inFirstRange) {

@@ -67,7 +67,8 @@ public class RangeRuleShort implements Rule<Short> {
             randomRangeIndex = random.nextInt(ranges.size() / 2);
         }
 
-        Short randomValue = (short) random.nextLong(ranges.get(randomRangeIndex * 2), ranges.get((randomRangeIndex * 2) + 1));
+        Short randomValue = (short) random.nextLong(ranges.get(randomRangeIndex * 2),
+                ranges.get((randomRangeIndex * 2) + 1));
 
         return randomValue;
     }

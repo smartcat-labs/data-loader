@@ -39,7 +39,8 @@ public class RangeRuleShortTest {
         short upper2 = 15;
         short lower3 = 20;
         short upper3 = 25;
-        List<User> builtUsers = randomUserBuilder.randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3, upper3).build(1000);
+        List<User> builtUsers = randomUserBuilder
+                .randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3, upper3).build(1000);
 
         Assert.assertEquals(1000, builtUsers.size());
 
@@ -48,7 +49,8 @@ public class RangeRuleShortTest {
         boolean atLeastOneInThirdRange = false;
         for (User u : builtUsers) {
             System.out.println("shorts is: " + u.getNumberOfShorts());
-            String message = "user should have number of shorts in range [0,5) or [10,15), but it was: " + u.getNumberOfShorts();
+            String message = "user should have number of shorts in range [0,5) or [10,15), but it was: "
+                    + u.getNumberOfShorts();
             boolean inFirstRange = u.getNumberOfShorts() >= lower1 && u.getNumberOfShorts() < upper1;
             if (inFirstRange) {
                 atLeastOneInFirstRange = true;
