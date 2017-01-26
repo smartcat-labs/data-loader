@@ -1,6 +1,9 @@
 package io.smartcat.data.loader;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -101,6 +104,75 @@ public class RandomBuilderTest {
             Assert.assertEquals("Invalid ranges definition. Ranges must be defined with even number of elements.",
                     e.getMessage());
         }
+    }
+
+    @Test
+    public void should_create_dates_when_passed_multiple_ranges() {
+        RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class);
+        LocalDateTime date1960 = LocalDateTime.of(1960, 1, 1, 0, 0);
+        LocalDateTime date1980 = LocalDateTime.of(1980, 1, 1, 0, 0);
+        LocalDateTime date1990 = LocalDateTime.of(1990, 1, 1, 0, 0);
+        LocalDateTime date2000 = LocalDateTime.of(2000, 1, 1, 0, 0);
+        List<User> result = randomUserBuilder.randomFromRange("birthDate", date1960, date1980, date1990, date2000).build(1000);
+
+        Assert.assertEquals(1000, result.size());
+
+        boolean atLeastOneInFirstRange = false;
+        boolean atLeastOneInSecondRange = false;
+        for (User u : result) {
+            boolean isAfter1960 = u.getBirthDate().toInstant().isAfter(date1960.toInstant(ZoneOffset.UTC));
+            boolean isAfter1990 = u.getBirthDate().toInstant().isAfter(date1990.toInstant(ZoneOffset.UTC));
+            boolean isBefore1980 = u.getBirthDate().toInstant().isBefore(date1980.toInstant(ZoneOffset.UTC));
+            boolean isBefore2000 = u.getBirthDate().toInstant().isBefore(date2000.toInstant(ZoneOffset.UTC));
+
+            boolean isExactly1960 = u.getBirthDate().toInstant().equals(date1960.toInstant(ZoneOffset.UTC));
+            boolean isExactly1990 = u.getBirthDate().toInstant().equals(date1990.toInstant(ZoneOffset.UTC));
+            if (isExactly1960 || (isAfter1960 && isBefore1980)) {
+                atLeastOneInFirstRange = true;
+            } else if (isExactly1990 || (isAfter1990 && isBefore2000)) {
+                atLeastOneInSecondRange = true;
+            } else {
+                Assert.fail("There are dates between defined ranges.");
+            }
+
+        }
+
+        Assert.assertTrue(atLeastOneInFirstRange);
+        Assert.assertTrue(atLeastOneInSecondRange);
+    }
+
+    @Test
+    public void should_create_dates() {
+        RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class);
+        Date date1960 = Date.from(LocalDateTime.of(1960, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
+        Date date1980 = Date.from(LocalDateTime.of(1980, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
+        Date date1990 = Date.from(LocalDateTime.of(1990, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
+        Date date2000 = Date.from(LocalDateTime.of(2000, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
+        List<User> result = randomUserBuilder.randomFromRange("birthDate", date1960, date1980, date1990, date2000).build(1000);
+
+        Assert.assertEquals(1000, result.size());
+
+        boolean atLeastOneInFirstRange = false;
+        boolean atLeastOneInSecondRange = false;
+        for (User u : result) {
+            boolean isAfter1960 = u.getBirthDate().after(date1960);
+            boolean isAfter1990 = u.getBirthDate().after(date1990);
+            boolean isBefore1980 = u.getBirthDate().before(date1980);
+            boolean isBefore2000 = u.getBirthDate().before(date2000);
+
+            boolean isExactly1960 = u.getBirthDate().equals(date1960);
+            boolean isExactly1990 = u.getBirthDate().equals(date1990);
+            if (isExactly1960 || (isAfter1960 && isBefore1980)) {
+                atLeastOneInFirstRange = true;
+            } else if (isExactly1990 || (isAfter1990 && isBefore2000)) {
+                atLeastOneInSecondRange = true;
+            } else {
+                Assert.fail("There are dates between defined ranges.");
+            }
+        }
+
+        Assert.assertTrue(atLeastOneInFirstRange);
+        Assert.assertTrue(atLeastOneInSecondRange);
     }
 
 }

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.smartcat.data.loader.rules.DiscreteRule;
 import io.smartcat.data.loader.rules.DiscreteRuleBoolean;
@@ -133,12 +134,37 @@ public class RandomBuilder<T> {
      *
      * @throws IllegalArgumentException if {@code startDate} is greater than <i>or equal to</i> {@code endDate}
      */
-    public RandomBuilder<T> randomFromRange(String fieldName, LocalDateTime startDate, LocalDateTime endDate) {
-        checkRangeInput(startDate, endDate);
-        Instant lower = startDate.toInstant(ZoneOffset.UTC);
-        Instant upper = endDate.toInstant(ZoneOffset.UTC);
+    public RandomBuilder<T> randomFromRange(String fieldName, LocalDateTime... rangeMarkers) {
+        checkRangeInput(rangeMarkers);
 
-        fieldRules.put(fieldName, RangeRuleDate.withRanges(Date.from(lower), Date.from(upper)).withRandom(random));
+        List<Date> result = Arrays.asList(rangeMarkers)
+                .stream()
+                .map(marker -> marker.toInstant(ZoneOffset.UTC))
+                .map(instant -> Date.from(instant))
+                .collect(Collectors.toList());
+        fieldRules.put(fieldName, RangeRuleDate.withRanges(result).withRandom(random));
+
+        return this;
+    }
+
+    /**
+     * Sets the allowed ranges of dates for the field with {@code fieldName}.
+     *
+     * Note that the corner cases will always be generated first in order to ensure protection against off-by-one
+     * errors. For example, if startDate is 2000-01-01 and endDate is 2000-01-04 the generator will first create two
+     * corner cases, that is: 2000-01-01 00:00:00:000 and 2000-01-03 23:59:59:999. The end of the range is calculated
+     * with millisecond granularity.
+     *
+     * @param fieldName name of the field in the type <T>
+     * @param startDate start of the range (inclusive)
+     * @param endDate end of the range (exclusive)
+     * @return RandomBuilder<T>
+     *
+     * @throws IllegalArgumentException if {@code startDate} is greater than <i>or equal to</i> {@code endDate}
+     */
+    public RandomBuilder<T> randomFromRange(String fieldName, Date... rangeMarkers) {
+        checkRangeInput(rangeMarkers);
+        fieldRules.put(fieldName, RangeRuleDate.withRanges(rangeMarkers).withRandom(random));
 
         return this;
     }
