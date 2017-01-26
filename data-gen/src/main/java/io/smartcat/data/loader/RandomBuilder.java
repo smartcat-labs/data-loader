@@ -205,9 +205,9 @@ public class RandomBuilder<T> {
      *
      * @throws IllegalArgumentException if {@code lower} is greater than <i>or equal to</i> {@code upper}
      */
-    public RandomBuilder<T> randomFromRange(String fieldName, Long lower, Long upper) {
-        checkRangeInput(lower, upper);
-        fieldRules.put(fieldName, RangeRuleLong.withRanges(lower, upper).withRandom(random));
+    public RandomBuilder<T> randomFromRange(String fieldName, Long... rangeMarkers) {
+        checkRangeInput(rangeMarkers);
+        fieldRules.put(fieldName, RangeRuleLong.withRanges(rangeMarkers).withRandom(random));
         return this;
     }
 

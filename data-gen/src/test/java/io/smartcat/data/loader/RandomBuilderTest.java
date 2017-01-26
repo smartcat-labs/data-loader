@@ -175,4 +175,27 @@ public class RandomBuilderTest {
         Assert.assertTrue(atLeastOneInSecondRange);
     }
 
+    @Test
+    public void should_accept_multiple_ranges_for_long() {
+        RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class);
+        List<User> result = randomUserBuilder.randomFromRange("numberOfCards", 1L, 10L, 20L, 30L).build(1000);
+
+        Assert.assertEquals(1000, result.size());
+
+        boolean atLeastOneInFirstRange = false;
+        boolean atLeastOneInSecondRange = false;
+        for (User u : result) {
+            if (u.getNumberOfCards() >= 1L && u.getNumberOfCards() < 10L) {
+                atLeastOneInFirstRange = true;
+            } else if (u.getNumberOfCards() >= 20L && u.getNumberOfCards() < 30L) {
+                atLeastOneInSecondRange = true;
+            } else {
+                Assert.fail("There are values between defined ranges.");
+            }
+        }
+
+        Assert.assertTrue(atLeastOneInFirstRange);
+        Assert.assertTrue(atLeastOneInSecondRange);
+    }
+
 }
