@@ -76,6 +76,8 @@ public class RandomBuilder<T> {
      * @param fieldName name of the field in the type <T>
      * @param rangeMarkers array of Short that denotes the ranges.
      * @return RandomBuilder<T>
+     *
+     * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Short... rangeMarkers) {
         checkRangeInput(rangeMarkers);
@@ -85,15 +87,17 @@ public class RandomBuilder<T> {
 
     /**
      * Sets the allowed ranges of Integers for the field with {@code fieldName}. The ranges are defined by an array of
-     * Integers S1,S2, ... ,Sn such that S1 < S2 < ... < Sn and (n % 2) = 0;
+     * Integers I1,I2, ... ,In such that I1 < I2 < ... < In and (n % 2) = 0;
      *
-     * The ranges defined by S1,S2, ... ,Sn are: [S1,S2), [S3,S4), ... , [Sn-1, Sn). In each range [Sj,Sk) Sj denotes
-     * inclusive start of the range and Sk denotes exclusive end of the range.
+     * The ranges defined by I1,I2, ... ,In are: [I1,I2), [I3,I4), ... , [In-1, In). In each range [Ij,Ik) Ij denotes
+     * inclusive start of the range and Ik denotes exclusive end of the range.
      *
      *
      * @param fieldName name of the field in the type <T>
      * @param rangeMarkers array of Integers that denotes the ranges.
      * @return RandomBuilder<T>
+     *
+     * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Integer... rangeMarkers) {
         checkRangeInput(rangeMarkers);
@@ -105,13 +109,15 @@ public class RandomBuilder<T> {
      * Sets the allowed ranges of Float for the field with {@code fieldName}. The ranges are defined by an array of
      * Floats F1,F2, ... ,Fn such that F1 < F2 < ... < Fn and (n % 2) = 0;
      *
-     * The ranges defined by F1,F2, ... ,Fn are: [F1,F2), [F3,F4), ... , [Fn-1, Fn). In each range [Fj,Fk) Fj denotes
+     * The ranges defined by F1,F2, ... ,Fn are: [F1,F2), [F3,F4), ... , [F(n-1), Fn). In each range [Fj,Fk) Fj denotes
      * inclusive start of the range and Fk denotes exclusive end of the range.
      *
      *
      * @param fieldName name of the field in the type <T>
      * @param rangeMarkers array of Floats that denotes the ranges.
      * @return RandomBuilder<T>
+     *
+     * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Float... rangeMarkers) {
         checkRangeInput(rangeMarkers);
@@ -120,47 +126,42 @@ public class RandomBuilder<T> {
     }
 
     /**
-     * Sets the allowed ranges of dates for the field with {@code fieldName}.
+     * Sets the allowed ranges of LocalDateTime for the field with {@code fieldName}. The ranges are defined by an array
+     * of LocalDateTime T1,T2, ... ,Tn such that T1 < T2 < ... < Tn and (n % 2) = 0;
      *
-     * Note that the corner cases will always be generated first in order to ensure protection against off-by-one
-     * errors. For example, if startDate is 2000-01-01 and endDate is 2000-01-04 the generator will first create two
-     * corner cases, that is: 2000-01-01 00:00:00:000 and 2000-01-03 23:59:59:999. The end of the range is calculated
-     * with millisecond granularity.
+     * The ranges defined by T1,T2, ... ,Tn are: [T1,T2), [T3,T4), ... , [T(n-1), Tn). In each range [Tj,Tk) Tj denotes
+     * inclusive start of the range and Tk denotes exclusive end of the range.
+     *
      *
      * @param fieldName name of the field in the type <T>
-     * @param startDate start of the range (inclusive)
-     * @param endDate end of the range (exclusive)
+     * @param rangeMarkers array of LocalDateTime that denotes the ranges.
      * @return RandomBuilder<T>
      *
-     * @throws IllegalArgumentException if {@code startDate} is greater than <i>or equal to</i> {@code endDate}
+     * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
      */
     public RandomBuilder<T> randomFromRange(String fieldName, LocalDateTime... rangeMarkers) {
         checkRangeInput(rangeMarkers);
 
-        List<Date> result = Arrays.asList(rangeMarkers)
-                .stream()
-                .map(marker -> marker.toInstant(ZoneOffset.UTC))
-                .map(instant -> Date.from(instant))
-                .collect(Collectors.toList());
+        List<Date> result = Arrays.asList(rangeMarkers).stream().map(marker -> marker.toInstant(ZoneOffset.UTC))
+                .map(instant -> Date.from(instant)).collect(Collectors.toList());
         fieldRules.put(fieldName, RangeRuleDate.withRanges(result).withRandom(random));
 
         return this;
     }
 
     /**
-     * Sets the allowed ranges of dates for the field with {@code fieldName}.
+     * Sets the allowed ranges of Dates for the field with {@code fieldName}. The ranges are defined by an array of
+     * Dates T1,T2, ... ,Tn such that T1 < T2 < ... < Tn and (n % 2) = 0;
      *
-     * Note that the corner cases will always be generated first in order to ensure protection against off-by-one
-     * errors. For example, if startDate is 2000-01-01 and endDate is 2000-01-04 the generator will first create two
-     * corner cases, that is: 2000-01-01 00:00:00:000 and 2000-01-03 23:59:59:999. The end of the range is calculated
-     * with millisecond granularity.
+     * The ranges defined by T1,T2, ... ,Tn are: [T1,T2), [T3,T4), ... , [T(n-1), Tn). In each range [Tj,Tk) Tj denotes
+     * inclusive start of the range and Tk denotes exclusive end of the range.
+     *
      *
      * @param fieldName name of the field in the type <T>
-     * @param startDate start of the range (inclusive)
-     * @param endDate end of the range (exclusive)
+     * @param rangeMarkers array of Dates that denotes the ranges.
      * @return RandomBuilder<T>
      *
-     * @throws IllegalArgumentException if {@code startDate} is greater than <i>or equal to</i> {@code endDate}
+     * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Date... rangeMarkers) {
         checkRangeInput(rangeMarkers);
@@ -196,14 +197,17 @@ public class RandomBuilder<T> {
     }
 
     /**
-     * Sets the allowed ranges of Longs for the field with {@code fieldName}.
+     * Sets the allowed ranges of Longs for the field with {@code fieldName}. The ranges are defined by an array of
+     * Longs L1,L2, ... ,Ln such that L1 < L2 < ... < Ln and (n % 2) = 0;
+     *
+     * The ranges defined by L1,L2, ... ,Ln are: [L1,L2), [L3,L4), ... , [L(n-1), Ln). In each range [Lj,Lk) Lj denotes
+     * inclusive start of the range and Lk denotes exclusive end of the range.
      *
      * @param fieldName name of the field in the type <T>
-     * @param lower start of the range (inclusive)
-     * @param upper end of the range (exclusive)
+     * @param rangeMarkers array of Longs that denotes the ranges.
      * @return RandomBuilder<T>
      *
-     * @throws IllegalArgumentException if {@code lower} is greater than <i>or equal to</i> {@code upper}
+     * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Long... rangeMarkers) {
         checkRangeInput(rangeMarkers);
@@ -229,18 +233,21 @@ public class RandomBuilder<T> {
     }
 
     /**
-     * Sets the allowed ranges of Doubles for the field with {@code fieldName}.
+     * Sets the allowed ranges of Doubles for the field with {@code fieldName}. The ranges are defined by an array of
+     * Doubles D1,D2, ... ,Dn such that D1 < D2 < ... < Dn and (n % 2) = 0;
+     *
+     * The ranges defined by D1,D2, ... ,Dn are: [D1,D2), [D3,D4), ... , [D(n-1), Dn). In each range [Dj,Dk) Dj denotes
+     * inclusive start of the range and Dk denotes exclusive end of the range.
      *
      * @param fieldName name of the field in the type <T>
-     * @param lower start of the range (inclusive)
-     * @param upper end of the range (exclusive)
+     * @param rangeMarkers array of Doubles that denotes the ranges.
      * @return RandomBuilder<T>
      *
-     * @throws IllegalArgumentException if {@code lower} is greater than <i>or equal to</i> {@code upper}
+     * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
      */
-    public RandomBuilder<T> randomFromRange(String fieldName, Double lower, Double upper) {
-        checkRangeInput(lower, upper);
-        fieldRules.put(fieldName, RangeRuleDouble.withRanges(lower, upper).withRandom(random));
+    public RandomBuilder<T> randomFromRange(String fieldName, Double... rangeMarkers) {
+        checkRangeInput(rangeMarkers);
+        fieldRules.put(fieldName, RangeRuleDouble.withRanges(rangeMarkers).withRandom(random));
         return this;
     }
 

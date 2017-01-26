@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import io.smartcat.data.loader.model.User;
+import io.smartcat.data.loader.rules.RangeRuleDouble;
 
 public class RandomBuilderTest {
 
@@ -113,7 +114,8 @@ public class RandomBuilderTest {
         LocalDateTime date1980 = LocalDateTime.of(1980, 1, 1, 0, 0);
         LocalDateTime date1990 = LocalDateTime.of(1990, 1, 1, 0, 0);
         LocalDateTime date2000 = LocalDateTime.of(2000, 1, 1, 0, 0);
-        List<User> result = randomUserBuilder.randomFromRange("birthDate", date1960, date1980, date1990, date2000).build(1000);
+        List<User> result = randomUserBuilder.randomFromRange("birthDate", date1960, date1980, date1990, date2000)
+                .build(1000);
 
         Assert.assertEquals(1000, result.size());
 
@@ -148,7 +150,9 @@ public class RandomBuilderTest {
         Date date1980 = Date.from(LocalDateTime.of(1980, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
         Date date1990 = Date.from(LocalDateTime.of(1990, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
         Date date2000 = Date.from(LocalDateTime.of(2000, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
-        List<User> result = randomUserBuilder.randomFromRange("birthDate", date1960, date1980, date1990, date2000).build(1000);
+        List<User> result = randomUserBuilder
+                .randomFromRange("birthDate", date1960, date1980, date1990, date2000)
+                .build(1000);
 
         Assert.assertEquals(1000, result.size());
 
@@ -196,6 +200,40 @@ public class RandomBuilderTest {
 
         Assert.assertTrue(atLeastOneInFirstRange);
         Assert.assertTrue(atLeastOneInSecondRange);
+    }
+
+    @Test
+    public void should_accept_multiple_ranges_for_double() {
+        RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class);
+        List<User> result = randomUserBuilder.randomFromRange("accountBalance", 1.0, 10.1, 20.0, 30.1).build(1000);
+
+        Assert.assertEquals(1000, result.size());
+
+        boolean atLeastOneInFirstRange = false;
+        boolean atLeastOneInSecondRange = false;
+        for (User u : result) {
+            boolean isInFirstRange = valueIsInRange(u.getAccountBalance(), 1.0, 10.1, RangeRuleDouble.EPSILON);
+            boolean isInSecondRange = valueIsInRange(u.getAccountBalance(), 20.0, 30.1, RangeRuleDouble.EPSILON);
+
+            if (isInFirstRange) {
+                atLeastOneInFirstRange = true;
+            } else if (isInSecondRange) {
+                atLeastOneInSecondRange = true;
+            } else {
+                Assert.fail("There are values between defined ranges: " + u.getAccountBalance());
+            }
+        }
+
+        Assert.assertTrue(atLeastOneInFirstRange);
+        Assert.assertTrue(atLeastOneInSecondRange);
+    }
+
+    private boolean valueIsInRange(Double value, Double rangeStart, Double rangeEnd, Double epsilon) {
+        boolean isAtBegining = Math.abs(rangeStart - value) <= epsilon;
+        boolean isAtEnd = Math.abs(rangeEnd - value - epsilon) <= epsilon;
+        boolean isInRange = Math.abs(rangeEnd - value) >= Math.abs(rangeStart);
+
+        return isAtBegining || isAtEnd || isInRange;
     }
 
 }
