@@ -45,18 +45,6 @@ public class RangeRuleInt implements Rule<Integer> {
     }
 
     @Override
-    public boolean isExclusive() {
-        // TODO considering removing exclusive rules altogether
-        return false;
-    }
-
-    @Override
-    public Rule<Integer> recalculatePrecedence(Rule<?> exclusiveRule) {
-        // TODO considering removing exclusive rules altogether
-        return null;
-    }
-
-    @Override
     public Integer getRandomAllowedValue() {
         if (!rangeEdges.isEmpty()) {
             return nextEdgeCase();

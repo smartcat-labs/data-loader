@@ -25,18 +25,6 @@ public class DiscreteRuleBoolean implements Rule<Boolean> {
     }
 
     @Override
-    public boolean isExclusive() {
-        // TODO considering removing exclusive rules altogether
-        return false;
-    }
-
-    @Override
-    public Rule<Boolean> recalculatePrecedence(Rule<?> exclusiveRule) {
-        // TODO considering removing exclusive rules altogether
-        return null;
-    }
-
-    @Override
     public Boolean getRandomAllowedValue() {
         return random.nextBoolean();
     }

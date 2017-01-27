@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.smartcat.data.loader.RangeUtil;
 import io.smartcat.data.loader.util.Randomizer;
 
 /**
@@ -67,33 +66,6 @@ public class RangeRuleFloat implements Rule<Float> {
         result.rangeEdges.addAll(rangeMarkers);
 
         return result;
-    }
-
-    @Override
-    public boolean isExclusive() {
-        return false;
-    }
-
-    private List<Float> getAllowedRanges() {
-        return ranges;
-    }
-
-    @Override
-    public Rule<Float> recalculatePrecedence(Rule<?> exclusiveRule) {
-        if (!exclusiveRule.isExclusive()) {
-            throw new IllegalArgumentException("no need to calculate rule precedence with non exclusive rule");
-        }
-        if (!(exclusiveRule instanceof RangeRuleFloat)) {
-            throw new IllegalArgumentException("cannot compare discrete and range rules");
-        }
-        RangeRuleFloat otherRule = (RangeRuleFloat) exclusiveRule;
-
-        if (!RangeUtil.rangesIntersects(this.ranges, otherRule.getAllowedRanges())) {
-            return this;
-        }
-        List<Float> newRanges = RangeUtil.recalculateRanges(this.ranges, otherRule.getAllowedRanges());
-
-        return RangeRuleFloat.withRanges(newRanges).withRandom(random);
     }
 
     @Override

@@ -32,42 +32,4 @@ public class DiscreteRuleTest {
 
     }
 
-    @Test
-    public void should_correctly_calculate_precedence_in_discrete_rules() {
-        Randomizer randomizer = new RandomizerImpl();
-        RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, randomizer);
-
-        randomUserBuilder
-                .randomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac")
-                .randomFrom("firstname", "alice", "bob", "charlie").toBeBuilt(1000);
-
-        RandomBuilder<User> exclusiveBuilder = new RandomBuilder<User>(User.class, randomizer);
-        exclusiveBuilder.exclusiveRandomFrom("username", "krelac").randomFrom("firstname", "delta").toBeBuilt(500);
-
-        BuildRunner<User> runner = new BuildRunner<>();
-
-        runner.addBuilder(randomUserBuilder);
-        runner.addBuilder(exclusiveBuilder);
-
-        List<User> userList = runner.build();
-
-        for (User u : userList) {
-            // because "krelac" is exclusive
-            String[] nonexclusiveUsernames = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero" };
-            List<String> allowedUsernames = new ArrayList<>(Arrays.asList(nonexclusiveUsernames));
-            String[] firstnames = {"alice", "bob", "charlie" };
-            List<String> allowedFirstnames = new ArrayList<>(Arrays.asList(firstnames));
-
-            if (u.getUsername().equals("krelac")) {
-                Assert.assertEquals(u.getFirstname(), "delta");
-            } else {
-                u.getUsername();
-                String messageUsername = "username should be from the allowed set, but was: " + u.getUsername();
-                Assert.assertTrue(messageUsername, allowedUsernames.contains(u.getUsername()));
-                String messageFirstName = "firstname should be from the allowed set, but was: " + u.getFirstname();
-                Assert.assertTrue(messageFirstName, allowedFirstnames.contains(u.getFirstname()));
-            }
-        }
-    }
-
 }

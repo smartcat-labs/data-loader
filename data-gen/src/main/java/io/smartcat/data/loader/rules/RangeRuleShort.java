@@ -45,18 +45,6 @@ public class RangeRuleShort implements Rule<Short> {
     }
 
     @Override
-    public boolean isExclusive() {
-        // TODO considering removing exclusive rules altogether
-        return false;
-    }
-
-    @Override
-    public Rule<Short> recalculatePrecedence(Rule<?> exclusiveRule) {
-        // TODO considering removing exclusive rules altogether
-        return null;
-    }
-
-    @Override
     public Short getRandomAllowedValue() {
         if (!rangeEdges.isEmpty()) {
             return nextEdgeCase();

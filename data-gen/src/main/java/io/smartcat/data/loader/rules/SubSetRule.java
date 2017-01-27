@@ -16,7 +16,6 @@ import io.smartcat.data.loader.util.Randomizer;
  */
 public class SubSetRule<T> implements Rule<Set<T>> {
 
-    private boolean exclusive;
     private final Set<T> values = new HashSet<>();
 
     private Randomizer random;
@@ -46,47 +45,6 @@ public class SubSetRule<T> implements Rule<Set<T>> {
         SubSetRule<T> subSetRule = new SubSetRule<>();
         subSetRule.values.addAll(allowedValues);
         return subSetRule;
-    }
-
-    /**
-     * Set exclusive set of allowed values for the sub set rule from which the sub set of allowed values will be
-     * created.
-     *
-     * @param <T> type param
-     * @param allowedValues collection (duplicate values will be removed)
-     * @return exclusive SubSetRule
-     */
-    public static <T> SubSetRule<T> withValuesX(Collection<T> allowedValues) {
-        SubSetRule<T> subSetRule = new SubSetRule<>();
-        subSetRule.values.addAll(allowedValues);
-        subSetRule.exclusive = true;
-        return subSetRule;
-    }
-
-    @Override
-    public boolean isExclusive() {
-        return this.exclusive;
-    }
-
-    @Override
-    public Rule<Set<T>> recalculatePrecedence(Rule<?> exclusiveRule) {
-        if (!exclusiveRule.isExclusive()) {
-            throw new IllegalArgumentException("no need to calculate rule precedence with non exclusive rule");
-        }
-        if (!(exclusiveRule instanceof SubSetRule)) {
-            throw new IllegalArgumentException("cannot compare discrete and range rules");
-        }
-
-        @SuppressWarnings("unchecked") // no way to ensure type safety
-        SubSetRule<T> otherRule = (SubSetRule<T>) exclusiveRule;
-
-        Set<T> newSet = new HashSet<>();
-        newSet.addAll(values);
-
-        newSet.removeAll(otherRule.values);
-
-        return SubSetRule.withValues(newSet).withRandom(random);
-
     }
 
     @Override
