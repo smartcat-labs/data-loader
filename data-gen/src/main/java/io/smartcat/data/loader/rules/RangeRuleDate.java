@@ -13,7 +13,6 @@ import io.smartcat.data.loader.util.Randomizer;
  */
 public class RangeRuleDate implements Rule<Date> {
 
-
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
     private List<Date> ranges = new ArrayList<>();
     private List<Date> rangeEdges = new ArrayList<>();

@@ -9,13 +9,13 @@ import io.smartcat.data.loader.util.Randomizer;
 /**
  * Rule for discrete set of allowed values (i.e. not range).
  */
-public class DiscreteRule implements Rule<String> {
+public class DiscreteRuleString implements Rule<String> {
 
     private final List<String> allowedValues = new ArrayList<>();
 
     private Randomizer random;
 
-    private DiscreteRule() {
+    private DiscreteRuleString() {
     };
 
     /**
@@ -24,8 +24,8 @@ public class DiscreteRule implements Rule<String> {
      * @param allowedValues array of allowed values
      * @return DiscreteRule with allowed values.
      */
-    public static DiscreteRule newSet(String... allowedValues) {
-        DiscreteRule result = new DiscreteRule();
+    public static DiscreteRuleString newSet(String... allowedValues) {
+        DiscreteRuleString result = new DiscreteRuleString();
 
         result.allowedValues.addAll(Arrays.asList(allowedValues));
 
@@ -38,7 +38,7 @@ public class DiscreteRule implements Rule<String> {
      * @param random Randomizer impl.
      * @return DiscreteRule with set Randomizer.
      */
-    public DiscreteRule withRandom(Randomizer random) {
+    public DiscreteRuleString withRandom(Randomizer random) {
         this.random = random;
         return this;
     }
@@ -49,8 +49,8 @@ public class DiscreteRule implements Rule<String> {
      * @param allowedValues list of allowed values
      * @return DiscreteRule with list of allowed values.
      */
-    public static DiscreteRule newSet(List<String> allowedValues) {
-        DiscreteRule result = new DiscreteRule();
+    public static DiscreteRuleString newSet(List<String> allowedValues) {
+        DiscreteRuleString result = new DiscreteRuleString();
 
         result.allowedValues.addAll(allowedValues);
 

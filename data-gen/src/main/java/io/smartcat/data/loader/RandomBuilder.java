@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.smartcat.data.loader.rules.DiscreteRule;
+import io.smartcat.data.loader.rules.DiscreteRuleString;
 import io.smartcat.data.loader.rules.DiscreteRuleBoolean;
 import io.smartcat.data.loader.rules.RangeRuleDate;
 import io.smartcat.data.loader.rules.RangeRuleDouble;
@@ -215,7 +215,7 @@ public class RandomBuilder<T> {
      * @return RandomBuilder<T>
      */
     public RandomBuilder<T> randomFrom(String fieldName, String... values) {
-        fieldRules.put(fieldName, DiscreteRule.newSet(values).withRandom(random));
+        fieldRules.put(fieldName, DiscreteRuleString.newSet(values).withRandom(random));
         return this;
     }
 
@@ -391,6 +391,7 @@ public class RandomBuilder<T> {
         throw new IllegalArgumentException("Unexisting field: " + fieldName);
     }
 
+    @SafeVarargs
     private static <C extends Comparable<C>> void checkRangeInput(C... markers) {
         List<C> markersList = new LinkedList<>(Arrays.asList(markers));
         if (markersList.size() % 2 != 0) {

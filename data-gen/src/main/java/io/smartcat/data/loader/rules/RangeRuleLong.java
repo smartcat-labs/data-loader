@@ -62,10 +62,6 @@ public final class RangeRuleLong implements Rule<Long> {
         return result;
     }
 
-    private List<Long> getAllowedRanges() {
-        return ranges;
-    }
-
     @Override
     public Long getRandomAllowedValue() {
         // ranges = [a,b,c,d]
