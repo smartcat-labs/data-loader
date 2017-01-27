@@ -62,7 +62,7 @@ public class SubListRuleTest {
 
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class);
         randomUserBuilder.randomFrom("username", "destroyerOfW0rldz")
-                .randomSubListWithBuilder("otherAddresses", randomAddressBuilder, 0, 2).build(1000);
+                .randomSubListWithBuilder("otherAddresses", randomAddressBuilder, 0, 2).toBeBuilt(1000);
 
         List<User> result = randomUserBuilder.buildAll();
 

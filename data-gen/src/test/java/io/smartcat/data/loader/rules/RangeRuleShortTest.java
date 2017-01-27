@@ -5,6 +5,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import io.smartcat.data.loader.BuildRunner;
 import io.smartcat.data.loader.RandomBuilder;
 import io.smartcat.data.loader.model.User;
 
@@ -17,7 +18,10 @@ public class RangeRuleShortTest {
 
         short lower = 0;
         short upper = 5;
-        List<User> builtUsers = randomUserBuilder.randomFromRange("numberOfShorts", lower, upper).build(1000);
+        randomUserBuilder.randomFromRange("numberOfShorts", lower, upper).toBeBuilt(1000);
+        BuildRunner<User> runner = new BuildRunner<>();
+        runner.addBuilder(randomUserBuilder);
+        List<User> builtUsers = runner.build();
 
         Assert.assertEquals(1000, builtUsers.size());
 
@@ -39,8 +43,12 @@ public class RangeRuleShortTest {
         short upper2 = 15;
         short lower3 = 20;
         short upper3 = 25;
-        List<User> builtUsers = randomUserBuilder
-                .randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3, upper3).build(1000);
+        randomUserBuilder
+            .randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3, upper3)
+            .toBeBuilt(1000);
+        BuildRunner<User> runner = new BuildRunner<>();
+        runner.addBuilder(randomUserBuilder);
+        List<User> builtUsers = runner.build();
 
         Assert.assertEquals(1000, builtUsers.size());
 

@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.smartcat.data.loader.rules.DiscreteRuleString;
 import io.smartcat.data.loader.rules.DiscreteRuleBoolean;
+import io.smartcat.data.loader.rules.DiscreteRuleString;
 import io.smartcat.data.loader.rules.RangeRuleDate;
 import io.smartcat.data.loader.rules.RangeRuleDouble;
 import io.smartcat.data.loader.rules.RangeRuleFloat;
@@ -312,7 +312,7 @@ public class RandomBuilder<T> {
      * @param numberOfObjects number of entities to be built
      * @return List<T>
      */
-    public List<T> build(long numberOfObjects) {
+    private List<T> build(long numberOfObjects) {
         List<T> result = new ArrayList<>();
         for (long i = 1; i <= numberOfObjects; i++) {
             final T randomEntity = buildOne();

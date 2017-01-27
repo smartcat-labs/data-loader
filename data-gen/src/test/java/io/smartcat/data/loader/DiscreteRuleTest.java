@@ -19,9 +19,13 @@ public class DiscreteRuleTest {
         Randomizer randomizer = new RandomizerImpl();
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, randomizer);
 
-        List<User> builtUsers = randomUserBuilder
+        randomUserBuilder
                 .randomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac")
-                .build(1000);
+                .toBeBuilt(1000);
+
+        BuildRunner<User> runner = new BuildRunner<>();
+        runner.addBuilder(randomUserBuilder);
+        List<User> builtUsers = runner.build();
 
         String[] usernames = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac" };
         List<String> allowedUsernames = new ArrayList<>(Arrays.asList(usernames));

@@ -23,7 +23,11 @@ public class RangeRuleDateTest {
         LocalDateTime tenDaysAgo = now.minusDays(10);
         LocalDateTime threeDaysAgo = now.minusDays(3);
 
-        List<User> builtUsers = randomUserBuilder.randomFromRange("birthDate", tenDaysAgo, threeDaysAgo).build(1000);
+        randomUserBuilder.randomFromRange("birthDate", tenDaysAgo, threeDaysAgo).toBeBuilt(1000);
+        BuildRunner<User> runner = new BuildRunner<>();
+        runner.addBuilder(randomUserBuilder);
+        List<User> builtUsers = runner.build();
+
 
         Assert.assertEquals(1000, builtUsers.size());
 

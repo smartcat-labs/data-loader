@@ -20,7 +20,7 @@ public class DiscreteRuleBooleanTest {
 
         List<User> builtUsers = randomUserBuilder
                 .randomBoolean("maried")
-                .build(1000);
+                .toBeBuilt(1000).buildAll();
 
         boolean atLeastOneMaried = false;
         boolean atLeastOneNotMaried = false;

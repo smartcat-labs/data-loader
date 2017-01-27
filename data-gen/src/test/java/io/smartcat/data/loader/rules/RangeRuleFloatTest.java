@@ -55,8 +55,11 @@ public class RangeRuleFloatTest {
         float upper2 = 15.2f;
         float lower3 = 20.3f;
         float upper3 = 25.4f;
-        List<User> builtUsers = randomUserBuilder
-                .randomFromRange("balanceInFloat", lower1, upper1, lower2, upper2, lower3, upper3).build(1000);
+        randomUserBuilder
+                .randomFromRange("balanceInFloat", lower1, upper1, lower2, upper2, lower3, upper3).toBeBuilt(1000);
+        BuildRunner<User> runner = new BuildRunner<>();
+        runner.addBuilder(randomUserBuilder);
+        List<User> builtUsers = runner.build();
 
         Assert.assertEquals(1000, builtUsers.size());
 
