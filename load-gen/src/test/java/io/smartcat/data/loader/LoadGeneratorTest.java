@@ -9,7 +9,7 @@ public class LoadGeneratorTest {
     @Test
     public void should_initialize() {
         final LoadGenerator loadGenerator = new LoadGenerator();
-        loadGenerator.start(10000);
+        loadGenerator.start();
 
         while (true) {
             try {

@@ -7,7 +7,7 @@ import io.smartcat.data.loader.api.DataSource;
 /**
  * NoOp data source implementation. Returns random integers as data.
  */
-public class NoOpDataSource implements DataSource {
+public class NoOpDataSource implements DataSource<Integer> {
 
     private Random random = new Random();
 

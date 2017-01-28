@@ -13,37 +13,35 @@ public class LoadGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadGenerator.class);
 
-    private ImpulseGenerator impulseGenerator;
+    private PulseGenerator pulseGenerator;
 
-    private Timer impulseTimer;
+    private Timer pulseTimer;
 
     /**
      * Constructor.
      */
     public LoadGenerator() {
 
-        impulseGenerator = new ImpulseGenerator.ImpulseGeneratorBuilder().withMetrics(true).build();
+        pulseGenerator = new PulseGenerator.PulseGeneratorBuilder().withTargetRate(1000).withMetrics(true).build();
 
-        impulseTimer = new Timer("impulse-generator-timer");
-        impulseTimer.scheduleAtFixedRate(new Counter(), 0, 1000);
+        pulseTimer = new Timer("pulse-generator-timer");
+        pulseTimer.scheduleAtFixedRate(new Counter(), 0, 1000);
     }
 
     /**
      * Start load generator.
-     *
-     * @param targetRate target load rate
      */
-    public void start(double targetRate) {
-        impulseGenerator.start(targetRate);
+    public void start() {
+        pulseGenerator.start();
     }
 
     /**
-     * Impulse metrics counter.
+     * Pulse metrics counter.
      */
     private class Counter extends TimerTask {
         @Override
         public void run() {
-            LOGGER.debug("Generated {} impulses", impulseGenerator.getImpulseCount());
+            LOGGER.debug("Generated {} pulses", pulseGenerator.getPulseCount());
         }
     }
 

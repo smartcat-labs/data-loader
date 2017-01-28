@@ -1,9 +1,9 @@
 package io.smartcat.data.loader;
 
+import java.util.function.Consumer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.smartcat.data.loader.api.WorkTask;
 
 /**
  * Worker runnable executing work tasks.
@@ -14,24 +14,24 @@ public final class Worker<T> implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Worker.class);
 
-    private WorkTask workTask;
+    private Consumer<T> consumer;
     private T parameter;
 
     /**
      * Constructor.
      *
-     * @param workTask  work task to be executed
-     * @param parameter work task parameter
+     * @param consumer  function to be executed
+     * @param parameter function parameter
      */
-    public Worker(WorkTask workTask, T parameter) {
-        this.workTask = workTask;
+    public Worker(Consumer<T> consumer, T parameter) {
+        this.consumer = consumer;
         this.parameter = parameter;
     }
 
     @Override
     public void run() {
         try {
-            workTask.execute(parameter);
+            consumer.accept(parameter);
         } catch (Exception e) {
             LOGGER.error("Exception wile executing a callable function", e);
         }

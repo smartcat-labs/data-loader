@@ -7,7 +7,7 @@ import io.smartcat.data.loader.api.WorkTask;
  */
 public class NoOpWorkTask implements WorkTask<Integer> {
     @Override
-    public void execute(Integer parameter) {
+    public void accept(Integer integer) {
 
     }
 }

@@ -1,11 +1,15 @@
 package io.smartcat.data.loader;
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.smartcat.data.loader.api.DataSource;
+import io.smartcat.data.loader.util.ThreadPoolExecutorUtil;
 
 /**
  * Data collector implementation. Used to take care of data queue for load generator.
@@ -16,13 +20,15 @@ public class DataCollector {
 
     private static final int DEFAULT_DATA_QUEUE_CAPACITY = 1024;
 
+    private static final AtomicLong COUNTER_THREAD_COUNT = new AtomicLong(0);
+
     private volatile boolean isRunning = false;
 
     private DataSource<Integer> dataSource;
 
     private LinkedBlockingQueue<Integer> dataQueue;
 
-    private Thread dataQueueThread;
+    private final ThreadPoolExecutor dataCollectorExecutor;
 
     private int dataQueueCapacity;
 
@@ -47,7 +53,14 @@ public class DataCollector {
 
         this.dataQueue = new LinkedBlockingQueue<>(dataQueueCapacity);
 
-        this.dataQueueThread = new Thread(new Collector());
+        dataCollectorExecutor = new ThreadPoolExecutor(10, 10, 10L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+                (runnable) -> {
+                    Thread thread = new Thread(runnable);
+                    thread.setName("data-collector-thread-" + COUNTER_THREAD_COUNT.getAndIncrement());
+                    thread.setDaemon(true);
+                    thread.setPriority(Thread.NORM_PRIORITY);
+                    return thread;
+                });
     }
 
     /**
@@ -73,17 +86,17 @@ public class DataCollector {
      */
     public void start() {
         this.isRunning = true;
-        this.dataQueueThread.start();
+        ThreadPoolExecutorUtil.fillThreadPool(dataCollectorExecutor, new Collector());
 
-        LOGGER.debug("Priming data queue from data source to 75% of capacity.");
+        LOGGER.info("Priming data queue from data source to 75% of capacity.");
         while (dataQueue.size() < (dataQueueCapacity * 0.75)) {
             try {
-                Thread.sleep(10);
+                TimeUnit.MICROSECONDS.sleep(100);
             } catch (InterruptedException e) {
                 LOGGER.error("Error waiting to populate data queue.", e);
             }
         }
-        LOGGER.debug("Finished priming data queue.");
+        LOGGER.info("Finished priming data queue.");
     }
 
     /**
@@ -93,7 +106,7 @@ public class DataCollector {
      */
     public void stop() throws InterruptedException {
         this.isRunning = false;
-        this.dataQueueThread.join();
+        this.dataCollectorExecutor.shutdown();
     }
 
     /**
@@ -107,7 +120,7 @@ public class DataCollector {
                     dataQueue.offer(dataSource.next());
                 } else {
                     try {
-                        Thread.sleep(0, 1000);
+                        TimeUnit.NANOSECONDS.sleep(1);
                     } catch (InterruptedException e) {
                         LOGGER.error("Error waiting for data source to be available.", e);
                     }
@@ -115,4 +128,5 @@ public class DataCollector {
             }
         }
     }
+
 }
