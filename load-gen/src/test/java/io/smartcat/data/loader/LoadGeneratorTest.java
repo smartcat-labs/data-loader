@@ -8,7 +8,8 @@ public class LoadGeneratorTest {
 
     @Test
     public void should_initialize() {
-        final LoadGenerator loadGenerator = new LoadGenerator();
+        final LoadGenerator loadGenerator = new LoadGenerator.Builder().withTargetRate(10000).withCollectMetrics(true)
+                .build();
         loadGenerator.start();
 
         while (true) {

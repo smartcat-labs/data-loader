@@ -8,14 +8,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.smartcat.data.loader.api.DataSource;
 import io.smartcat.data.loader.api.WorkTask;
-import io.smartcat.data.loader.tokenbuket.FixedRateRefillStrategy;
-import io.smartcat.data.loader.tokenbuket.SleepStrategies;
 import io.smartcat.data.loader.tokenbuket.TokenBucket;
 import io.smartcat.data.loader.util.AtomicCounter;
-import io.smartcat.data.loader.util.NoOpDataSource;
-import io.smartcat.data.loader.util.NoOpWorkTask;
 import io.smartcat.data.loader.util.ThreadPoolExecutorUtil;
 
 /**
@@ -45,34 +40,39 @@ public class PulseGenerator {
 
     private final WorkTask workTask;
 
-    private PulseGenerator(PulseGeneratorBuilder builder) {
+    /**
+     * Pulse generator constructor.
+     *
+     * @param dataCollector data collector
+     * @param tokenBucket token bucket
+     * @param workTask work task
+     * @param collectMetrics collect metrics
+     */
+    public PulseGenerator(DataCollector dataCollector, TokenBucket tokenBucket, WorkTask workTask,
+            boolean collectMetrics) {
 
-        this.collectMetrics = builder.collectMetrics;
-        this.dataCollector = new DataCollector(builder.dataSource, (int) (builder.targetRate * 1.2));
+        this.dataCollector = dataCollector;
+        this.tokenBucket = tokenBucket;
+        this.workTask = workTask;
+        this.collectMetrics = collectMetrics;
 
-        workerExecutor = new ThreadPoolExecutor(builder.workerThreadPoolCoreSize, builder.workerThreadPoolMaxSize, 100L,
-                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), (runnable) -> {
-            Thread thread = new Thread(runnable);
-            thread.setName("load-gen-worker-thread-" + LOADGEN_THREAD_COUNT.getAndIncrement());
-            thread.setDaemon(true);
-            thread.setPriority(Thread.MIN_PRIORITY);
-            return thread;
-        });
+        workerExecutor = new ThreadPoolExecutor(10, 50, 100L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+                (runnable) -> {
+                    Thread thread = new Thread(runnable);
+                    thread.setName("load-gen-worker-thread-" + LOADGEN_THREAD_COUNT.getAndIncrement());
+                    thread.setDaemon(true);
+                    thread.setPriority(Thread.MIN_PRIORITY);
+                    return thread;
+                });
 
-        pulseExecutor = new ThreadPoolExecutor(builder.pulseThreadPoolCoreSize, builder.pulseThreadPoolMaxSize, 10L,
-                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), (runnable) -> {
-            Thread thread = new Thread(runnable);
-            thread.setName("pulse-worker-thread-" + PULSE_THREAD_COUNT.getAndIncrement());
-            thread.setDaemon(true);
-            thread.setPriority(Thread.MIN_PRIORITY);
-            return thread;
-        });
-
-        tokenBucket = new TokenBucket(builder.targetRate, 0,
-                new FixedRateRefillStrategy(builder.targetRate, 1, TimeUnit.SECONDS),
-                SleepStrategies.NANOSECOND_SLEEP_STRATEGY(1));
-
-        this.workTask = builder.workTask;
+        pulseExecutor = new ThreadPoolExecutor(10, 10, 100L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+                (runnable) -> {
+                    Thread thread = new Thread(runnable);
+                    thread.setName("pulse-worker-thread-" + PULSE_THREAD_COUNT.getAndIncrement());
+                    thread.setDaemon(true);
+                    thread.setPriority(Thread.MIN_PRIORITY);
+                    return thread;
+                });
     }
 
     /**
@@ -94,15 +94,6 @@ public class PulseGenerator {
         this.dataCollector.stop();
         this.pulseExecutor.shutdown();
         this.workerExecutor.shutdown();
-    }
-
-    /**
-     * Set target rate.
-     *
-     * @param targetRate target rate
-     */
-    public void setTargetRate(long targetRate) {
-        // TODO: Handle rate changes through RefillStrategy implementation
     }
 
     /**
@@ -140,114 +131,6 @@ public class PulseGenerator {
      */
     public long getPulseCount() {
         return pulseCounter.getAndReset();
-    }
-
-    /**
-     * Pulse generator builder class.
-     */
-    public static class PulseGeneratorBuilder {
-
-        private int workerThreadPoolCoreSize = 10;
-
-        private int workerThreadPoolMaxSize = 500;
-
-        private int pulseThreadPoolCoreSize = 10;
-
-        private int pulseThreadPoolMaxSize = 10;
-
-        private long targetRate = 1000;
-
-        private boolean collectMetrics = false;
-
-        private DataSource dataSource = new NoOpDataSource();
-
-        private WorkTask workTask = new NoOpWorkTask();
-
-        /**
-         * Define a worker thread pool core size.
-         *
-         * @param workerThreadPoolCoreSize worker thread pool core size
-         * @return {@code io.smartcat.data.loader.PulseGeneratorBuilder} instance
-         */
-        public PulseGeneratorBuilder withWorkerThreadPoolCoreSize(int workerThreadPoolCoreSize) {
-            this.workerThreadPoolCoreSize = workerThreadPoolCoreSize;
-            return this;
-        }
-
-        /**
-         * Define a worker thread pool max size.
-         *
-         * @param workerThreadPoolMaxSize worker thread pool max size
-         * @return {@code io.smartcat.data.loader.PulseGeneratorBuilder} instance
-         */
-        public PulseGeneratorBuilder withWorkerThreadPoolMaxSize(int workerThreadPoolMaxSize) {
-            this.workerThreadPoolMaxSize = workerThreadPoolMaxSize;
-            return this;
-        }
-
-        public PulseGeneratorBuilder withPulseThreadPoolCoreSize(int pulseThreadPoolCoreSize) {
-            this.pulseThreadPoolCoreSize = pulseThreadPoolCoreSize;
-            return this;
-        }
-
-        public PulseGeneratorBuilder withPulseThreadPoolMaxSize(int pulseThreadPoolMaxSize) {
-            this.pulseThreadPoolMaxSize = pulseThreadPoolMaxSize;
-            return this;
-        }
-
-        /**
-         * Define a target rate.
-         *
-         * @param targetRate target rate
-         * @return {@code io.smartcat.data.loader.PulseGeneratorBuilder} instance
-         */
-        public PulseGeneratorBuilder withTargetRate(long targetRate) {
-            this.targetRate = targetRate;
-            return this;
-        }
-
-        /**
-         * Define if metrics are being collected.
-         *
-         * @param collectMetrics collect metrics
-         * @return {@code io.smartcat.data.loader.PulseGeneratorBuilder} instance
-         */
-        public PulseGeneratorBuilder withMetrics(boolean collectMetrics) {
-            this.collectMetrics = collectMetrics;
-            return this;
-        }
-
-        /**
-         * Define a DataSource implementation providing data for WorkTask execution.
-         *
-         * @param dataSource {@code io.smartcat.data.loader.api.DataSource} implementation
-         * @return {@code io.smartcat.data.loader.PulseGeneratorBuilder} instance
-         */
-        public PulseGeneratorBuilder withDataSource(DataSource dataSource) {
-            this.dataSource = dataSource;
-            return this;
-        }
-
-        /**
-         * Define a WorkTask implementation that will be executed at a given rate.
-         *
-         * @param workTask {@code io.smartcat.data.loader.api.WorkTask} implementation
-         * @return {@code io.smartcat.data.loader.PulseGeneratorBuilder} instance
-         */
-        public PulseGeneratorBuilder withWorkTask(WorkTask workTask) {
-            this.workTask = workTask;
-            return this;
-        }
-
-        /**
-         * Build {@code io.smartcat.data.loader.PulseGenerator} instance.
-         *
-         * @return {@code io.smartcat.data.loader.PulseGenerator} instance
-         */
-        public PulseGenerator build() {
-            return new PulseGenerator(this);
-        }
-
     }
 
 }

@@ -1,33 +1,42 @@
 package io.smartcat.data.loader.tokenbuket;
 
+/**
+ * Token bucket algorithm implementation.
+ */
 public class TokenBucket {
 
-    private final long capacity;
+    private final long capacity = Long.MAX_VALUE;
     private final SleepStrategy sleepStrategy;
     private final RefillStrategy refillStrategy;
 
     private long size;
 
-    public TokenBucket(long capacity, long initialTokens, RefillStrategy refillStrategy, SleepStrategy sleepStrategy) {
+    /**
+     * Constructor.
+     *
+     * @param initialTokens number of initial tokens
+     * @param refillStrategy refill strategy
+     * @param sleepStrategy sleep strategy
+     */
+    public TokenBucket(long initialTokens, RefillStrategy refillStrategy, SleepStrategy sleepStrategy) {
 
-        if (capacity <= 0) {
-            throw new IllegalArgumentException("capacity must be positive");
-        }
-
-        if (initialTokens > capacity) {
-            throw new IllegalArgumentException("initialTokens must be equal or less than capacity");
-        }
-
-        this.capacity = capacity;
         this.size = initialTokens;
         this.refillStrategy = refillStrategy;
         this.sleepStrategy = sleepStrategy;
     }
 
+    /**
+     * Get one token or block until one token available.
+     */
     public void get() {
         get(1);
     }
 
+    /**
+     * Get number of tokens or block until that number of tokens is available.
+     *
+     * @param tokens number of tokens
+     */
     public void get(long tokens) {
         while (true) {
             if (tryGet(tokens)) {
@@ -38,7 +47,7 @@ public class TokenBucket {
         }
     }
 
-    public synchronized boolean tryGet(long tokens) {
+    private synchronized boolean tryGet(long tokens) {
         if (tokens <= 0) {
             throw new IllegalArgumentException("Number of tokens to consume must be positive");
         }
@@ -59,7 +68,7 @@ public class TokenBucket {
     }
 
     private synchronized void refill(long tokens) {
-        size = Math.max(0, Math.min(size + Math.abs(tokens), capacity));
+        size += tokens;
     }
 
 }

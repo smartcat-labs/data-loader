@@ -7,13 +7,28 @@ import java.util.concurrent.TimeUnit;
  */
 public class SleepStrategies {
 
-    public static final io.smartcat.data.loader.tokenbuket.SleepStrategy BUSY_SLEEP_STRATEGY() {
+    private SleepStrategies() {
+
+    }
+
+    /**
+     * Busy sleep strategy implementation that doesn't sleep or block the thread.
+     *
+     * @return sleep strategy
+     */
+    public static final SleepStrategy busySleepStrategy() {
         return () -> {
 
         };
     }
 
-    public static final io.smartcat.data.loader.tokenbuket.SleepStrategy NANOSECOND_SLEEP_STRATEGY(int duration) {
+    /**
+     * Nanosecond based sleep strategy.
+     *
+     * @param duration nanosecond duration
+     * @return sleep strategy
+     */
+    public static final SleepStrategy nanosecondSleepStrategy(int duration) {
         return () -> {
             try {
                 TimeUnit.NANOSECONDS.sleep(duration);
@@ -23,7 +38,13 @@ public class SleepStrategies {
         };
     }
 
-    public static final io.smartcat.data.loader.tokenbuket.SleepStrategy MICROSECOND_SLEEP_STRATEGY(int duration) {
+    /**
+     * Microsecond based sleep strategy.
+     *
+     * @param duration microsecond duration
+     * @return sleep strategy
+     */
+    public static final SleepStrategy microsecondSleepStrategy(int duration) {
         return () -> {
             try {
                 TimeUnit.MICROSECONDS.sleep(duration);
@@ -33,7 +54,13 @@ public class SleepStrategies {
         };
     }
 
-    public static final io.smartcat.data.loader.tokenbuket.SleepStrategy MILLISECOND_SLEEP_STRATEGY(int duration) {
+    /**
+     * Millisecond based sleep strategy.
+     *
+     * @param duration millisecond duration
+     * @return sleep strategy
+     */
+    public static final SleepStrategy millisecondSleepStrategy(int duration) {
         return () -> {
             try {
                 TimeUnit.MILLISECONDS.sleep(duration);
