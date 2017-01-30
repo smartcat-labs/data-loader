@@ -2,8 +2,8 @@ package io.smartcat.data.loader.rules;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.smartcat.data.loader.util.Randomizer;
@@ -14,12 +14,15 @@ import io.smartcat.data.loader.util.Randomizer;
 public class RangeRuleDate implements Rule<Date> {
 
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
-    private List<Date> ranges = new ArrayList<>();
-    private List<Date> rangeEdges = new ArrayList<>();
+    private final List<Date> ranges;
+    private final List<Date> rangeEdges;
 
     private Randomizer random;
 
-    private RangeRuleDate() {
+    private RangeRuleDate(Builder builder) {
+        this.random = builder.random;
+        this.ranges = builder.ranges;
+        this.rangeEdges = builder.rangeEdges;
     };
 
     /**
@@ -31,36 +34,6 @@ public class RangeRuleDate implements Rule<Date> {
     public RangeRuleDate withRandom(Randomizer random) {
         this.random = random;
         return this;
-    }
-
-    /**
-     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     *
-     * @param rangeMarkers array of Dates that denote the ranges.
-     * @return RangeRuleDate with set ranges.
-     */
-    public static RangeRuleDate withRanges(Date... rangeMarkers) {
-        RangeRuleDate result = new RangeRuleDate();
-
-        result.ranges.addAll(Arrays.asList(rangeMarkers));
-        result.rangeEdges.addAll(Arrays.asList(rangeMarkers));
-
-        return result;
-    }
-
-    /**
-     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     *
-     * @param rangeMarkers list of Dates that denote the ranges.
-     * @return RangeRuleDate with set ranges.
-     */
-    public static RangeRuleDate withRanges(List<Date> rangeMarkers) {
-        RangeRuleDate result = new RangeRuleDate();
-
-        result.ranges.addAll(rangeMarkers);
-        result.rangeEdges.addAll(rangeMarkers);
-
-        return result;
     }
 
     @Override
@@ -97,6 +70,67 @@ public class RangeRuleDate implements Rule<Date> {
             long edge = rangeEdges.remove(0).getTime() - 1;
             Instant largestInstant = Instant.ofEpochMilli(edge);
             return Date.from(largestInstant);
+        }
+    }
+
+    /**
+     * Builder for RangeRuleDate.
+     */
+    public static class Builder {
+
+        private List<Date> ranges = new ArrayList<>();
+        private List<Date> rangeEdges = new ArrayList<>();
+
+        private Randomizer random;
+
+        /**
+         * Constructor.
+         *
+         * @param random Randomizer implementation.
+         */
+        public Builder(Randomizer random) {
+            this.random = random;
+        }
+
+        /**
+         * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+         *
+         * @param dates array of Dates that denote the ranges.
+         * @return Builder with set ranges of dates.
+         */
+        public Builder ranges(Date...dates) {
+            List<Date> copy = new LinkedList<>();
+            for (Date date : dates) {
+                copy.add(new Date(date.getTime()));
+            }
+            ranges.addAll(copy);
+            rangeEdges.addAll(copy);
+            return this;
+        }
+
+        /**
+         * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+         *
+         * @param dates List of Dates that denote the ranges.
+         * @return Builder with set ranges of dates.
+         */
+        public Builder ranges(List<Date> dates) {
+            List<Date> copy = new LinkedList<>();
+            for (Date date : dates) {
+                copy.add(new Date(date.getTime()));
+            }
+            ranges.addAll(copy);
+            rangeEdges.addAll(copy);
+            return this;
+        }
+
+        /**
+         * Build method.
+         *
+         * @return immutable RangeRuleDate object based on the previously instantiated builder.
+         */
+        public RangeRuleDate build() {
+            return new RangeRuleDate(this);
         }
     }
 }

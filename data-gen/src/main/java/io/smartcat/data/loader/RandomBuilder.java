@@ -143,7 +143,8 @@ public class RandomBuilder<T> {
 
         List<Date> result = Arrays.asList(rangeMarkers).stream().map(marker -> marker.toInstant(ZoneOffset.UTC))
                 .map(instant -> Date.from(instant)).collect(Collectors.toList());
-        fieldRules.put(fieldName, RangeRuleDate.withRanges(result).withRandom(random));
+
+        fieldRules.put(fieldName, new RangeRuleDate.Builder(random).ranges(result).build());
 
         return this;
     }
@@ -164,7 +165,7 @@ public class RandomBuilder<T> {
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Date... rangeMarkers) {
         checkRangeInput(rangeMarkers);
-        fieldRules.put(fieldName, RangeRuleDate.withRanges(rangeMarkers).withRandom(random));
+        fieldRules.put(fieldName, new RangeRuleDate.Builder(random).ranges(rangeMarkers).build());
 
         return this;
     }
