@@ -13,53 +13,15 @@ import io.smartcat.data.loader.util.Randomizer;
 public final class RangeRuleLong implements Rule<Long> {
 
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
-    private final List<Long> ranges = new ArrayList<>();
-    private final List<Long> rangeEdges = new LinkedList<>();
+    private final List<Long> ranges;
+    private final List<Long> rangeEdges;
 
-    private Randomizer random;
+    private final Randomizer random;
 
-    private RangeRuleLong() {
-    };
-
-    /**
-     * Set Randomizer for the Rule.
-     *
-     * @param random Randomizer impl.
-     * @return RangeRuleLong with set Randomizer.
-     */
-    public RangeRuleLong withRandom(Randomizer random) {
-        this.random = random;
-        return this;
-    }
-
-    /**
-     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     *
-     * @param rangeMarkers array of longs that denote the ranges.
-     * @return RangeRuleLong with set ranges.
-     */
-    public static RangeRuleLong withRanges(Long... rangeMarkers) {
-        RangeRuleLong result = new RangeRuleLong();
-
-        result.ranges.addAll(Arrays.asList(rangeMarkers));
-        result.rangeEdges.addAll(Arrays.asList(rangeMarkers));
-
-        return result;
-    }
-
-    /**
-     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     *
-     * @param rangeMarkers list of longs that denote the ranges.
-     * @return RangeRuleLong with set ranges.
-     */
-    public static RangeRuleLong withRanges(List<Long> rangeMarkers) {
-        RangeRuleLong result = new RangeRuleLong();
-
-        result.ranges.addAll(rangeMarkers);
-        result.rangeEdges.addAll(rangeMarkers);
-
-        return result;
+    private RangeRuleLong(Builder builder) {
+        this.ranges = builder.ranges;
+        this.rangeEdges = builder.rangeEdges;
+        this.random = builder.random;
     }
 
     @Override
@@ -93,6 +55,47 @@ public final class RangeRuleLong implements Rule<Long> {
         } else {
             return rangeEdges.remove(0) - 1;
         }
+    }
+
+    /**
+     * Builder for RangeRuleLong.
+     */
+    public static class Builder {
+
+        private List<Long> ranges = new ArrayList<>();
+        private final List<Long> rangeEdges = new LinkedList<>();
+        private Randomizer random;
+
+        /**
+         * Constructor.
+         *
+         * @param randomizer Randomizer implementation.
+         */
+        public Builder(Randomizer randomizer) {
+            this.random = randomizer;
+        }
+
+        /**
+         * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+         *
+         * @param ranges array of Long that denote the ranges.
+         * @return Builder with set ranges of Long.
+         */
+        public Builder ranges(Long... ranges) {
+            this.ranges.addAll(Arrays.asList(ranges));
+            this.rangeEdges.addAll(Arrays.asList(ranges));
+            return this;
+        }
+
+        /**
+         * Build method.
+         *
+         * @return immutable RangeRuleLong object based on the previously instantiated builder.
+         */
+        public RangeRuleLong build() {
+            return new RangeRuleLong(this);
+        }
+
     }
 
 }

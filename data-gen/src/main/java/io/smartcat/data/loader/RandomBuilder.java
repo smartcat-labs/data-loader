@@ -185,7 +185,7 @@ public class RandomBuilder<T> {
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Long... rangeMarkers) {
         checkRangeInput(rangeMarkers);
-        fieldRules.put(fieldName, RangeRuleLong.withRanges(rangeMarkers).withRandom(random));
+        fieldRules.put(fieldName, new RangeRuleLong.Builder(random).ranges(rangeMarkers).build());
         return this;
     }
 

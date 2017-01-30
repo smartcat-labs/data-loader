@@ -54,7 +54,7 @@ public class RangeRuleInt implements Rule<Integer> {
     }
 
     /**
-     * Builder for RangeRuleFInt.
+     * Builder for RangeRuleInt.
      */
     public static class Builder {
 
