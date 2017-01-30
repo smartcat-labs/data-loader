@@ -9,24 +9,38 @@ public class DiscreteRuleBoolean implements Rule<Boolean> {
 
     private Randomizer random;
 
-    private DiscreteRuleBoolean() {
-    };
-
-    /**
-     * Set Randomizer for the Rule.
-     *
-     * @param random Randomizer impl.
-     * @return DiscreteRule with set Randomizer.
-     */
-    public static DiscreteRuleBoolean withRandom(Randomizer random) {
-        DiscreteRuleBoolean rule = new DiscreteRuleBoolean();
-        rule.random = random;
-        return rule;
+    private DiscreteRuleBoolean(Builder builder) {
+        this.random = builder.random;
     }
 
     @Override
     public Boolean getRandomAllowedValue() {
         return random.nextBoolean();
+    }
+
+    /**
+     * Builder for DiscreteRuleBoolean.
+     */
+    public static class Builder {
+        private Randomizer random;
+
+        /**
+         * Constructor.
+         *
+         * @param randomizer Randomizer implementation.
+         */
+        public Builder(Randomizer randomizer) {
+            this.random = randomizer;
+        }
+
+        /**
+         * Build method.
+         *
+         * @return immutable DiscreteRuleBoolean object based on the previously instantiated builder.
+         */
+        public DiscreteRuleBoolean build() {
+            return new DiscreteRuleBoolean(this);
+        }
     }
 
 }
