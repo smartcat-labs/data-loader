@@ -13,59 +13,21 @@ import io.smartcat.data.loader.util.Randomizer;
 public class RangeRuleFloat implements Rule<Float> {
 
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
-    private List<Float> ranges = new ArrayList<>();
+    private final List<Float> ranges;
 
-    private final List<Float> rangeEdges = new LinkedList<>();
+    private final List<Float> rangeEdges;
 
-    private Randomizer random;
+    private final Randomizer random;
 
     /**
      * Small value that will be subtracted from the end of ranges.
      */
     public static final Float EPSILON = 0.00001f;
 
-    private RangeRuleFloat() {
-    };
-
-    /**
-     * Set Randomizer for the Rule.
-     *
-     * @param random Randomizer impl.
-     * @return RangeRuleFloat with set Randomizer.
-     */
-    public RangeRuleFloat withRandom(Randomizer random) {
-        this.random = random;
-        return this;
-    }
-
-    /**
-     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     *
-     * @param rangeMarkers array of doubles that denote the ranges.
-     * @return RangeRuleFloat with set ranges.
-     */
-    public static RangeRuleFloat withRanges(Float... rangeMarkers) {
-        RangeRuleFloat result = new RangeRuleFloat();
-
-        result.ranges.addAll(Arrays.asList(rangeMarkers));
-        result.rangeEdges.addAll(Arrays.asList(rangeMarkers));
-
-        return result;
-    }
-
-    /**
-     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     *
-     * @param rangeMarkers list of doubles that denote the ranges.
-     * @return RangeRuleFloat with set ranges.
-     */
-    public static RangeRuleFloat withRanges(List<Float> rangeMarkers) {
-        RangeRuleFloat result = new RangeRuleFloat();
-
-        result.ranges.addAll(rangeMarkers);
-        result.rangeEdges.addAll(rangeMarkers);
-
-        return result;
+    private RangeRuleFloat(Builder builder) {
+        this.ranges = builder.ranges;
+        this.rangeEdges = builder.rangeEdges;
+        this.random = builder.random;
     }
 
     @Override
@@ -99,6 +61,47 @@ public class RangeRuleFloat implements Rule<Float> {
         } else {
             return rangeEdges.remove(0) - EPSILON;
         }
+    }
+
+    /**
+     * Builder for RangeRuleFloat.
+     */
+    public static class Builder {
+
+        private List<Float> ranges = new ArrayList<>();
+        private final List<Float> rangeEdges = new LinkedList<>();
+        private Randomizer random;
+
+        /**
+         * Constructor.
+         *
+         * @param randomizer Randomizer implementation.
+         */
+        public Builder(Randomizer randomizer) {
+            this.random = randomizer;
+        }
+
+        /**
+         * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+         *
+         * @param ranges array of Float that denote the ranges.
+         * @return Builder with set ranges of Float.
+         */
+        public Builder ranges(Float...ranges) {
+            this.ranges.addAll(Arrays.asList(ranges));
+            this.rangeEdges.addAll(Arrays.asList(ranges));
+            return this;
+        }
+
+        /**
+         * Build method.
+         *
+         * @return immutable RangeRuleFloat object based on the previously instantiated builder.
+         */
+        public RangeRuleFloat build() {
+            return new RangeRuleFloat(this);
+        }
+
     }
 
 }

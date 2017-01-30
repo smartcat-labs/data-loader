@@ -120,7 +120,7 @@ public class RandomBuilder<T> {
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Float... rangeMarkers) {
         checkRangeInput(rangeMarkers);
-        fieldRules.put(fieldName, RangeRuleFloat.withRanges(rangeMarkers).withRandom(random));
+        fieldRules.put(fieldName, new RangeRuleFloat.Builder(random).ranges(rangeMarkers).build());
         return this;
     }
 
