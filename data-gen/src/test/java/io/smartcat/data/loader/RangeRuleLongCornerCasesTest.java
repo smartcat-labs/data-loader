@@ -16,15 +16,10 @@ public class RangeRuleLongCornerCasesTest {
         Long beginingOfRange = 0L;
         Long endOfRange = 10L;
 
-        randomUserBuilder
-            .randomFrom("username", "subzero")
-            .randomFromRange("numberOfCards", beginingOfRange, endOfRange)
-            .toBeBuilt(3);
+        randomUserBuilder.randomFrom("username", "subzero")
+                .randomFromRange("numberOfCards", beginingOfRange, endOfRange).toBeBuilt(3);
 
-        BuildRunner<User> runner = new BuildRunner<>();
-
-        runner.addBuilder(randomUserBuilder);
-        List<User> builtUsers = runner.build();
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         boolean oneExactlyAtTheBeginingOfTheRange = false;
         boolean oneExactlyAtTheEndOfTheRange = false;

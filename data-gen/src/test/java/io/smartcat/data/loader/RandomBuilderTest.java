@@ -81,9 +81,7 @@ public class RandomBuilderTest {
         try {
             randomUserBuilder.randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3, upper3)
                     .toBeBuilt(1000);
-            BuildRunner<User> runner = new BuildRunner<>();
-            runner.addBuilder(randomUserBuilder);
-            runner.build();
+            new BuildRunner<User>().withBuilder(randomUserBuilder).build();
             Assert.fail();
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Invalid range bounds. Range definition must be stricly increasing.", e.getMessage());
@@ -103,9 +101,7 @@ public class RandomBuilderTest {
         short lower3 = 15;
         try {
             randomUserBuilder.randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3).toBeBuilt(1000);
-            BuildRunner<User> runner = new BuildRunner<>();
-            runner.addBuilder(randomUserBuilder);
-            runner.build();
+            new BuildRunner<User>().withBuilder(randomUserBuilder).build();
             Assert.fail();
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Invalid ranges definition. Ranges must be defined with even number of elements.",
@@ -120,12 +116,9 @@ public class RandomBuilderTest {
         LocalDateTime date1980 = LocalDateTime.of(1980, 1, 1, 0, 0);
         LocalDateTime date1990 = LocalDateTime.of(1990, 1, 1, 0, 0);
         LocalDateTime date2000 = LocalDateTime.of(2000, 1, 1, 0, 0);
-        randomUserBuilder.randomFromRange("birthDate", date1960, date1980, date1990, date2000)
-                .toBeBuilt(1000);
+        randomUserBuilder.randomFromRange("birthDate", date1960, date1980, date1990, date2000).toBeBuilt(1000);
 
-        BuildRunner<User> runner = new BuildRunner<>();
-        runner.addBuilder(randomUserBuilder);
-        List<User> result = runner.build();
+        List<User> result = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         Assert.assertEquals(1000, result.size());
 
@@ -160,13 +153,9 @@ public class RandomBuilderTest {
         Date date1980 = Date.from(LocalDateTime.of(1980, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
         Date date1990 = Date.from(LocalDateTime.of(1990, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
         Date date2000 = Date.from(LocalDateTime.of(2000, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
-        randomUserBuilder
-                .randomFromRange("birthDate", date1960, date1980, date1990, date2000)
-                .toBeBuilt(1000);
+        randomUserBuilder.randomFromRange("birthDate", date1960, date1980, date1990, date2000).toBeBuilt(1000);
 
-        BuildRunner<User> runner = new BuildRunner<>();
-        runner.addBuilder(randomUserBuilder);
-        List<User> result = runner.build();
+        List<User> result = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         Assert.assertEquals(1000, result.size());
 
@@ -197,9 +186,7 @@ public class RandomBuilderTest {
     public void should_accept_multiple_ranges_for_long() {
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class);
         randomUserBuilder.randomFromRange("numberOfCards", 1L, 10L, 20L, 30L).toBeBuilt(1000);
-        BuildRunner<User> runner = new BuildRunner<>();
-        runner.addBuilder(randomUserBuilder);
-        List<User> result = runner.build();
+        List<User> result = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         Assert.assertEquals(1000, result.size());
 
@@ -223,9 +210,7 @@ public class RandomBuilderTest {
     public void should_accept_multiple_ranges_for_double() {
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class);
         randomUserBuilder.randomFromRange("accountBalance", 1.0, 10.1, 20.0, 30.1).toBeBuilt(1000);
-        BuildRunner<User> runner = new BuildRunner<>();
-        runner.addBuilder(randomUserBuilder);
-        List<User> result = runner.build();
+        List<User> result = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         Assert.assertEquals(1000, result.size());
 

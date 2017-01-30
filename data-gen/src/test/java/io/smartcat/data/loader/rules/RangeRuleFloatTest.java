@@ -21,10 +21,7 @@ public class RangeRuleFloatTest {
         randomUserBuilder.randomFrom("username", "subzero")
                 .randomFromRange("balanceInFloat", beginingOfRange, endOfRange).toBeBuilt(3);
 
-        BuildRunner<User> runner = new BuildRunner<>();
-
-        runner.addBuilder(randomUserBuilder);
-        List<User> builtUsers = runner.build();
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         boolean oneExactlyAtTheBeginingOfTheRange = false;
         boolean oneExactlyAtTheEndOfTheRange = false;
@@ -55,11 +52,10 @@ public class RangeRuleFloatTest {
         float upper2 = 15.2f;
         float lower3 = 20.3f;
         float upper3 = 25.4f;
-        randomUserBuilder
-                .randomFromRange("balanceInFloat", lower1, upper1, lower2, upper2, lower3, upper3).toBeBuilt(1000);
-        BuildRunner<User> runner = new BuildRunner<>();
-        runner.addBuilder(randomUserBuilder);
-        List<User> builtUsers = runner.build();
+        randomUserBuilder.randomFromRange("balanceInFloat", lower1, upper1, lower2, upper2, lower3, upper3)
+                .toBeBuilt(1000);
+
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         Assert.assertEquals(1000, builtUsers.size());
 
@@ -68,8 +64,7 @@ public class RangeRuleFloatTest {
         boolean atLeastOneInThirdRange = false;
         for (User u : builtUsers) {
             String message = "user should have balanceInFloat in range:"
-                    + " [0.1, 5.0) or [10.1, 15.2) or [20.3, 25.4), but it was: "
-                    + u.getBalanceInFloat();
+                    + " [0.1, 5.0) or [10.1, 15.2) or [20.3, 25.4), but it was: " + u.getBalanceInFloat();
             boolean inFirstRange = u.getBalanceInFloat() >= lower1 && u.getBalanceInFloat() < upper1;
             if (inFirstRange) {
                 atLeastOneInFirstRange = true;

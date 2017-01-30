@@ -17,15 +17,10 @@ public class RangeRuleDoubleTest {
         Double beginingOfRange = 0.2;
         Double endOfRange = 10.1;
 
-        randomUserBuilder
-            .randomFrom("username", "subzero")
-            .randomFromRange("accountBalance", beginingOfRange, endOfRange)
-            .toBeBuilt(3);
+        randomUserBuilder.randomFrom("username", "subzero")
+                .randomFromRange("accountBalance", beginingOfRange, endOfRange).toBeBuilt(3);
 
-        BuildRunner<User> runner = new BuildRunner<>();
-
-        runner.addBuilder(randomUserBuilder);
-        List<User> builtUsers = runner.build();
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         boolean oneExactlyAtTheBeginingOfTheRange = false;
         boolean oneExactlyAtTheEndOfTheRange = false;

@@ -29,13 +29,7 @@ public class UserTest {
                 .randomSubsetFrom("nicknames", "al").randomFromRange("birthDate", mayTheFirst, mayTheSecond)
                 .randomWithBuilder("address", randomAddressBuilder).toBeBuilt(1);
 
-        BuildRunner<User> runner = new BuildRunner<>();
-
-        runner.addBuilder(randomUserBuilder);
-
-        List<User> userList = runner.build();
-
-        userList.stream().forEach(System.out::println);
+        List<User> userList = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         User u = userList.get(0);
 
@@ -45,8 +39,9 @@ public class UserTest {
         Long expectedNumberOfCards = 1L;
         Assert.assertEquals(expectedNumberOfCards, u.getNumberOfCards());
         Assert.assertTrue(u.getAccountBalance() - 2.72 < 0.1);
-        Assert.assertTrue(u.getFavoriteMovies().isEmpty()
-                || (u.getFavoriteMovies().size() == 1 && u.getFavoriteMovies().get(0).equals("Predator")));
+        Assert.assertTrue(
+                u.getFavoriteMovies().isEmpty() || (u.getFavoriteMovies().size() == 1 && u.getFavoriteMovies().get(0)
+                        .equals("Predator")));
         Assert.assertTrue(
                 u.getNicknames().isEmpty() || (u.getNicknames().size() == 1 && u.getNicknames().contains("al")));
         Assert.assertTrue("birthdate should be equals or after the May 1, 1975",

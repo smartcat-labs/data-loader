@@ -19,9 +19,8 @@ public class RangeRuleIntTest {
         int lower = 0;
         int upper = 5;
         randomUserBuilder.randomFromRange("numberOfInts", lower, upper).toBeBuilt(1000);
-        BuildRunner<User> runner = new BuildRunner<>();
-        runner.addBuilder(randomUserBuilder);
-        List<User> builtUsers = runner.build();
+
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         Assert.assertEquals(1000, builtUsers.size());
 
@@ -43,11 +42,10 @@ public class RangeRuleIntTest {
         int upper2 = 15;
         int lower3 = 20;
         int upper3 = 25;
-        randomUserBuilder
-                .randomFromRange("numberOfInts", lower1, upper1, lower2, upper2, lower3, upper3).toBeBuilt(1000);
-        BuildRunner<User> runner = new BuildRunner<>();
-        runner.addBuilder(randomUserBuilder);
-        List<User> builtUsers = runner.build();
+        randomUserBuilder.randomFromRange("numberOfInts", lower1, upper1, lower2, upper2, lower3, upper3)
+                .toBeBuilt(1000);
+
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         Assert.assertEquals(1000, builtUsers.size());
 
@@ -55,9 +53,8 @@ public class RangeRuleIntTest {
         boolean atLeastOneInSecondRange = false;
         boolean atLeastOneInThirdRange = false;
         for (User u : builtUsers) {
-            System.out.println("shorts is: " + u.getNumberOfInts());
-            String message = "user should have number of ints in range [0,5) or [10,15), but it was: "
-                    + u.getNumberOfInts();
+            String message = "user should have number of ints in range [0,5) or [10,15), but it was: " + u
+                    .getNumberOfInts();
             boolean inFirstRange = u.getNumberOfInts() >= lower1 && u.getNumberOfInts() < upper1;
             if (inFirstRange) {
                 atLeastOneInFirstRange = true;

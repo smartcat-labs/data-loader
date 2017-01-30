@@ -17,9 +17,7 @@ public class UUIDRuleTest {
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class, randomizer);
 
         randomUserBuilder.randomUUID("username").toBeBuilt(10);
-        BuildRunner<User> runner = new BuildRunner<>();
-        runner.addBuilder(randomUserBuilder);
-        List<User> builtUsers = runner.build();
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
         builtUsers.forEach(user -> Assert.assertEquals(36, user.getUsername().length()));
 

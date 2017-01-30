@@ -25,12 +25,8 @@ public class BuildRunnerTest {
         RandomBuilder<User> userBuilderUsernameOnly = new RandomBuilder<User>(User.class, randomizer);
         userBuilderUsernameOnly.randomFrom("username", usernameArray).toBeBuilt(10);
 
-        BuildRunner<User> runner = new BuildRunner<>();
-
-        runner.addBuilder(randomUserBuilder);
-        runner.addBuilder(userBuilderUsernameOnly);
-
-        List<User> builtUsers = runner.build();
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(randomUserBuilder)
+                .withBuilder(userBuilderUsernameOnly).build();
 
         int numberOfUsersWithUsernameAndFirstName = 0;
         int numberOfUsersWithUsernameOnly = 0;
@@ -67,12 +63,8 @@ public class BuildRunnerTest {
         builderUsernameLastName.randomFrom("username", usernameArray).randomFrom("lastname", lastNameArray)
                 .toBeBuilt(3);
 
-        BuildRunner<User> runner = new BuildRunner<>();
-
-        runner.addBuilder(builderUsernameAndFirstName);
-        runner.addBuilder(builderUsernameLastName);
-
-        List<User> builtUsers = runner.build();
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(builderUsernameAndFirstName)
+                .withBuilder(builderUsernameLastName).build();
 
         int numberOfUsersWithUsernameAndFirstName = 0;
         int numberOfUsersWithUsernameAndLastName = 0;
@@ -110,14 +102,8 @@ public class BuildRunnerTest {
         builderFirstNameNumberOfCards.randomFrom("firstname", firstNameArray).randomFromRange("numberOfCards", 1L, 10L)
                 .toBeBuilt(3);
 
-        BuildRunner<User> runner = new BuildRunner<>();
-
-        runner.addBuilder(builderUsernameBalance);
-        runner.addBuilder(builderFirstNameNumberOfCards);
-
-        List<User> builtUsers = runner.build();
-
-        builtUsers.stream().forEach(System.out::println);
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(builderUsernameBalance)
+                .withBuilder(builderFirstNameNumberOfCards).build();
 
         int numberOfUsersWithUsernameAndAccountBalance = 0;
         int numberOfUsersWithFirstNameAndNumberOfCards = 0;
@@ -145,12 +131,8 @@ public class BuildRunnerTest {
         RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class);
         randomUserBuilder.randomFrom("unexistingField", "something").toBeBuilt(100);
 
-        BuildRunner<User> runner = new BuildRunner<>();
-
-        runner.addBuilder(randomUserBuilder);
-
         try {
-            runner.build();
+            List<User> users = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
             Assert.fail("should fail silently when trying to set unexiting field.");
         } catch (IllegalArgumentException e) {
             Assert.assertTrue(e != null);

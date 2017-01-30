@@ -23,11 +23,9 @@ public class DiscreteRuleTest {
                 .randomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac")
                 .toBeBuilt(1000);
 
-        BuildRunner<User> runner = new BuildRunner<>();
-        runner.addBuilder(randomUserBuilder);
-        List<User> builtUsers = runner.build();
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
 
-        String[] usernames = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac" };
+        String[] usernames = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac"};
         List<String> allowedUsernames = new ArrayList<>(Arrays.asList(usernames));
         for (User u : builtUsers) {
             String message = "username can only be from allowed set, but was: " + u.getUsername();
