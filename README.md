@@ -30,6 +30,30 @@ List<User> userList = runner.build();
 
 It can be used as a Java library, programatically in unit and integration tests, and from the command line (though the last one is not yet implemented).
 
+# How to use?
+
+Currently the artifact can be fetched from bintray by adding following element to `<repositories>` section in your project's pom.xml:
+
+```xml
+<repository>
+  <id>bintray-smartcat-labs-maven</id>
+  <name>bintray</name>
+  <url>https://dl.bintray.com/smartcat-labs/maven</url>
+</repository>
+```
+
+And the dependency element to the you pom.xml `<dependencies>` element:
+
+```xml
+<dependency>
+  <groupId>io.smartcat</groupId>
+  <artifactId>data-gen</artifactId>
+  <version>0.0.2</version>
+</dependency>
+```
+
+For showcase and usage examples, take a look at our [Ranger Demo](https://github.com/smartcat-labs/ranger-demo) application.
+
 # Why:
 
 Totally random test data is not so usefull:
