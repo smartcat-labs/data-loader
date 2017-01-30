@@ -13,9 +13,9 @@ import io.smartcat.data.loader.util.Randomizer;
 public class RangeRuleDouble implements Rule<Double> {
 
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
-    private List<Double> ranges = new ArrayList<>();
+    private final List<Double> ranges;
 
-    private final List<Double> rangeEdges = new LinkedList<>();
+    private final List<Double> rangeEdges;
 
     private Randomizer random;
 
@@ -24,48 +24,10 @@ public class RangeRuleDouble implements Rule<Double> {
      */
     public static final Double EPSILON = 0.00000000001;
 
-    private RangeRuleDouble() {
-    };
-
-    /**
-     * Set Randomizer for the Rule.
-     *
-     * @param random Randomizer impl.
-     * @return RangeRuleDouble with set Randomizer.
-     */
-    public RangeRuleDouble withRandom(Randomizer random) {
-        this.random = random;
-        return this;
-    }
-
-    /**
-     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     *
-     * @param rangeMarkers array of doubles that denote the ranges.
-     * @return RangeRuleDouble with set ranges.
-     */
-    public static RangeRuleDouble withRanges(Double... rangeMarkers) {
-        RangeRuleDouble result = new RangeRuleDouble();
-
-        result.ranges.addAll(Arrays.asList(rangeMarkers));
-        result.rangeEdges.addAll(Arrays.asList(rangeMarkers));
-
-        return result;
-    }
-
-    /**
-     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     *
-     * @param rangeMarkers list of doubles that denote the ranges.
-     * @return RangeRuleDouble with set ranges.
-     */
-    public static RangeRuleDouble withRanges(List<Double> rangeMarkers) {
-        RangeRuleDouble result = new RangeRuleDouble();
-
-        result.ranges.addAll(rangeMarkers);
-        result.rangeEdges.addAll(rangeMarkers);
-
-        return result;
+    private RangeRuleDouble(Builder builder) {
+        this.ranges = builder.ranges;
+        this.rangeEdges = builder.rangeEdges;
+        this.random = builder.random;
     }
 
     @Override
@@ -99,6 +61,47 @@ public class RangeRuleDouble implements Rule<Double> {
         } else {
             return rangeEdges.remove(0) - EPSILON;
         }
+    }
+
+    /**
+     * Builder for RangeRuleDouble.
+     */
+    public static class Builder {
+
+        private List<Double> ranges = new ArrayList<>();
+        private final List<Double> rangeEdges = new LinkedList<>();
+        private Randomizer random;
+
+        /**
+         * Constructor.
+         *
+         * @param randomizer Randomizer implementation.
+         */
+        public Builder(Randomizer randomizer) {
+            this.random = randomizer;
+        }
+
+        /**
+         * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+         *
+         * @param ranges array of Double that denote the ranges.
+         * @return Builder with set ranges of Doubles.
+         */
+        public Builder ranges(Double...ranges) {
+            this.ranges.addAll(Arrays.asList(ranges));
+            this.rangeEdges.addAll(Arrays.asList(ranges));
+            return this;
+        }
+
+        /**
+         * Build method.
+         *
+         * @return immutable RangeRuleDouble object based on the previously instantiated builder.
+         */
+        public RangeRuleDouble build() {
+            return new RangeRuleDouble(this);
+        }
+
     }
 
 }

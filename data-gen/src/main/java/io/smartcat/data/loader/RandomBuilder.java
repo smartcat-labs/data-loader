@@ -204,7 +204,8 @@ public class RandomBuilder<T> {
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Double... rangeMarkers) {
         checkRangeInput(rangeMarkers);
-        fieldRules.put(fieldName, RangeRuleDouble.withRanges(rangeMarkers).withRandom(random));
+        fieldRules.put(fieldName, new RangeRuleDouble.Builder(random).ranges(rangeMarkers).build());
+
         return this;
     }
 
