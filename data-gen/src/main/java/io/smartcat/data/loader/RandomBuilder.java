@@ -226,7 +226,7 @@ public class RandomBuilder<T> {
      * @return RandomBuilder<T>
      */
     public RandomBuilder<T> randomBoolean(String fieldName) {
-        fieldRules.put(fieldName, DiscreteRuleBoolean.withRandom(random));
+        fieldRules.put(fieldName, new DiscreteRuleBoolean.Builder(random).build());
         return this;
     }
 

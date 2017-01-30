@@ -7,7 +7,7 @@ import java.util.List;
 import io.smartcat.data.loader.util.Randomizer;
 
 /**
- * Rule for discrete set of allowed values (i.e. not range).
+ * Rule for discrete set of allowed String values.
  */
 public class DiscreteRuleString implements Rule<String> {
 
@@ -15,46 +15,9 @@ public class DiscreteRuleString implements Rule<String> {
 
     private Randomizer random;
 
-    private DiscreteRuleString() {
-    };
-
-    /**
-     * Set list of allowed String values for the rule.
-     *
-     * @param allowedValues array of allowed values
-     * @return DiscreteRule with allowed values.
-     */
-    public static DiscreteRuleString newSet(String... allowedValues) {
-        DiscreteRuleString result = new DiscreteRuleString();
-
-        result.allowedValues.addAll(Arrays.asList(allowedValues));
-
-        return result;
-    }
-
-    /**
-     * Set Randomizer for the Rule.
-     *
-     * @param random Randomizer impl.
-     * @return DiscreteRule with set Randomizer.
-     */
-    public DiscreteRuleString withRandom(Randomizer random) {
-        this.random = random;
-        return this;
-    }
-
-    /**
-     * Set list of allowed String values for the rule.
-     *
-     * @param allowedValues list of allowed values
-     * @return DiscreteRule with list of allowed values.
-     */
-    public static DiscreteRuleString newSet(List<String> allowedValues) {
-        DiscreteRuleString result = new DiscreteRuleString();
-
-        result.allowedValues.addAll(allowedValues);
-
-        return result;
+    private DiscreteRuleString(Builder builder) {
+        this.allowedValues.addAll(builder.allowedValues);
+        this.random = builder.random;
     }
 
     @Override
@@ -62,6 +25,55 @@ public class DiscreteRuleString implements Rule<String> {
         int randomIndex = this.random.nextInt(allowedValues.size());
         String value = allowedValues.get(randomIndex);
         return value;
+    }
+
+    /**
+     * Builder for DiscreteRuleString.
+     */
+    public static class Builder {
+
+        private Randomizer random;
+        private final List<String> allowedValues = new ArrayList<>();
+
+        /**
+         * Constructor.
+         *
+         * @param randomizer Randomizer implementation.
+         */
+        public Builder(Randomizer randomizer) {
+            this.random = randomizer;
+        }
+
+        /**
+         * Set list of allowed String values for the rule.
+         *
+         * @param allowedValues array of allowed values
+         * @return Builder with set allowedValues
+         */
+        public Builder allowedValues(String... allowedValues) {
+            this.allowedValues.addAll(Arrays.asList(allowedValues));
+            return this;
+        }
+
+        /**
+         * Set list of allowed String values for the rule.
+         *
+         * @param allowedValues array of allowed values
+         * @return Builder with set allowedValues
+         */
+       public Builder allowedValues(List<String> allowedValues) {
+           this.allowedValues.addAll(allowedValues);
+           return this;
+       }
+
+        /**
+         * Build method.
+         *
+         * @return immutable DiscreteRuleBoolean object based on the previously instantiated builder.
+         */
+        public DiscreteRuleString build() {
+            return new DiscreteRuleString(this);
+        }
     }
 
 }
