@@ -13,35 +13,15 @@ import io.smartcat.data.loader.util.Randomizer;
 public class RangeRuleShort implements Rule<Short> {
 
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
-    private final List<Short> ranges = new ArrayList<>();
-    private final List<Short> rangeEdges = new LinkedList<>();
+    private final List<Short> ranges;
+    private final List<Short> rangeEdges;
 
-    private Randomizer random;
+    private final Randomizer random;
 
-    /**
-     * Set Randomizer for the Rule.
-     *
-     * @param random Randomizer impl.
-     * @return RangeRuleLong with set Randomizer.
-     */
-    public RangeRuleShort withRandom(Randomizer random) {
-        this.random = random;
-        return this;
-    }
-
-    /**
-     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     *
-     * @param rangeMarkers array of shorts that denote the ranges.
-     * @return RangeRuleShort with set ranges.
-     */
-    public static RangeRuleShort withRanges(Short... rangeMarkers) {
-        RangeRuleShort result = new RangeRuleShort();
-
-        result.ranges.addAll(Arrays.asList(rangeMarkers));
-        result.rangeEdges.addAll(Arrays.asList(rangeMarkers));
-
-        return result;
+    private RangeRuleShort(Builder builder) {
+        this.ranges = builder.ranges;
+        this.rangeEdges = builder.rangeEdges;
+        this.random = builder.random;
     }
 
     @Override
@@ -71,6 +51,47 @@ public class RangeRuleShort implements Rule<Short> {
         } else {
             return (short) (rangeEdges.remove(0) - 1);
         }
+    }
+
+    /**
+     * Builder for RangeRuleShort.
+     */
+    public static class Builder {
+
+        private List<Short> ranges = new ArrayList<>();
+        private final List<Short> rangeEdges = new LinkedList<>();
+        private Randomizer random;
+
+        /**
+         * Constructor.
+         *
+         * @param randomizer Randomizer implementation.
+         */
+        public Builder(Randomizer randomizer) {
+            this.random = randomizer;
+        }
+
+        /**
+         * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+         *
+         * @param ranges array of Short that denote the ranges.
+         * @return Builder with set ranges of Short.
+         */
+        public Builder ranges(Short... ranges) {
+            this.ranges.addAll(Arrays.asList(ranges));
+            this.rangeEdges.addAll(Arrays.asList(ranges));
+            return this;
+        }
+
+        /**
+         * Build method.
+         *
+         * @return immutable RangeRuleShort object based on the previously instantiated builder.
+         */
+        public RangeRuleShort build() {
+            return new RangeRuleShort(this);
+        }
+
     }
 
 }

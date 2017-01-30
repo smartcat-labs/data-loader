@@ -80,7 +80,7 @@ public class RandomBuilder<T> {
      */
     public RandomBuilder<T> randomFromRange(String fieldName, Short... rangeMarkers) {
         checkRangeInput(rangeMarkers);
-        fieldRules.put(fieldName, RangeRuleShort.withRanges(rangeMarkers).withRandom(random));
+        fieldRules.put(fieldName, new RangeRuleShort.Builder(random).ranges(rangeMarkers).build());
         return this;
     }
 
