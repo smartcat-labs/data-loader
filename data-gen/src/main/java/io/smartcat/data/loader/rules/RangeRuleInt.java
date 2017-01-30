@@ -13,35 +13,15 @@ import io.smartcat.data.loader.util.Randomizer;
 public class RangeRuleInt implements Rule<Integer> {
 
     // definition of the range: e.g [a,b,c,d] : a < b <= c < d is a set of ranges: {[a,b),[c,d)}
-    private final List<Integer> ranges = new ArrayList<>();
-    private final List<Integer> rangeEdges = new LinkedList<>();
+    private final List<Integer> ranges;
+    private final List<Integer> rangeEdges;
 
-    private Randomizer random;
+    private final Randomizer random;
 
-    /**
-     * Set Randomizer for the Rule.
-     *
-     * @param random Randomizer impl.
-     * @return RangeRuleInt with set Randomizer.
-     */
-    public RangeRuleInt withRandom(Randomizer random) {
-        this.random = random;
-        return this;
-    }
-
-    /**
-     * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
-     *
-     * @param rangeMarkers array of ints that denote the ranges.
-     * @return RangeRuleInt with set ranges.
-     */
-    public static RangeRuleInt withRanges(Integer... rangeMarkers) {
-        RangeRuleInt result = new RangeRuleInt();
-
-        result.ranges.addAll(Arrays.asList(rangeMarkers));
-        result.rangeEdges.addAll(Arrays.asList(rangeMarkers));
-
-        return result;
+    private RangeRuleInt(Builder builder) {
+        this.ranges = builder.ranges;
+        this.rangeEdges = builder.rangeEdges;
+        this.random = builder.random;
     }
 
     @Override
@@ -71,6 +51,47 @@ public class RangeRuleInt implements Rule<Integer> {
         } else {
             return rangeEdges.remove(0) - 1;
         }
+    }
+
+    /**
+     * Builder for RangeRuleFInt.
+     */
+    public static class Builder {
+
+        private List<Integer> ranges = new ArrayList<>();
+        private final List<Integer> rangeEdges = new LinkedList<>();
+        private Randomizer random;
+
+        /**
+         * Constructor.
+         *
+         * @param randomizer Randomizer implementation.
+         */
+        public Builder(Randomizer randomizer) {
+            this.random = randomizer;
+        }
+
+        /**
+         * Set range markers (i.e. a,b,c,d -> [a,b),[c,d)) for the rule.
+         *
+         * @param ranges array of Integers that denote the ranges.
+         * @return Builder with set ranges of Integer.
+         */
+        public Builder ranges(Integer... ranges) {
+            this.ranges.addAll(Arrays.asList(ranges));
+            this.rangeEdges.addAll(Arrays.asList(ranges));
+            return this;
+        }
+
+        /**
+         * Build method.
+         *
+         * @return immutable RangeRuleInt object based on the previously instantiated builder.
+         */
+        public RangeRuleInt build() {
+            return new RangeRuleInt(this);
+        }
+
     }
 
 }
