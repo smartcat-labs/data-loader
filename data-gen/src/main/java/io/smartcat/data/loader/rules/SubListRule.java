@@ -10,39 +10,19 @@ import io.smartcat.data.loader.util.Randomizer;
  * Rule for creating a list of random values that is a sublist of passed allowed values. This class preserves the order
  * of the elements, i.e. for a list (a,b,c,d,e), sublists are: (a,b,c), (a,c,d), (b,d), but (b,a) is not sublist.
  *
+ * If {@code <T>} is immutable, this class is immutable as well.
+ *
  * @param <T>
  */
 public class SubListRule<T> implements Rule<List<T>> {
 
-    private final List<T> values = new ArrayList<>();
+    private final List<T> values;
 
-    private Randomizer random;
+    private final Randomizer random;
 
-    private SubListRule() {
-    }
-
-    /**
-     * Set Randomizer for the Rule.
-     *
-     * @param random Randomizer impl.
-     * @return SubListRule<T> with set Randomizer.
-     */
-    public SubListRule<T> withRandom(Randomizer random) {
-        this.random = random;
-        return this;
-    }
-
-    /**
-     * Set list of allowed values for the sublist rule from which the sub list of allowed values will be created.
-     *
-     * @param <T> type param
-     * @param allowedValues list
-     * @return SubListRule<T>
-     */
-    public static <T> SubListRule<T> withValues(List<T> allowedValues) {
-        SubListRule<T> subListRule = new SubListRule<>();
-        subListRule.values.addAll(allowedValues);
-        return subListRule;
+    private SubListRule(Builder<T> builder) {
+        this.values = builder.values;
+        this.random = builder.random;
     }
 
     @Override
@@ -59,6 +39,45 @@ public class SubListRule<T> implements Rule<List<T>> {
             }
         }
         return result;
+    }
+
+
+    /**
+     * Builder for SubListRule.
+     *
+     * @param <T>
+     */
+    public static class Builder<T> {
+
+        private final List<T> values = new ArrayList<>();
+        private Randomizer random;
+
+        /**
+         * Constructor.
+         *
+         * @param randomizer Randomizer implementation.
+         */
+        public Builder(Randomizer randomizer) {
+            this.random = randomizer;
+        }
+
+        /**
+         * List of allowed values of type {@code <T>}.
+         * @param allowedValues list
+         * @return Builder with set values.
+         */
+        public Builder<T> withValues(List<T> allowedValues) {
+            this.values.addAll(allowedValues);
+            return this;
+        }
+
+        /**
+         * Build method.
+         * @return SubListRule object based on the previously instantiated builder.
+         */
+        public SubListRule<T> build() {
+            return new SubListRule<T>(this);
+        }
 
     }
 }

@@ -266,7 +266,7 @@ public class RandomBuilder<T> {
      * @return RandomBuilder<T>
      */
     public RandomBuilder<T> randomSubListFrom(String fieldName, String... values) {
-        fieldRules.put(fieldName, SubListRule.withValues(Arrays.asList(values)).withRandom(random));
+        fieldRules.put(fieldName, new SubListRule.Builder<String>(random).withValues(Arrays.asList(values)).build());
         return this;
     }
 
