@@ -1,7 +1,6 @@
 package io.smartcat.data.loader.rules;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -16,35 +15,13 @@ import io.smartcat.data.loader.util.Randomizer;
  */
 public class SubSetRule<T> implements Rule<Set<T>> {
 
-    private final Set<T> values = new HashSet<>();
+    private final Set<T> values;
 
-    private Randomizer random;
+    private final Randomizer random;
 
-    private SubSetRule() {
-    }
-
-    /**
-     * Set Randomizer for the Rule.
-     *
-     * @param random Randomizer impl.
-     * @return SubSetRule<T> with set Randomizer.
-     */
-    public SubSetRule<T> withRandom(Randomizer random) {
-        this.random = random;
-        return this;
-    }
-
-    /**
-     * Set set of allowed values for the subset rule from which the sub set of allowed values will be created.
-     *
-     * @param <T> type param
-     * @param allowedValues collection (duplicate values will be removed)
-     * @return SubSetRule<T>
-     */
-    public static <T> SubSetRule<T> withValues(Collection<T> allowedValues) {
-        SubSetRule<T> subSetRule = new SubSetRule<>();
-        subSetRule.values.addAll(allowedValues);
-        return subSetRule;
+    private SubSetRule(Builder<T> builder) {
+        this.values = builder.values;
+        this.random = builder.random;
     }
 
     @Override
@@ -60,6 +37,45 @@ public class SubSetRule<T> implements Rule<Set<T>> {
         Set<T> randomSubset = new HashSet<>(list.subList(0, randomSize));
 
         return randomSubset;
+    }
+
+    /**
+     * Builder for SubSetRule.
+     *
+     * @param <T>
+     */
+    public static class Builder<T> {
+
+        private final Set<T> values = new HashSet<>();
+        private Randomizer random;
+
+        /**
+         * Constructor.
+         *
+         * @param randomizer Randomizer implementation.
+         */
+        public Builder(Randomizer randomizer) {
+            this.random = randomizer;
+        }
+
+        /**
+         * Set of allowed values of type {@code <T>}.
+         * @param allowedValues set
+         * @return Builder with set values.
+         */
+        public Builder<T> withValues(Set<T> allowedValues) {
+            this.values.addAll(allowedValues);
+            return this;
+        }
+
+        /**
+         * Build method.
+         * @return SubSetRule object based on the previously instantiated builder.
+         */
+        public SubSetRule<T> build() {
+            return new SubSetRule<T>(this);
+        }
+
     }
 
 }

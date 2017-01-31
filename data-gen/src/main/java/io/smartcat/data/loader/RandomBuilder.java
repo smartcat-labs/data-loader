@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.smartcat.data.loader.rules.DiscreteRuleBoolean;
@@ -253,7 +255,9 @@ public class RandomBuilder<T> {
      * @return RandomBuilder<T>
      */
     public RandomBuilder<T> randomSubsetFrom(String fieldName, String... values) {
-        fieldRules.put(fieldName, SubSetRule.withValues(Arrays.asList(values)).withRandom(random));
+        List<String> list = new ArrayList<>(Arrays.asList(values));
+        Set<String> set = new HashSet<>(list);
+        fieldRules.put(fieldName, new SubSetRule.Builder<String>(random).withValues(set).build());
         return this;
     }
 
