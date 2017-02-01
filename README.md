@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/smartcat-labs/ranger.svg?branch=master)](https://travis-ci.org/smartcat-labs/ranger)
+[ ![Download](https://api.bintray.com/packages/smartcat-labs/maven/ranger/images/download.svg?version=0.0.2) ](https://bintray.com/smartcat-labs/maven/ranger/0.0.2/link)
+
 # What is Ranger?
 
 Ranger is contextual data and load generator. Contextual data generator allows developers to quickly and in a simple manner define and create large number of objects whose attributes have randomly selected values from the configured set.
