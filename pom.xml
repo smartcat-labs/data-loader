@@ -43,6 +43,7 @@
         <version.slf4japi>1.7.21</version.slf4japi>
         <version.logback.classic>1.1.7</version.logback.classic>
         <version.junit>4.12</version.junit>
+        <version.pitest>1.1.11</version.pitest>
         <source.level>1.8</source.level>
         <code.level>1.8</code.level>
         <version.plugin.compiler>3.5.1</version.plugin.compiler>
@@ -75,6 +76,11 @@
                 <artifactId>junit</artifactId>
                 <version>${version.junit}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${version.pitest}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
