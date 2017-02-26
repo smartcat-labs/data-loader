@@ -38,7 +38,7 @@ public class PulseGenerator {
 
     private boolean collectMetrics;
 
-    private final WorkTask workTask;
+    private final WorkTask<Object> workTask;
 
     /**
      * Pulse generator constructor.
@@ -48,7 +48,7 @@ public class PulseGenerator {
      * @param workTask work task
      * @param collectMetrics collect metrics
      */
-    public PulseGenerator(DataCollector dataCollector, TokenBucket tokenBucket, WorkTask workTask,
+    public PulseGenerator(DataCollector dataCollector, TokenBucket tokenBucket, WorkTask<Object> workTask,
             boolean collectMetrics) {
 
         this.dataCollector = dataCollector;

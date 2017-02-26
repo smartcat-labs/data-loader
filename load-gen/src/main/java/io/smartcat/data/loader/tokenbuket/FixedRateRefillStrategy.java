@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 public class FixedRateRefillStrategy implements RefillStrategy {
 
     private final Ticker ticker;
-    private final long numTokensPerPeriod;
+    private final long numTokensPerSecond;
     private final long periodDurationInNanos;
     private long lastRefillTime;
     private long nextRefillTime;
@@ -16,14 +16,12 @@ public class FixedRateRefillStrategy implements RefillStrategy {
     /**
      * Constructor.
      *
-     * @param numTokensPerPeriod The number of tokens to add to the bucket every period.
-     * @param period             How often to refill the bucket.
-     * @param unit               Unit for period.
+     * @param numTokensPerSecond The number of tokens to add to the bucket every second.
      */
-    public FixedRateRefillStrategy(long numTokensPerPeriod, long period, TimeUnit unit) {
+    public FixedRateRefillStrategy(long numTokensPerSecond) {
         this.ticker = new Ticker();
-        this.numTokensPerPeriod = numTokensPerPeriod;
-        this.periodDurationInNanos = unit.toNanos(period);
+        this.numTokensPerSecond = numTokensPerSecond;
+        this.periodDurationInNanos = TimeUnit.SECONDS.toNanos(1);
         this.lastRefillTime = 0;
         this.nextRefillTime = 0;
     }
@@ -37,7 +35,7 @@ public class FixedRateRefillStrategy implements RefillStrategy {
 
         lastRefillTime = now;
         nextRefillTime = lastRefillTime + periodDurationInNanos;
-        return numTokensPerPeriod;
+        return numTokensPerSecond;
     }
 
     /**

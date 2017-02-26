@@ -1,5 +1,7 @@
 package io.smartcat.data.loader;
 
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -14,7 +16,7 @@ public class LoadGeneratorTest {
 
         while (true) {
             try {
-                Thread.sleep(10);
+                TimeUnit.MICROSECONDS.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

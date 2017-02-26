@@ -2,7 +2,6 @@ package io.smartcat.data.loader;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ public class LoadGenerator {
     private Timer metricsTimer;
 
     private LoadGenerator(Builder builder) {
-        this.dataCollector = new DataCollector(builder.dataSource, (int) (builder.targetRate * 10));
+        this.dataCollector = new DataCollector(builder.dataSource, builder.targetRate * 10);
         this.tokenBucket = new TokenBucket(0, builder.refillStrategy, builder.sleepStrategy);
         this.pulseGenerator = new PulseGenerator(dataCollector, tokenBucket, builder.workTask, builder.collectMetrics);
 
@@ -146,7 +145,7 @@ public class LoadGenerator {
         public LoadGenerator build() {
             if (this.refillStrategy == null) {
                 LOGGER.info("Defaulting to FixedRateRefillStrategy.");
-                this.refillStrategy = new FixedRateRefillStrategy(this.targetRate, 1, TimeUnit.SECONDS);
+                this.refillStrategy = new FixedRateRefillStrategy(this.targetRate);
             }
 
             return new LoadGenerator(this);
