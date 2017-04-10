@@ -5,9 +5,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.smartcat.data.loader.api.WorkTask;
 import io.smartcat.data.loader.tokenbuket.TokenBucket;
 import io.smartcat.data.loader.util.AtomicCounter;
@@ -15,10 +12,10 @@ import io.smartcat.data.loader.util.ThreadPoolExecutorUtil;
 
 /**
  * Pulse generator based on scheduler generating targeted rate.
+ *
+ * @param <T> Type of data which will be used by this pulse generator.
  */
-public class PulseGenerator {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PulseGenerator.class);
+public class PulseGenerator<T> {
 
     private static final AtomicLong LOADGEN_THREAD_COUNT = new AtomicLong(0);
 
@@ -34,11 +31,11 @@ public class PulseGenerator {
 
     private final TokenBucket tokenBucket;
 
-    private final DataCollector dataCollector;
+    private final DataCollector<T> dataCollector;
 
     private boolean collectMetrics;
 
-    private final WorkTask<Object> workTask;
+    private final WorkTask<T> workTask;
 
     /**
      * Pulse generator constructor.
@@ -48,7 +45,7 @@ public class PulseGenerator {
      * @param workTask work task
      * @param collectMetrics collect metrics
      */
-    public PulseGenerator(DataCollector dataCollector, TokenBucket tokenBucket, WorkTask<Object> workTask,
+    public PulseGenerator(DataCollector<T> dataCollector, TokenBucket tokenBucket, WorkTask<T> workTask,
             boolean collectMetrics) {
 
         this.dataCollector = dataCollector;
@@ -101,9 +98,9 @@ public class PulseGenerator {
      */
     private class Pulse implements Runnable {
 
-        private WorkTask workTask;
+        private WorkTask<T> workTask;
 
-        public Pulse(WorkTask workTask) {
+        public Pulse(WorkTask<T> workTask) {
             this.workTask = workTask;
         }
 
@@ -113,8 +110,8 @@ public class PulseGenerator {
                 tokenBucket.get();
                 if (dataCollector.queueSize() > 0) {
 
-                    int value = dataCollector.poll();
-                    workerExecutor.submit(new Worker(workTask, value));
+                    T value = dataCollector.poll();
+                    workerExecutor.submit(new Worker<>(workTask, value));
 
                     if (collectMetrics) {
                         pulseCounter.increment();

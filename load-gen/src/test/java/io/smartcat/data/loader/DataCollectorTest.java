@@ -16,7 +16,7 @@ public class DataCollectorTest {
     public void should_initialize() throws InterruptedException {
         int queueSize = 100;
         TestDataSource testDataSource = new TestDataSource();
-        DataCollector collector = new DataCollector(testDataSource, queueSize);
+        DataCollector<Integer> collector = new DataCollector<>(testDataSource, queueSize);
 
         collector.start();
         assertTrue(collector.queueSize() > queueSize * 0.75);
@@ -27,7 +27,7 @@ public class DataCollectorTest {
     public void should_deplete_data_queue() throws InterruptedException {
         int queueSize = 10;
         TestDataSource testDataSource = new TestDataSource();
-        DataCollector collector = new DataCollector(testDataSource, queueSize);
+        DataCollector<Integer> collector = new DataCollector<>(testDataSource, queueSize);
 
         collector.start();
         collector.stop();
@@ -46,7 +46,7 @@ public class DataCollectorTest {
     public void should_deplete_data_when_data_source_empty() throws InterruptedException {
         int queueSize = 10;
         TestDataSource testDataSource = new TestDataSource();
-        DataCollector collector = new DataCollector(testDataSource, queueSize);
+        DataCollector<Integer> collector = new DataCollector<>(testDataSource, queueSize);
 
         collector.start();
         testDataSource.setHasNext(false);
@@ -65,7 +65,7 @@ public class DataCollectorTest {
     public void should_repopulate_queue_when_data_available() throws InterruptedException {
         int queueSize = 10;
         TestDataSource testDataSource = new TestDataSource();
-        DataCollector collector = new DataCollector(testDataSource, queueSize);
+        DataCollector<Integer> collector = new DataCollector<>(testDataSource, queueSize);
 
         collector.start();
         testDataSource.setHasNext(false);

@@ -13,28 +13,30 @@ import io.smartcat.data.loader.tokenbuket.RefillStrategy;
 import io.smartcat.data.loader.tokenbuket.SleepStrategies;
 import io.smartcat.data.loader.tokenbuket.SleepStrategy;
 import io.smartcat.data.loader.tokenbuket.TokenBucket;
-import io.smartcat.data.loader.util.NoOpDataSource;
 import io.smartcat.data.loader.util.NoOpWorkTask;
 
 /**
  * Load generator used to execute work tasks with data from provided data source.
+ *
+ * @param <T> Type of data which will be used.
  */
-public class LoadGenerator {
+public class LoadGenerator<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadGenerator.class);
 
-    private final DataCollector dataCollector;
+    private final DataCollector<T> dataCollector;
 
     private final TokenBucket tokenBucket;
 
-    private final PulseGenerator pulseGenerator;
+    private final PulseGenerator<T> pulseGenerator;
 
     private Timer metricsTimer;
 
-    private LoadGenerator(Builder builder) {
-        this.dataCollector = new DataCollector(builder.dataSource, builder.targetRate * 10);
+    private LoadGenerator(Builder<T> builder) {
+        this.dataCollector = new DataCollector<>(builder.dataSource, builder.targetRate * 10);
         this.tokenBucket = new TokenBucket(0, builder.refillStrategy, builder.sleepStrategy);
-        this.pulseGenerator = new PulseGenerator(dataCollector, tokenBucket, builder.workTask, builder.collectMetrics);
+        this.pulseGenerator = new PulseGenerator<>(dataCollector, tokenBucket, builder.workTask,
+                builder.collectMetrics);
 
         this.metricsTimer = new Timer("pulse-generator-timer");
         this.metricsTimer.scheduleAtFixedRate(new MetricsLogger(), 0, 1000);
@@ -59,15 +61,17 @@ public class LoadGenerator {
 
     /**
      * LoadGenerator builder class.
+     *
+     * @param <T> Type of load generator to build.
      */
-    public static class Builder {
+    public static class Builder<T> {
 
-        private int targetRate = 1000;
-        private boolean collectMetrics = true;
-        private WorkTask workTask = new NoOpWorkTask();
-        private DataSource dataSource = new NoOpDataSource();
+        private int targetRate = 0;
+        private Boolean collectMetrics = null;
+        private WorkTask<T> workTask = null;
+        private DataSource<T> dataSource;
         private RefillStrategy refillStrategy;
-        private SleepStrategy sleepStrategy = SleepStrategies.nanosecondSleepStrategy(1);
+        private SleepStrategy sleepStrategy = null;
 
         /**
          * Set target rate per second.
@@ -75,7 +79,7 @@ public class LoadGenerator {
          * @param targetRate target rate
          * @return builder
          */
-        public Builder withTargetRate(int targetRate) {
+        public Builder<T> withTargetRate(int targetRate) {
             this.targetRate = targetRate;
             return this;
         }
@@ -86,7 +90,7 @@ public class LoadGenerator {
          * @param collectMetrics collect metrics
          * @return builder
          */
-        public Builder withCollectMetrics(boolean collectMetrics) {
+        public Builder<T> withCollectMetrics(boolean collectMetrics) {
             this.collectMetrics = collectMetrics;
             return this;
         }
@@ -97,7 +101,7 @@ public class LoadGenerator {
          * @param workTask work task implementation
          * @return builder
          */
-        public Builder withWorkTask(WorkTask workTask) {
+        public Builder<T> withWorkTask(WorkTask<T> workTask) {
             this.workTask = workTask;
             return this;
         }
@@ -108,19 +112,19 @@ public class LoadGenerator {
          * @param dataSource data source implementation
          * @return builder
          */
-        public Builder withDataSource(DataSource dataSource) {
+        public Builder<T> withDataSource(DataSource<T> dataSource) {
             this.dataSource = dataSource;
             return this;
         }
 
         /**
-         * Refill strategy implementation for generating token bucket tokens.
-         * Default implementation is {@code io.smartcat.data.loader.tokenbuket.FixedRateRefillStrategy}.
+         * Refill strategy implementation for generating token bucket tokens. Default implementation is
+         * {@code io.smartcat.data.loader.tokenbuket.FixedRateRefillStrategy}.
          *
          * @param refillStrategy refill strategy implementation
          * @return builder
          */
-        public Builder withRefillStrategy(RefillStrategy refillStrategy) {
+        public Builder<T> withRefillStrategy(RefillStrategy refillStrategy) {
             this.refillStrategy = refillStrategy;
             return this;
         }
@@ -132,7 +136,7 @@ public class LoadGenerator {
          * @param sleepStrategy sleep strategy implementation
          * @return builder
          */
-        public Builder withSleepStrategy(SleepStrategy sleepStrategy) {
+        public Builder<T> withSleepStrategy(SleepStrategy sleepStrategy) {
             this.sleepStrategy = sleepStrategy;
             return this;
         }
@@ -142,14 +146,34 @@ public class LoadGenerator {
          *
          * @return load generator instance
          */
-        public LoadGenerator build() {
-            if (this.refillStrategy == null) {
-                LOGGER.info("Defaulting to FixedRateRefillStrategy.");
-                this.refillStrategy = new FixedRateRefillStrategy(this.targetRate);
-            }
+        public LoadGenerator<T> build() {
+            checkAndSetDefaultValues();
+            return new LoadGenerator<>(this);
+        }
 
-            return new LoadGenerator(this);
+        private void checkAndSetDefaultValues() {
+            if (targetRate < 1) {
+                throw new IllegalStateException("Target rate is not set.");
+            }
+            if (dataSource == null) {
+                throw new IllegalStateException("Data source is not set.");
+            }
+            if (collectMetrics == null) {
+                LOGGER.info("DEFAULT: Collect metrics set to true.");
+                this.collectMetrics = true;
+            }
+            if (workTask == null) {
+                LOGGER.info("DEFAULT: Work task set to NoOpWorkTask.");
+                this.workTask = new NoOpWorkTask<>();
+            }
+            if (refillStrategy == null) {
+                LOGGER.info("DEFAULT: Refill strategy set to FixedRateRefillStrategy.");
+                this.refillStrategy = new FixedRateRefillStrategy(targetRate);
+            }
+            if (sleepStrategy == null) {
+                LOGGER.info("DEFAULT: Sleep strategy set to nanosecond sleep strategy.");
+                this.sleepStrategy = SleepStrategies.nanosecondSleepStrategy(1);
+            }
         }
     }
-
 }

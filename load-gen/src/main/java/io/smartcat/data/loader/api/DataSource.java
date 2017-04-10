@@ -5,8 +5,8 @@ import java.util.Iterator;
 /**
  * DataSource interface providing API for load generator data queue.
  *
- * @param <Object> Type of the data provided by data source implementation.
+ * @param <T> Type of the data provided by data source implementation.
  */
-public interface DataSource<Object> extends Iterator<Object> {
+public interface DataSource<T> extends Iterator<T> {
 
 }

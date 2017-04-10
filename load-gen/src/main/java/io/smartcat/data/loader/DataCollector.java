@@ -13,8 +13,10 @@ import io.smartcat.data.loader.util.ThreadPoolExecutorUtil;
 
 /**
  * Data collector implementation. Used to take care of data queue for load generator.
+ *
+ * @param <T> Type of data which will be used in queuing.
  */
-public class DataCollector {
+public class DataCollector<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataCollector.class);
 
@@ -24,9 +26,9 @@ public class DataCollector {
 
     private volatile boolean isRunning = false;
 
-    private DataSource<Integer> dataSource;
+    private DataSource<T> dataSource;
 
-    private LinkedBlockingQueue<Integer> dataQueue;
+    private LinkedBlockingQueue<T> dataQueue;
 
     private final ThreadPoolExecutor dataCollectorExecutor;
 
@@ -37,7 +39,7 @@ public class DataCollector {
      *
      * @param dataSource Data source
      */
-    public DataCollector(DataSource dataSource) {
+    public DataCollector(DataSource<T> dataSource) {
         this(dataSource, DEFAULT_DATA_QUEUE_CAPACITY);
     }
 
@@ -47,7 +49,7 @@ public class DataCollector {
      * @param dataSource        Data source
      * @param dataQueueCapacity Data queue capacity
      */
-    public DataCollector(DataSource dataSource, int dataQueueCapacity) {
+    public DataCollector(DataSource<T> dataSource, int dataQueueCapacity) {
         this.dataSource = dataSource;
         this.dataQueueCapacity = dataQueueCapacity;
 
@@ -77,7 +79,7 @@ public class DataCollector {
      *
      * @return Head item in queue
      */
-    public Integer poll() {
+    public T poll() {
         return this.dataQueue.poll();
     }
 

@@ -45,7 +45,6 @@ public class FixedRateRefillStrategy implements RefillStrategy {
         if (nowInNanos < nextRefillTimeInNanos) {
             return 0;
         }
-        long unused;
 
         // refill every millisecond
         // if more than one millisecond passed
