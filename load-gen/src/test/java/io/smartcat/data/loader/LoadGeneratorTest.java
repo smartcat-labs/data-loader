@@ -2,6 +2,7 @@ package io.smartcat.data.loader;
 
 import java.util.concurrent.TimeUnit;
 
+import io.smartcat.data.loader.util.RandomIntDataSource;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -10,8 +11,8 @@ public class LoadGeneratorTest {
 
     @Test
     public void should_initialize() {
-        final LoadGenerator loadGenerator = new LoadGenerator.Builder().withTargetRate(10000).withCollectMetrics(true)
-                .build();
+        final LoadGenerator<Integer> loadGenerator = new LoadGenerator.Builder<Integer>().withTargetRate(10000)
+                .withDataSource(new RandomIntDataSource()).build();
         loadGenerator.start();
 
         while (true) {

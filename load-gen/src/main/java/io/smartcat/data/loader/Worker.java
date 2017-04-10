@@ -8,14 +8,14 @@ import io.smartcat.data.loader.api.WorkTask;
 /**
  * Worker runnable executing work tasks.
  *
- * @param <Object> work task parameter type
+ * @param <T> work task parameter type
  */
-public final class Worker<Object> implements Runnable {
+public final class Worker<T> implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Worker.class);
 
-    private WorkTask<Object> workTask;
-    private Object parameter;
+    private WorkTask<T> workTask;
+    private T parameter;
 
     /**
      * Constructor.
@@ -23,7 +23,7 @@ public final class Worker<Object> implements Runnable {
      * @param workTask  function to be executed
      * @param parameter function parameter
      */
-    public Worker(WorkTask<Object> workTask, Object parameter) {
+    public Worker(WorkTask<T> workTask, T parameter) {
         this.workTask = workTask;
         this.parameter = parameter;
     }
