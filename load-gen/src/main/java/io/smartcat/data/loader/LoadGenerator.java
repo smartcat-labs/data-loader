@@ -1,155 +1,105 @@
 package io.smartcat.data.loader;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.smartcat.data.loader.api.DataSource;
-import io.smartcat.data.loader.api.WorkTask;
-import io.smartcat.data.loader.tokenbuket.FixedRateRefillStrategy;
-import io.smartcat.data.loader.tokenbuket.RefillStrategy;
-import io.smartcat.data.loader.tokenbuket.SleepStrategies;
-import io.smartcat.data.loader.tokenbuket.SleepStrategy;
-import io.smartcat.data.loader.tokenbuket.TokenBucket;
-import io.smartcat.data.loader.util.NoOpDataSource;
-import io.smartcat.data.loader.util.NoOpWorkTask;
+import io.smartcat.data.loader.api.RateGenerator;
+import io.smartcat.data.loader.api.Worker;
 
 /**
  * Load generator used to execute work tasks with data from provided data source.
+ *
+ * @param <T> Type of data which will be used.
  */
-public class LoadGenerator {
+public class LoadGenerator<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadGenerator.class);
+    private static final long NANOS_IN_SECOND = TimeUnit.SECONDS.toNanos(1);
+    private static final long TICK_PERIOD_IN_NANOS = 1000;
 
-    private final DataCollector dataCollector;
+    private final DataSource<T> dataSource;
+    private final RateGenerator rateGenerator;
+    private final Worker<T> worker;
 
-    private final TokenBucket tokenBucket;
+    private AtomicBoolean terminate = new AtomicBoolean(false);
 
-    private final PulseGenerator pulseGenerator;
-
-    private Timer metricsTimer;
-
-    private LoadGenerator(Builder builder) {
-        this.dataCollector = new DataCollector(builder.dataSource, builder.targetRate * 10);
-        this.tokenBucket = new TokenBucket(0, builder.refillStrategy, builder.sleepStrategy);
-        this.pulseGenerator = new PulseGenerator(dataCollector, tokenBucket, builder.workTask, builder.collectMetrics);
-
-        this.metricsTimer = new Timer("pulse-generator-timer");
-        this.metricsTimer.scheduleAtFixedRate(new MetricsLogger(), 0, 1000);
+    /**
+     * Constructs load generator with specified <code>dataSource</code>, <code>rateGenerator</code> and
+     * <code>worker</code>.
+     *
+     * @param dataSource Data source from which load generator polls data.
+     * @param rateGenerator Rate generator which generates rate based on time point.
+     * @param worker Worker which accepts data polled from <code>dataSource</code> at rate provided by
+     *            <code>rateGenerator</code>.
+     */
+    public LoadGenerator(DataSource<T> dataSource, RateGenerator rateGenerator, Worker<T> worker) {
+        this.dataSource = dataSource;
+        this.rateGenerator = rateGenerator;
+        this.worker = worker;
     }
 
     /**
-     * Start load generator.
+     * Runs load generator.
+     *
+     * @throws IllegalStateException When run is attempted after load generator was terminated.
      */
-    public void start() {
-        pulseGenerator.start();
-    }
-
-    /**
-     * Metrics logger timer task.
-     */
-    private class MetricsLogger extends TimerTask {
-        @Override
-        public void run() {
-            LOGGER.debug("Generated {} pulses", pulseGenerator.getPulseCount());
-        }
-    }
-
-    /**
-     * LoadGenerator builder class.
-     */
-    public static class Builder {
-
-        private int targetRate = 1000;
-        private boolean collectMetrics = true;
-        private WorkTask workTask = new NoOpWorkTask();
-        private DataSource dataSource = new NoOpDataSource();
-        private RefillStrategy refillStrategy;
-        private SleepStrategy sleepStrategy = SleepStrategies.nanosecondSleepStrategy(1);
-
-        /**
-         * Set target rate per second.
-         *
-         * @param targetRate target rate
-         * @return builder
-         */
-        public Builder withTargetRate(int targetRate) {
-            this.targetRate = targetRate;
-            return this;
-        }
-
-        /**
-         * Set this to true if metrics should be collected.
-         *
-         * @param collectMetrics collect metrics
-         * @return builder
-         */
-        public Builder withCollectMetrics(boolean collectMetrics) {
-            this.collectMetrics = collectMetrics;
-            return this;
-        }
-
-        /**
-         * WorkTask interface implementation. This is what load generator executes at a given rate.
-         *
-         * @param workTask work task implementation
-         * @return builder
-         */
-        public Builder withWorkTask(WorkTask workTask) {
-            this.workTask = workTask;
-            return this;
-        }
-
-        /**
-         * DataSource interface implementation. Provides data source for all executed tasks.
-         *
-         * @param dataSource data source implementation
-         * @return builder
-         */
-        public Builder withDataSource(DataSource dataSource) {
-            this.dataSource = dataSource;
-            return this;
-        }
-
-        /**
-         * Refill strategy implementation for generating token bucket tokens.
-         * Default implementation is {@code io.smartcat.data.loader.tokenbuket.FixedRateRefillStrategy}.
-         *
-         * @param refillStrategy refill strategy implementation
-         * @return builder
-         */
-        public Builder withRefillStrategy(RefillStrategy refillStrategy) {
-            this.refillStrategy = refillStrategy;
-            return this;
-        }
-
-        /**
-         * Sleep strategy implementation for inserting sleep in token bucket algorithm. Default implementation is
-         * {@code io.smartcat.data.loader.tokenbuket.SleepStrategies.NANOSECOND_SLEEP_STRATEGY}.
-         *
-         * @param sleepStrategy sleep strategy implementation
-         * @return builder
-         */
-        public Builder withSleepStrategy(SleepStrategy sleepStrategy) {
-            this.sleepStrategy = sleepStrategy;
-            return this;
-        }
-
-        /**
-         * Build load generator with provided parameters.
-         *
-         * @return load generator instance
-         */
-        public LoadGenerator build() {
-            if (this.refillStrategy == null) {
-                LOGGER.info("Defaulting to FixedRateRefillStrategy.");
-                this.refillStrategy = new FixedRateRefillStrategy(this.targetRate);
+    public void run() {
+        checkState();
+        LOGGER.info("Load generator started.");
+        long beginning = System.nanoTime();
+        long previous = beginning;
+        infiniteWhile: while (true) {
+            if (terminate.get()) {
+                LOGGER.info("Termination signal detected. Terminating load generator...");
+                break;
             }
+            long now = System.nanoTime();
+            long fromBeginning = now - beginning;
+            long elapsed = now - previous;
+            long rate = rateGenerator.getRate(fromBeginning);
+            long normalizedRate = normalizeRate(elapsed, rate);
+            if (normalizedRate > 0) {
+                previous += calculateConsumedTime(normalizedRate, rate);
+            }
+            for (int i = 0; i < normalizedRate; i++) {
+                if (!dataSource.hasNext(fromBeginning)) {
+                    LOGGER.info("Reached end of data source. Terminating load generator...");
+                    terminate.set(true);
+                    break infiniteWhile;
+                }
+                T data = dataSource.getNext(fromBeginning);
+                worker.accept(data);
+            }
+        }
+        LOGGER.info("Load generator terminated.");
+    }
 
-            return new LoadGenerator(this);
+    /**
+     * Stops load generator.
+     */
+    public void terminate() {
+        terminate.set(true);
+        LOGGER.info("Termination signal sent.");
+    }
+
+    private void checkState() {
+        if (terminate.get()) {
+            throw new IllegalStateException("Load generator is stopped and cannot be started again.");
         }
     }
 
+    private long normalizeRate(long elapsed, long rate) {
+        if (elapsed < TICK_PERIOD_IN_NANOS) {
+            return 0;
+        }
+        return elapsed * rate / NANOS_IN_SECOND;
+    }
+
+    private long calculateConsumedTime(long normalizedRate, long rate) {
+        return normalizedRate * NANOS_IN_SECOND / rate;
+    }
 }
