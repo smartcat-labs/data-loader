@@ -12,9 +12,9 @@
     <description>Contextual data and load generator</description>
 
     <modules>
-        <module>data-gen</module>
-        <module>load-gen-core</module>
-        <module>load-gen-kafka</module>
+        <module>ranger-data-generator</module>
+        <module>ranger-load-generator-core</module>
+        <module>ranger-load-generator-kafka</module>
     </modules>
 
     <licenses>

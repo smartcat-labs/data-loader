@@ -1,0 +1,41 @@
+package io.smartcat.ranger.data.generator;
+
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import io.smartcat.ranger.data.generator.model.User;
+
+public class RangeRuleLongCornerCasesTest {
+
+    @Test
+    public void should_set_low_and_high_end_values_of_a_range() {
+        RandomBuilder<User> randomUserBuilder = new RandomBuilder<User>(User.class);
+
+        Long beginingOfRange = 0L;
+        Long endOfRange = 10L;
+
+        randomUserBuilder.randomFrom("username", "subzero")
+                .randomFromRange("numberOfCards", beginingOfRange, endOfRange).toBeBuilt(3);
+
+        List<User> builtUsers = new BuildRunner<User>().withBuilder(randomUserBuilder).build();
+
+        boolean oneExactlyAtTheBeginingOfTheRange = false;
+        boolean oneExactlyAtTheEndOfTheRange = false;
+
+        for (User u : builtUsers) {
+
+            if (u.getNumberOfCards() == 0) {
+                oneExactlyAtTheBeginingOfTheRange = true;
+            }
+            if (u.getNumberOfCards() == endOfRange - 1) {
+                oneExactlyAtTheEndOfTheRange = true;
+            }
+        }
+
+        Assert.assertTrue("One user must have numberOfCards property with value 0", oneExactlyAtTheBeginingOfTheRange);
+        Assert.assertTrue("One user must have numberOfCards property with value 9", oneExactlyAtTheEndOfTheRange);
+    }
+
+}
