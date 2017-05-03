@@ -41,11 +41,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <version.slf4japi>1.7.21</version.slf4japi>
-        <version.logback.classic>1.1.7</version.logback.classic>
-        <version.apache.commons.csv>1.4</version.apache.commons.csv>
-        <version.apache.commons.cli>1.3.1</version.apache.commons.cli>
-        <version.kafka>0.10.2.0</version.kafka>
+        <version.slf4j-api>1.7.21</version.slf4j-api>
+        <version.logback-classic>1.1.7</version.logback-classic>
+        <version.commons-csv>1.4</version.commons-csv>
+        <version.commons-cli>1.3.1</version.commons-cli>
         <version.snakeyaml>1.18</version.snakeyaml>
         <version.junit>4.12</version.junit>
         <version.pitest>1.1.11</version.pitest>
@@ -68,32 +67,22 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${version.slf4japi}</version>
+                <version>${version.slf4j-api}</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>${version.logback.classic}</version>
+                <version>${version.logback-classic}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-csv</artifactId>
-                <version>${version.apache.commons.csv}</version>
+                <version>${version.commons-csv}</version>
             </dependency>
             <dependency>
                 <groupId>commons-cli</groupId>
                 <artifactId>commons-cli</artifactId>
-                <version>${version.apache.commons.cli}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>connect-api</artifactId>
-                <version>${version.kafka}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>connect-runtime</artifactId>
-                <version>${version.kafka}</version>
+                <version>${version.commons-cli}</version>
             </dependency>
             <dependency>
                 <groupId>org.yaml</groupId>

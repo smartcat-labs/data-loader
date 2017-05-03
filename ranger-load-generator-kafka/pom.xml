@@ -12,6 +12,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.kafka>0.10.2.0</version.kafka>
     </properties>
 
     <dependencies>
@@ -39,10 +40,12 @@
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>connect-api</artifactId>
+            <version>${version.kafka}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>connect-runtime</artifactId>
+            <version>${version.kafka}</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
