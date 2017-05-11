@@ -7,32 +7,31 @@
         <version>0.0.5-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ranger-load-generator-kafka</artifactId>
+    <artifactId>ranger-load-generator-data-generator</artifactId>
     <packaging>jar</packaging>
 
-    <name>Ranger Load Generator Kafka</name>
-    <description>Worker implementation which sends messages to Kafka cluster.</description>
+    <name>Ranger Load Generator Data Generator</name>
+    <description>Data source implementation based on data generator.</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.kafka>0.10.2.0</version.kafka>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.smartcat</groupId>
-            <artifactId>ranger-commons</artifactId>
+            <artifactId>ranger-load-generator-core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>connect-api</artifactId>
-            <version>${version.kafka}</version>
+            <groupId>io.smartcat</groupId>
+            <artifactId>ranger-data-generator</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>connect-runtime</artifactId>
-            <version>${version.kafka}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

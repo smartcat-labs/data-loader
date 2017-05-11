@@ -10,11 +10,22 @@
     <artifactId>ranger-data-generator</artifactId>
     <packaging>jar</packaging>
 
+    <name>Ranger Data Generator</name>
+    <description>Contextual data generator allowing quick and simple generation of meaningful random objects.</description>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

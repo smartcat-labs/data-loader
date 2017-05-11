@@ -1,8 +1,7 @@
 package io.smartcat.ranger.load.generator.api;
 
 /**
- * Interface providing API for {@link io.smartcat.ranger.load.generator.LoadGenerator} rate generation. Generates rate
- * per second.
+ * Interface providing API for rate generation. Generates rate per second.
  */
 public interface RateGenerator {
 
