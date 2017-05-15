@@ -82,8 +82,8 @@ public class LoadGeneratorTest {
     }
 
     @Test
-    public void worker_should_be_invoked_300_000_000_times_when_loadGenerator_works_30_sec_with_rate_of_10_000_000() {
-        testRateAndCountOfInvocation(30, 10_000_000);
+    public void worker_should_be_invoked_3_000_000_times_when_loadGenerator_works_30_sec_with_rate_of_100_000() {
+        testRateAndCountOfInvocation(30, 100_000);
     }
 
     private void testRateAndCountOfInvocation(int numOfSeconds, long rate) {
