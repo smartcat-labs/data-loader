@@ -17,7 +17,7 @@ public class RangeRuleShortTest {
         short upper = 5;
 
         ObjectGenerator<User> randomUserBuilder = new ObjectGenerator.Builder<User>(User.class)
-                .randomFromRange("numberOfShorts", lower, upper).toBeGenerated(1000).build();
+                .withRanges("numberOfShorts", lower, upper).toBeGenerated(1000).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(randomUserBuilder).build();
@@ -41,7 +41,7 @@ public class RangeRuleShortTest {
         short upper3 = 25;
 
         ObjectGenerator<User> randomUserBuilder = new ObjectGenerator.Builder<User>(User.class)
-                .randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3, upper3).toBeGenerated(1000)
+                .withRanges("numberOfShorts", lower1, upper1, lower2, upper2, lower3, upper3).toBeGenerated(1000)
                 .build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()

@@ -1,5 +1,8 @@
 package io.smartcat.ranger.data.generator.rules;
 
+import io.smartcat.ranger.data.generator.distribution.Distribution;
+import io.smartcat.ranger.data.generator.distribution.UniformDistribution;
+
 /**
  * Rule is used for generating random values of certain type.
  *
@@ -8,10 +11,15 @@ package io.smartcat.ranger.data.generator.rules;
 public interface Rule<T> {
 
     /**
-     * Get random allowed value.
-     *
-     * @return Random allowed value.
+     * Default distribution.
      */
-    T getRandomAllowedValue();
+    static Distribution DEFAULT_DISTRIBUTION = new UniformDistribution();
+
+    /**
+     * Get next value.
+     *
+     * @return Next value.
+     */
+    T next();
 
 }

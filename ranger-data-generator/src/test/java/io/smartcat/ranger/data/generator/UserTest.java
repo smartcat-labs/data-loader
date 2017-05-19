@@ -19,15 +19,15 @@ public class UserTest {
         LocalDateTime mayTheSecond = LocalDateTime.of(1975, 5, 2, 0, 0);
 
         ObjectGenerator<Address> addressGenerator = new ObjectGenerator.Builder<Address>(Address.class)
-                .randomFrom("city", "Isengard").randomFrom("street", "White Wizzard Boulevard")
-                .randomFromRange("houseNumber", 5L, 6L).build();
+                .withValues("city", "Isengard").withValues("street", "White Wizzard Boulevard")
+                .withRanges("houseNumber", 5L, 6L).toBeGenerated(1).build();
 
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFrom("username", "destroyerOfW0rldz").randomFrom("firstname", "alice")
-                .randomFrom("lastname", "annison").randomFromRange("numberOfCards", 1L, 2L)
-                .randomFromRange("accountBalance", 2.72, 2.73).randomSubListFrom("favoriteMovies", "Predator")
-                .randomSubsetFrom("nicknames", "al").randomFromRange("birthDate", mayTheFirst, mayTheSecond)
-                .randomWithGenerator("address", addressGenerator).toBeGenerated(1).build();
+                .withValues("username", "destroyerOfW0rldz").withValues("firstname", "alice")
+                .withValues("lastname", "annison").withRanges("numberOfCards", 1L, 2L)
+                .withRanges("accountBalance", 2.72, 2.73).withSubList("favoriteMovies", "Predator")
+                .withSubSet("nicknames", "al").withRanges("birthDate", mayTheFirst, mayTheSecond)
+                .withObjectGenerator("address", addressGenerator).toBeGenerated(1).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(userGenerator).build();

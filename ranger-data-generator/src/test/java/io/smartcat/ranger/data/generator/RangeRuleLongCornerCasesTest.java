@@ -13,7 +13,7 @@ public class RangeRuleLongCornerCasesTest {
         Long endOfRange = 10L;
 
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFrom("username", "subzero").randomFromRange("numberOfCards", beginingOfRange, endOfRange)
+                .withValues("username", "subzero").withRanges("numberOfCards", beginingOfRange, endOfRange)
                 .toBeGenerated(3).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()

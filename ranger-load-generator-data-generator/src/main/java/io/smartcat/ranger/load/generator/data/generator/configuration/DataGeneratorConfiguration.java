@@ -39,7 +39,7 @@ public class DataGeneratorConfiguration implements DataSourceConfiguration {
         for (Field field : objectConfiguration.getFields()) {
             String name = field.getName();
             String[] values = field.getValues().split(",");
-            objectGeneratorBuilder.randomFrom(name, values);
+            objectGeneratorBuilder.withValues(name, values);
         }
         ObjectGenerator<KafkaPayload> objectGenerator = objectGeneratorBuilder.build();
         AggregatedObjectGenerator<KafkaPayload> aggregatedObjectGenerator =

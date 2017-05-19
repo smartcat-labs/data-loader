@@ -7,33 +7,26 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import io.smartcat.ranger.data.generator.model.User;
-import io.smartcat.ranger.data.generator.util.Randomizer;
-import io.smartcat.ranger.data.generator.util.RandomizerImpl;
 
 public class AggregatedObjectGeneratorTest {
 
     @Test
     public void should_allow_not_setting_a_field_in_one_of_the_object_generators() {
-        String[] usernameArray = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero"};
-        String[] firstNameArray = {"alice", "bob", "charlie"};
+        List<String> usernames = Arrays.asList("destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero");
+        List<String> firstNames = Arrays.asList("alice", "bob", "charlie");
 
-        Randomizer randomizer = new RandomizerImpl();
+        ObjectGenerator<User> randomUserGenerator = new ObjectGenerator.Builder<User>(User.class)
+                .withValues("username", usernames)
+                .withValues("firstname", firstNames).toBeGenerated(100).build();
 
-        ObjectGenerator<User> randomUserGenerator = new ObjectGenerator.Builder<User>(User.class, randomizer)
-                .randomFrom("username", usernameArray).randomFrom("firstname", firstNameArray).toBeGenerated(100)
-                .build();
-
-        ObjectGenerator<User> usernameOnlyUserGenerator = new ObjectGenerator.Builder<User>(User.class, randomizer)
-                .randomFrom("username", usernameArray).toBeGenerated(10).build();
+        ObjectGenerator<User> usernameOnlyUserGenerator = new ObjectGenerator.Builder<User>(User.class)
+                .withValues("username", usernames).toBeGenerated(10).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(randomUserGenerator).withObjectGenerator(usernameOnlyUserGenerator).build();
 
         int numberOfUsersWithUsernameAndFirstName = 0;
         int numberOfUsersWithUsernameOnly = 0;
-
-        List<String> usernames = Arrays.asList(usernameArray);
-        List<String> firstNames = Arrays.asList(firstNameArray);
 
         for (User u : aggregatedObjectGenerator) {
             Assert.assertTrue(usernames.contains(u.getUsername()));
@@ -50,19 +43,17 @@ public class AggregatedObjectGeneratorTest {
 
     @Test
     public void should_allow_not_setting_different_fields_in_different_object_generators() {
-        String[] usernameArray = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero"};
-        String[] firstNameArray = {"alice", "bob", "charlie"};
-        String[] lastNameArray = {"delta", "eta", "feta"};
+        List<String> usernames = Arrays.asList("destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero");
+        List<String> firstNames = Arrays.asList("alice", "bob", "charlie");
+        List<String> lastNames = Arrays.asList("delta", "eta", "feta");
 
-        Randomizer randomizer = new RandomizerImpl();
+        ObjectGenerator<User> usernameAndFirstNameUserGenerator = new ObjectGenerator.Builder<User>(User.class)
+                .withValues("username", usernames)
+                .withValues("firstname", firstNames).toBeGenerated(5).build();
 
-        ObjectGenerator<User> usernameAndFirstNameUserGenerator = new ObjectGenerator.Builder<User>(User.class,
-                randomizer).randomFrom("username", usernameArray).randomFrom("firstname", firstNameArray)
-                        .toBeGenerated(5).build();
-
-        ObjectGenerator<User> usernameAndLastNameUserGenerator = new ObjectGenerator.Builder<User>(User.class,
-                randomizer).randomFrom("username", usernameArray).randomFrom("lastname", lastNameArray).toBeGenerated(3)
-                        .build();
+        ObjectGenerator<User> usernameAndLastNameUserGenerator = new ObjectGenerator.Builder<User>(User.class)
+                .withValues("username", usernames).withValues("lastname", lastNames)
+                .toBeGenerated(3).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(usernameAndFirstNameUserGenerator)
@@ -70,10 +61,6 @@ public class AggregatedObjectGeneratorTest {
 
         int numberOfUsersWithUsernameAndFirstName = 0;
         int numberOfUsersWithUsernameAndLastName = 0;
-
-        List<String> usernames = Arrays.asList(usernameArray);
-        List<String> firstNames = Arrays.asList(firstNameArray);
-        List<String> lastNames = Arrays.asList(lastNameArray);
 
         for (User u : aggregatedObjectGenerator) {
             Assert.assertTrue(usernames.contains(u.getUsername()));
@@ -91,18 +78,16 @@ public class AggregatedObjectGeneratorTest {
 
     @Test
     public void should_allow_setting_completelly_different_fields_in_different_object_generators() {
-        String[] usernameArray = {"destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero"};
-        String[] firstNameArray = {"alice", "bob", "charlie"};
+        List<String> usernames = Arrays.asList("destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero");
+        List<String> firstNames = Arrays.asList("alice", "bob", "charlie");
 
-        Randomizer randomizer = new RandomizerImpl();
+        ObjectGenerator<User> usernameAndBalanceUserGenerator = new ObjectGenerator.Builder<User>(User.class)
+                .withValues("username", usernames)
+                .withRanges("accountBalance", -5.2, 3.14).toBeGenerated(5).build();
 
-        ObjectGenerator<User> usernameAndBalanceUserGenerator = new ObjectGenerator.Builder<User>(User.class,
-                randomizer).randomFrom("username", usernameArray).randomFromRange("accountBalance", -5.2, 3.14)
-                        .toBeGenerated(5).build();
-
-        ObjectGenerator<User> firstNameAndNumberOfCardsUserGenerator = new ObjectGenerator.Builder<User>(User.class,
-                randomizer).randomFrom("firstname", firstNameArray).randomFromRange("numberOfCards", 1L, 10L)
-                        .toBeGenerated(3).build();
+        ObjectGenerator<User> firstNameAndNumberOfCardsUserGenerator = new ObjectGenerator.Builder<User>(User.class)
+                .withValues("firstname", firstNames)
+                .withRanges("numberOfCards", 1L, 10L).toBeGenerated(3).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(usernameAndBalanceUserGenerator)
@@ -110,9 +95,6 @@ public class AggregatedObjectGeneratorTest {
 
         int numberOfUsersWithUsernameAndAccountBalance = 0;
         int numberOfUsersWithFirstNameAndNumberOfCards = 0;
-
-        List<String> usernames = Arrays.asList(usernameArray);
-        List<String> firstNames = Arrays.asList(firstNameArray);
 
         for (User u : aggregatedObjectGenerator) {
             if (u.getFirstname() != null) {
@@ -132,7 +114,7 @@ public class AggregatedObjectGeneratorTest {
     @Test
     public void should_throw_exception_for_unexisting_field() {
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFrom("unexistingField", "something").toBeGenerated(100).build();
+                .withValues("unexistingField", "something").toBeGenerated(100).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(userGenerator).build();

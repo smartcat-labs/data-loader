@@ -6,17 +6,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import io.smartcat.ranger.data.generator.model.User;
-import io.smartcat.ranger.data.generator.util.Randomizer;
-import io.smartcat.ranger.data.generator.util.RandomizerImpl;
 
 public class RangeRuleLongTest {
 
     @Test
     public void should_set_number_of_cards_randomly_from_range() {
-        Randomizer randomizerMock = new RandomizerImpl();
-
-        ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class, randomizerMock)
-                .randomFromRange("numberOfCards", 0L, 5L).toBeGenerated(1000).build();
+        ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
+                .withRanges("numberOfCards", 0L, 5L).toBeGenerated(1000).build();
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(userGenerator).build();
 

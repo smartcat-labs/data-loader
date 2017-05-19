@@ -1,36 +1,29 @@
-package io.smartcat.ranger.data.generator.util;
+package io.smartcat.ranger.data.generator.distribution;
 
 import java.util.Random;
 
 /**
- * Wrapper for java.util.Random.
+ * Uniform distribution.
  */
-public class RandomizerImpl implements Randomizer {
+public class UniformDistribution implements Distribution {
 
     private Random random = new Random();
 
-    /**
-     * Returns a random int value between 0 (inclusive) and the specified value (exclusive).
-     *
-     * @param bound
-     * @return random int
-     */
     @Override
     public int nextInt(int bound) {
         return random.nextInt(bound);
     }
 
-    /**
-     * Returns a random long value between 0 (inclusive) and the specified value (exclusive).
-     */
+    @Override
+    public int nextInt(int lower, int upper) {
+        return random.ints(1, lower, upper).findFirst().getAsInt();
+    }
+
     @Override
     public long nextLong(long bound) {
         return random.longs(1, 0, bound).findFirst().getAsLong();
     }
 
-    /**
-     * Returns a random long value between specified lower value (inclusive) and specified upper value (exclusive).
-     */
     @Override
     public long nextLong(long lower, long upper) {
         return random.longs(1, lower, upper).findFirst().getAsLong();
@@ -45,5 +38,4 @@ public class RandomizerImpl implements Randomizer {
     public boolean nextBoolean() {
         return random.nextBoolean();
     }
-
 }

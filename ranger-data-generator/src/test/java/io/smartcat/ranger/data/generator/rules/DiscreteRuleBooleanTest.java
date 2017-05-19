@@ -7,16 +7,13 @@ import org.junit.Test;
 
 import io.smartcat.ranger.data.generator.ObjectGenerator;
 import io.smartcat.ranger.data.generator.model.User;
-import io.smartcat.ranger.data.generator.util.Randomizer;
-import io.smartcat.ranger.data.generator.util.RandomizerImpl;
 
 public class DiscreteRuleBooleanTest {
 
     @Test
     public void should_set_boolean_property() {
-        Randomizer randomizer = new RandomizerImpl();
-        ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class, randomizer)
-                .randomBoolean("maried").toBeGenerated(1000).build();
+        ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
+                .withBoolean("maried").toBeGenerated(1000).build();
 
         List<User> result = userGenerator.generateAll();
 

@@ -12,7 +12,7 @@ public class SubSetRuleTest {
     @Test
     public void should_set_set_property() {
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFrom("username", "Melkor").randomSubsetFrom("nicknames", "Belegurth", "Morgoth")
+                .withValues("username", "Melkor").withSubSet("nicknames", "Belegurth", "Morgoth")
                 .toBeGenerated(1000).build();
 
         List<User> result = userGenerator.generateAll();

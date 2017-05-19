@@ -17,7 +17,7 @@ public class RangeRuleFloatTest {
         Float endOfRange = 10.1f;
 
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFrom("username", "subzero").randomFromRange("balanceInFloat", beginingOfRange, endOfRange)
+                .withValues("username", "subzero").withRanges("balanceInFloat", beginingOfRange, endOfRange)
                 .toBeGenerated(3).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
@@ -51,7 +51,7 @@ public class RangeRuleFloatTest {
         float upper3 = 25.4f;
 
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFromRange("balanceInFloat", lower1, upper1, lower2, upper2, lower3, upper3).toBeGenerated(1000)
+                .withRanges("balanceInFloat", lower1, upper1, lower2, upper2, lower3, upper3).toBeGenerated(1000)
                 .build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()

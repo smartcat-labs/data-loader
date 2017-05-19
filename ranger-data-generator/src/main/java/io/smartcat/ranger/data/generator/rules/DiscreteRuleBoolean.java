@@ -1,46 +1,33 @@
 package io.smartcat.ranger.data.generator.rules;
 
-import io.smartcat.ranger.data.generator.util.Randomizer;
+import io.smartcat.ranger.data.generator.distribution.Distribution;
 
 /**
  * Rule for discrete set of allowed values (i.e. not range).
  */
 public class DiscreteRuleBoolean implements Rule<Boolean> {
 
-    private Randomizer random;
+    private Distribution distribution;
 
-    private DiscreteRuleBoolean(Builder builder) {
-        this.random = builder.random;
-    }
-
-    @Override
-    public Boolean getRandomAllowedValue() {
-        return random.nextBoolean();
+    /**
+     * Constructs boolean discrete rule with default distribution.
+     */
+    public DiscreteRuleBoolean() {
+        this.distribution = DEFAULT_DISTRIBUTION;
     }
 
     /**
-     * Builder for DiscreteRuleBoolean.
+     * Constructs boolean dictrete rule with specified <code>distribution</code>.
+     *
+     * @param distribution Distribution to be used when generating values.
      */
-    public static class Builder {
-        private Randomizer random;
+    public DiscreteRuleBoolean(Distribution distribution) {
+        this.distribution = distribution;
+    }
 
-        /**
-         * Constructor.
-         *
-         * @param randomizer Randomizer implementation.
-         */
-        public Builder(Randomizer randomizer) {
-            this.random = randomizer;
-        }
-
-        /**
-         * Build method.
-         *
-         * @return immutable DiscreteRuleBoolean object based on the previously instantiated builder.
-         */
-        public DiscreteRuleBoolean build() {
-            return new DiscreteRuleBoolean(this);
-        }
+    @Override
+    public Boolean next() {
+        return distribution.nextBoolean();
     }
 
 }

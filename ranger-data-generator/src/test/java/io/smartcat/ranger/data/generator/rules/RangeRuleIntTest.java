@@ -17,7 +17,7 @@ public class RangeRuleIntTest {
         int upper = 5;
 
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFromRange("numberOfInts", lower, upper).toBeGenerated(1000).build();
+                .withRanges("numberOfInts", lower, upper).toBeGenerated(1000).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(userGenerator).build();
@@ -41,7 +41,7 @@ public class RangeRuleIntTest {
         int upper3 = 25;
 
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFromRange("numberOfInts", lower1, upper1, lower2, upper2, lower3, upper3).toBeGenerated(1000)
+                .withRanges("numberOfInts", lower1, upper1, lower2, upper2, lower3, upper3).toBeGenerated(1000)
                 .build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()

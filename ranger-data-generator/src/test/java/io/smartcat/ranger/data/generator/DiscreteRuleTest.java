@@ -8,17 +8,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import io.smartcat.ranger.data.generator.model.User;
-import io.smartcat.ranger.data.generator.util.Randomizer;
-import io.smartcat.ranger.data.generator.util.RandomizerImpl;
 
 public class DiscreteRuleTest {
 
     @Test
     public void should_set_usernames_randomly_from_the_provided_list() {
-        Randomizer randomizer = new RandomizerImpl();
-
-        ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class, randomizer)
-                .randomFrom("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac")
+        ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
+                .withValues("username", "destroyerOfW0rldz", "univerzalBlack", "johnycage", "subzero", "krelac")
                 .toBeGenerated(1000).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()

@@ -17,8 +17,8 @@ public class RangeRuleDateCornerCasesTest {
         LocalDateTime threeDaysAgo = now.minusDays(3);
 
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFrom("username", "subzero").randomFromRange("birthDate", tenDaysAgo, threeDaysAgo)
-                .toBeGenerated(3).build();
+                .withValues("username", "subzero")
+                .withRanges("birthDate", tenDaysAgo, threeDaysAgo).toBeGenerated(3).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(userGenerator).build();
@@ -53,9 +53,8 @@ public class RangeRuleDateCornerCasesTest {
         LocalDateTime threeDaysAgo = now.minusDays(3);
 
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFrom("username", "subzero")
-                .randomFromRange("birthDate", tenDaysAgo, sevenDaysAgo, fiveDaysAgo, threeDaysAgo).toBeGenerated(10)
-                .build();
+                .withValues("username", "subzero")
+                .withRanges("birthDate", tenDaysAgo, sevenDaysAgo, fiveDaysAgo, threeDaysAgo).toBeGenerated(10).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(userGenerator).build();

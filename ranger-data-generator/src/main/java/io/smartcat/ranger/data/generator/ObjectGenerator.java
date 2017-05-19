@@ -9,15 +9,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.smartcat.ranger.data.generator.distribution.Distribution;
+import io.smartcat.ranger.data.generator.rules.DiscreteRule;
 import io.smartcat.ranger.data.generator.rules.DiscreteRuleBoolean;
-import io.smartcat.ranger.data.generator.rules.DiscreteRuleString;
+import io.smartcat.ranger.data.generator.rules.ObjectGeneratorRule;
 import io.smartcat.ranger.data.generator.rules.RangeRuleDate;
 import io.smartcat.ranger.data.generator.rules.RangeRuleDouble;
 import io.smartcat.ranger.data.generator.rules.RangeRuleFloat;
@@ -28,8 +29,6 @@ import io.smartcat.ranger.data.generator.rules.Rule;
 import io.smartcat.ranger.data.generator.rules.SubListRule;
 import io.smartcat.ranger.data.generator.rules.SubSetRule;
 import io.smartcat.ranger.data.generator.rules.UUIDRule;
-import io.smartcat.ranger.data.generator.util.Randomizer;
-import io.smartcat.ranger.data.generator.util.RandomizerImpl;
 
 /**
  * Generates objects of certain type and specified criteria.
@@ -41,13 +40,11 @@ public class ObjectGenerator<T> implements Iterable<T> {
     private final Class<T> objectType;
     private final int numberOfObjects;
     private final Map<String, Rule<?>> fieldRules;
-    private final Map<String, ObjectGenerator<?>> nestedObjectGeneratorMap;
 
     private ObjectGenerator(Builder<T> builder) {
         this.objectType = builder.objectType;
         this.numberOfObjects = builder.numberOfObjects;
         this.fieldRules = new HashMap<>(builder.fieldRules);
-        this.nestedObjectGeneratorMap = new HashMap<>(builder.nestedObjectGeneratorMap);
     }
 
     /**
@@ -109,8 +106,7 @@ public class ObjectGenerator<T> implements Iterable<T> {
 
     private T buildOne() {
         final T instance = initObject();
-        fieldRules.forEach((key, value) -> set(instance, key, value.getRandomAllowedValue()));
-        nestedObjectGeneratorMap.forEach((key, value) -> set(instance, key, value.buildOne()));
+        fieldRules.forEach((key, value) -> set(instance, key, value.next()));
         return instance;
     }
 
@@ -160,8 +156,6 @@ public class ObjectGenerator<T> implements Iterable<T> {
         private Class<T> objectType;
         private Map<String, Rule<?>> fieldRules = new HashMap<>();
         private int numberOfObjects = -1;
-        private Map<String, ObjectGenerator<?>> nestedObjectGeneratorMap = new HashMap<>();
-        private Randomizer random = new RandomizerImpl();
 
         /**
          * Creates Builder that is used with passed {@code objectType}.
@@ -173,250 +167,300 @@ public class ObjectGenerator<T> implements Iterable<T> {
         }
 
         /**
-         * Creates Builder that is used with passed {@code objectType} and randomizer.
-         *
-         * @param objectType Type which {@link ObjectGenerator} will generate.
-         * @param random Randomizer implementation.
-         */
-        public Builder(Class<T> objectType, Randomizer random) {
-            this.objectType = objectType;
-            this.random = random;
-        }
-
-        /**
-         * Sets the allowed ranges of Shorts for the field with {@code fieldName}. The ranges are defined by array of
-         * Shorts <code>S1, S2, ..., Sn</code> such that <code>S1 &lt; S2 &lt; ... &lt; Sn</code> and
-         * <code>(n % 2) == 0</code>;
-         *
-         * The ranges defined by <code>S1, S2, ..., Sn</code> are: <code>[S1, S2), [S3, S4), ..., [Sn-1, Sn)</code>. In
-         * each range <code>[Sj, Sk)</code> <code>Sj</code> denotes inclusive start of the range and <code>Sk</code>
-         * denotes exclusive end of the range.
-         *
+         * Sets the rule to be used for generating values for field with {@code fieldName}.
          *
          * @param fieldName Name of the field in the type {@code <T>}.
-         * @param rangeMarkers Array of Short that denotes the ranges.
+         * @param rule Rule to be used for generating values.
+         * @param <V> Type of value which rule will be generate.
          * @return This builder.
-         *
-         * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
          */
-        public Builder<T> randomFromRange(String fieldName, Short... rangeMarkers) {
-            checkRangeInput(rangeMarkers);
-            fieldRules.put(fieldName, new RangeRuleShort.Builder(random).ranges(rangeMarkers).build());
+        public <V> Builder<T> withRule(String fieldName, Rule<V> rule) {
+            fieldRules.put(fieldName, rule);
             return this;
         }
 
         /**
-         * Sets the allowed ranges of Integers for the field with {@code fieldName}. The ranges are defined by an array
-         * of Integers <code>I1, I2, ..., In</code> such that <code>I1 &lt; I2 &lt; ... &lt; In</code> and
-         * <code>(n % 2) == 0</code>;
-         *
-         * The ranges defined by <code>I1, I2, ..., In</code> are: <code>[I1, I2), [I3, I4), ..., [In-1, In)</code>. In
-         * each range <code>[Ij, Ik)</code> <code>Ij</code> denotes inclusive start of the range and <code>Ik</code>
-         * denotes exclusive end of the range.
-         *
+         * Sets the boolean rule to be used for generating values for field with {@code fieldName}.
          *
          * @param fieldName Name of the field in the type {@code <T>}.
-         * @param rangeMarkers Array of Integers that denotes the ranges.
          * @return This builder.
-         *
-         * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
          */
-        public Builder<T> randomFromRange(String fieldName, Integer... rangeMarkers) {
-            checkRangeInput(rangeMarkers);
-            fieldRules.put(fieldName, new RangeRuleInt.Builder(random).ranges(rangeMarkers).build());
-            return this;
+        public Builder<T> withBoolean(String fieldName) {
+            Rule<Boolean> rule = new DiscreteRuleBoolean();
+            return withRule(fieldName, rule);
         }
 
         /**
-         * Sets the allowed ranges of Float for the field with {@code fieldName}. The ranges are defined by an array of
-         * Floats <code>F1, F2, ..., Fn</code> such that <code>F1 &lt; F2 &lt; ... &lt; Fn</code> and
-         * <code>(n % 2) == 0</code>;
-         *
-         * The ranges defined by <code>F1, F2, ..., Fn</code> are: <code>[F1, F2), [F3, F4), ..., [F(n-1), Fn)</code>.
-         * In each range <code>[Fj, Fk)</code> <code>Fj</code> denotes inclusive start of the range and <code>Fk</code>
-         * denotes exclusive end of the range.
-         *
+         * Sets the possible values for the field with {@code fieldName}.
          *
          * @param fieldName Name of the field in the type {@code <T>}.
-         * @param rangeMarkers Array of Floats that denotes the ranges.
+         * @param values List of possible values.
+         * @param <V> Type of value which rule will be generate.
          * @return This builder.
-         *
-         * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
          */
-        public Builder<T> randomFromRange(String fieldName, Float... rangeMarkers) {
-            checkRangeInput(rangeMarkers);
-            fieldRules.put(fieldName, new RangeRuleFloat.Builder(random).ranges(rangeMarkers).build());
-            return this;
+        @SuppressWarnings("unchecked")
+        public <V> Builder<T> withValues(String fieldName, V... values) {
+            return withValues(fieldName, Arrays.asList(values));
         }
 
         /**
-         * Sets the allowed ranges of LocalDateTime for the field with {@code fieldName}. The ranges are defined by an
-         * array of LocalDateTime <code>T1, T2, ..., Tn</code> such that <code>T1 &lt; T2 &lt; ... &lt; Tn</code> and
-         * <code>(n % 2) == 0</code>;
-         *
-         * The ranges defined by <code>T1, T2, ..., Tn</code> are: <code>[T1, T2), [T3, T4), ..., [T(n-1), Tn)</code>.
-         * In each range <code>[Tj, Tk)</code> <code>Tj</code> denotes inclusive start of the range and <code>Tk</code>
-         * denotes exclusive end of the range.
-         *
+         * Sets the possible values for the field with {@code fieldName}.
          *
          * @param fieldName Name of the field in the type {@code <T>}.
-         * @param rangeMarkers Array of LocalDateTime that denotes the ranges.
+         * @param distribution Distribution to be used when generating values.
+         * @param values List of possible values.
+         * @param <V> Type of value which rule will be generate.
          * @return This builder.
-         *
-         * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
          */
-        public Builder<T> randomFromRange(String fieldName, LocalDateTime... rangeMarkers) {
-            checkRangeInput(rangeMarkers);
-            List<Date> result = Arrays.asList(rangeMarkers).stream().map(marker -> marker.toInstant(ZoneOffset.UTC))
-                    .map(instant -> Date.from(instant)).collect(Collectors.toList());
-            fieldRules.put(fieldName, new RangeRuleDate.Builder(random).ranges(result).build());
-            return this;
+        @SuppressWarnings("unchecked")
+        public <V> Builder<T> withValues(String fieldName, Distribution distribution, V... values) {
+            return withValues(fieldName, distribution, Arrays.asList(values));
         }
 
         /**
-         * Sets the allowed ranges of Dates for the field with {@code fieldName}. The ranges are defined by an array of
-         * Dates <code>T1, T2, ..., Tn</code> such that <code>T1 &lt; T2 &lt; ... &lt; Tn</code> and
-         * <code>(n % 2) == 0</code>;
-         *
-         * The ranges defined by <code>T1, T2, ..., Tn</code> are: <code>[T1, T2), [T3, T4), ..., [T(n-1), Tn)</code>.
-         * In each range <code>[Tj, Tk)</code> <code>Tj</code> denotes inclusive start of the range and <code>Tk</code>
-         * denotes exclusive end of the range.
-         *
+         * Sets the possible values for the field with {@code fieldName}.
          *
          * @param fieldName Name of the field in the type {@code <T>}.
-         * @param rangeMarkers Array of Dates that denotes the ranges.
+         * @param values List of possible values.
+         * @param <V> Type of value which rule will be generate.
          * @return This builder.
-         *
-         * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
          */
-        public Builder<T> randomFromRange(String fieldName, Date... rangeMarkers) {
-            checkRangeInput(rangeMarkers);
-            fieldRules.put(fieldName, new RangeRuleDate.Builder(random).ranges(rangeMarkers).build());
-            return this;
+        public <V> Builder<T> withValues(String fieldName, List<V> values) {
+            Rule<V> rule = new DiscreteRule<>(values);
+            return withRule(fieldName, rule);
         }
 
         /**
-         * Sets the allowed ranges of Longs for the field with {@code fieldName}. The ranges are defined by an array of
-         * Longs <code>L1, L2, ..., Ln</code> such that <code>L1 &lt; L2 &lt; ... &lt; Ln</code> and
+         * Sets the possible values for the field with {@code fieldName}.
+         *
+         * @param fieldName Name of the field in the type {@code <T>}.
+         * @param distribution Distribution to be used when generating values.
+         * @param values List of possible values.
+         * @param <V> Type of value which rule will be generate.
+         * @return This builder.
+         */
+        public <V> Builder<T> withValues(String fieldName, Distribution distribution, List<V> values) {
+            Rule<V> rule = new DiscreteRule<>(values, distribution);
+            return withRule(fieldName, rule);
+        }
+
+        /**
+         * Sets the allowed ranges of {@code <R>} for the field with {@code fieldName}. The ranges are defined by an
+         * array of {@code <R>} <code>A1, A2, ..., An</code> such that <code>A1 &lt; A2 &lt; ... &lt; An</code> and
          * <code>(n % 2) == 0</code>;
          *
-         * The ranges defined by <code>L1, L2, ..., Ln</code> are: <code>[L1, L2), [L3, L4), ..., [L(n-1), Ln)</code>.
-         * In each range <code>[Lj, Lk)</code> <code>Lj</code> denotes inclusive start of the range and <code>Lk</code>
+         * The ranges defined by <code>A1, A2, ..., An</code> are: <code>[A1, A2), [A3, A4), ..., [A(n-1), An)</code>.
+         * In each range <code>[Aj, Ak)</code> <code>Aj</code> denotes inclusive start of the range and <code>Ak</code>
          * denotes exclusive end of the range.
          *
          * @param fieldName Name of the field in the type {@code <T>}.
-         * @param rangeMarkers Array of Longs that denotes the ranges.
+         * @param rangeMarkers Array of {@code <R>} that denotes the ranges.
+         * @param <R> Type of value which rule will be generate.
          * @return This builder.
          *
-         * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
+         * @throws IllegalArgumentException if {@code rangeMarkers} is empty or not strictly increasing array.
          */
-        public Builder<T> randomFromRange(String fieldName, Long... rangeMarkers) {
-            checkRangeInput(rangeMarkers);
-            fieldRules.put(fieldName, new RangeRuleLong.Builder(random).ranges(rangeMarkers).build());
-            return this;
+        @SuppressWarnings("unchecked")
+        public <R extends Comparable<R>> Builder<T> withRanges(String fieldName, R... rangeMarkers) {
+            return withRanges(fieldName, Arrays.asList(rangeMarkers));
         }
 
         /**
-         * Sets the allowed ranges of Doubles for the field with {@code fieldName}. The ranges are defined by an array
-         * of Doubles <code>D1, D2, ..., Dn</code> such that <code>D1 &lt; D2 &lt; ... &lt; Dn</code> and
+         * Sets the allowed ranges of {@code <R>} for the field with {@code fieldName}. The ranges are defined by an
+         * array of {@code <R>} <code>A1, A2, ..., An</code> such that <code>A1 &lt; A2 &lt; ... &lt; An</code> and
          * <code>(n % 2) == 0</code>;
          *
-         * The ranges defined by <code>D1, D2, ..., Dn</code> are: <code>[D1, D2), [D3, D4), ..., [D(n-1), Dn)</code>.
-         * In each range <code>[Dj, Dk)</code> <code>Dj</code> denotes inclusive start of the range and <code>Dk</code>
+         * The ranges defined by <code>A1, A2, ..., An</code> are: <code>[A1, A2), [A3, A4), ..., [A(n-1), An)</code>.
+         * In each range <code>[Aj, Ak)</code> <code>Aj</code> denotes inclusive start of the range and <code>Ak</code>
          * denotes exclusive end of the range.
          *
          * @param fieldName Name of the field in the type {@code <T>}.
-         * @param rangeMarkers Array of Doubles that denotes the ranges.
+         * @param distribution Distribution to be used when generating values.
+         * @param rangeMarkers Array of {@code <R>} that denotes the ranges.
+         * @param <R> Type of value which rule will be generate.
          * @return This builder.
          *
-         * @throws IllegalArgumentException if {@code rangeMarkers} is not strictly increasing array.
+         * @throws IllegalArgumentException if {@code rangeMarkers} is empty or not strictly increasing array.
          */
-        public Builder<T> randomFromRange(String fieldName, Double... rangeMarkers) {
-            checkRangeInput(rangeMarkers);
-            fieldRules.put(fieldName, new RangeRuleDouble.Builder(random).ranges(rangeMarkers).build());
-            return this;
+        @SuppressWarnings("unchecked")
+        public <R extends Comparable<R>> Builder<T> withRanges(String fieldName, Distribution distribution,
+                R... rangeMarkers) {
+            return withRanges(fieldName, distribution, Arrays.asList(rangeMarkers));
         }
 
         /**
-         * Sets the allowed list of String values for the field with {@code fieldName}.
+         * Sets the allowed ranges of {@code <R>} for the field with {@code fieldName}. The ranges are defined by an
+         * list of {@code <R>} <code>A1, A2, ..., An</code> such that <code>A1 &lt; A2 &lt; ... &lt; An</code> and
+         * <code>(n % 2) == 0</code>;
+         *
+         * The ranges defined by <code>A1, A2, ..., An</code> are: <code>[A1, A2), [A3, A4), ..., [A(n-1), An)</code>.
+         * In each range <code>[Aj, Ak)</code> <code>Aj</code> denotes inclusive start of the range and <code>Ak</code>
+         * denotes exclusive end of the range.
          *
          * @param fieldName Name of the field in the type {@code <T>}.
-         * @param values List of allowed values.
+         * @param rangeMarkers List of {@code <R>} that denotes the ranges.
+         * @param <R> Type of value which rule will be generate.
          * @return This builder.
-         */
-        public Builder<T> randomFrom(String fieldName, String... values) {
-            fieldRules.put(fieldName, new DiscreteRuleString.Builder(random).allowedValues(values).build());
-            return this;
-        }
-
-        /**
-         * Declares that the field with {@code fieldName} should be assigned random boolean value.
          *
-         * @param fieldName name of the field in the type {@code <T>}.
-         * @return This builder.
+         * @throws IllegalArgumentException if {@code rangeMarkers} is null or empty or not strictly increasing list.
          */
-        public Builder<T> randomBoolean(String fieldName) {
-            fieldRules.put(fieldName, new DiscreteRuleBoolean.Builder(random).build());
-            return this;
+        @SuppressWarnings("unchecked")
+        public <R extends Comparable<R>> Builder<T> withRanges(String fieldName, List<R> rangeMarkers) {
+            Rule<R> rule = createRangeRule(rangeMarkers);
+            return withRule(fieldName, rule);
         }
 
         /**
-         * Sets the builder for the property for the field with {@code fieldName}.
+         * Sets the allowed ranges of {@code <R>} for the field with {@code fieldName}. The ranges are defined by an
+         * list of {@code <R>} <code>A1, A2, ..., An</code> such that <code>A1 &lt; A2 &lt; ... &lt; An</code> and
+         * <code>(n % 2) == 0</code>;
          *
-         * @param fieldName Name of the field in the type {@code <T>}.
-         * @param objectGenerator Instance of {@code ObjectGenerator<?>} for the type of the field with passed
-         *            {@code fieldName}.
-         * @return This builder.
-         */
-        public Builder<T> randomWithGenerator(String fieldName, ObjectGenerator<?> objectGenerator) {
-            nestedObjectGeneratorMap.put(fieldName, objectGenerator);
-            return this;
-        }
-
-        /**
-         * Sets the allowed list of String values for the field with {@code fieldName} from which a random sub set
-         * should be chosen (including empty set).
+         * The ranges defined by <code>A1, A2, ..., An</code> are: <code>[A1, A2), [A3, A4), ..., [A(n-1), An)</code>.
+         * In each range <code>[Aj, Ak)</code> <code>Aj</code> denotes inclusive start of the range and <code>Ak</code>
+         * denotes exclusive end of the range.
          *
          * @param fieldName Name of the field in the type {@code <T>}.
-         * @param values List of allowed values.
+         * @param distribution Distribution to be used when generating values.
+         * @param rangeMarkers List of {@code <R>} that denotes the ranges.
+         * @param <R> Type of value which rule will be generate.
          * @return This builder.
+         *
+         * @throws IllegalArgumentException if {@code rangeMarkers} is null or empty or not strictly increasing list.
          */
-        public Builder<T> randomSubsetFrom(String fieldName, String... values) {
-            Set<String> set = new HashSet<>(Arrays.asList(values));
-            fieldRules.put(fieldName, new SubSetRule.Builder<String>(random).withValues(set).build());
-            return this;
+        @SuppressWarnings("unchecked")
+        public <R extends Comparable<R>> Builder<T> withRanges(String fieldName, Distribution distribution,
+                List<R> rangeMarkers) {
+            Rule<R> rule = createRangeRule(distribution, rangeMarkers);
+            return withRule(fieldName, rule);
         }
 
         /**
-         * Sets the allowed list of String values for the field with {@code fieldName} from which a random sub list
-         * should be chosen (including empty list).
+         * Sets object generator to be used for generating values for field with {@code fieldName}.
          *
-         * @param fieldName name of the field in the type {@code <T>}.
-         * @param values List of allowed values.
+         * @param fieldName Name of the field in the type {@code <T>}.
+         * @param objectGenerator Object Generator to be used.
+         * @param <V> Type of value which rule will be generate.
          * @return This builder.
          */
-        public Builder<T> randomSubListFrom(String fieldName, String... values) {
-            fieldRules.put(fieldName,
-                    new SubListRule.Builder<String>(random).withValues(Arrays.asList(values)).build());
-            return this;
+        public <V> Builder<T> withObjectGenerator(String fieldName, ObjectGenerator<V> objectGenerator) {
+            Rule<V> rule = new ObjectGeneratorRule<>(objectGenerator);
+            return withRule(fieldName, rule);
         }
 
         /**
-         * Sets the builder for the property for the field with {@code fieldName}. The passed builder will be used to
-         * create a list of size between passed {@code lower} value (inclusive) and passed {@code upper} value
-         * (exclusive).
+         * Sets the possible list of values for the field with {@code fieldName} from which a sub list should be chosen
+         * (including empty list).
          *
-         * @param fieldName name of the field in the type {@code <T>}.
-         * @param objectGenerator Instance of {@code ObjectGenerator<?>} for the type of the field with passed
-         *            {@code fieldName}.
-         * @param lower Lower bound of random list size.
-         * @param upper Upper bound of random list size.
+         * @param fieldName Name of the field in the type {@code <T>}.
+         * @param values Possible values.
+         * @param <R> Type of value which rule will be generate.
          * @return This builder.
          */
-        public Builder<T> randomSubListWithGenerator(String fieldName, ObjectGenerator<?> objectGenerator, int lower,
-                int upper) {
-            // TODO as part of issue #37
-            throw new UnsupportedOperationException("Not yet implemented");
+        @SuppressWarnings("unchecked")
+        public <R> Builder<T> withSubList(String fieldName, R... values) {
+            return withSubList(fieldName, Arrays.asList(values));
+        }
+
+        /**
+         * Sets the possible list of values for the field with {@code fieldName} from which a sub list should be chosen
+         * (including empty list).
+         *
+         * @param fieldName Name of the field in the type {@code <T>}.
+         * @param values Possible values.
+         * @param <R> Type of value which rule will be generate.
+         * @return This builder.
+         */
+        public <R> Builder<T> withSubList(String fieldName, List<R> values) {
+            Rule<List<R>> rule = new SubListRule<>(values);
+            return withRule(fieldName, rule);
+        }
+
+        /**
+         * Sets the possible list of values for the field with {@code fieldName} from which a sub list should be chosen
+         * (including empty list).
+         *
+         * @param fieldName Name of the field in the type {@code <T>}.
+         * @param distribution Distribution to be used when generating values.
+         * @param values Possible values.
+         * @param <R> Type of value which rule will be generate.
+         * @return This builder.
+         */
+        @SuppressWarnings("unchecked")
+        public <R> Builder<T> withSubList(String fieldName, Distribution distribution, R... values) {
+            return withSubList(fieldName, distribution, Arrays.asList(values));
+        }
+
+        /**
+         * Sets the possible list of values for the field with {@code fieldName} from which a sub list should be chosen
+         * (including empty list).
+         *
+         * @param fieldName Name of the field in the type {@code <T>}.
+         * @param distribution Distribution to be used when generating values.
+         * @param values Possible values.
+         * @param <R> Type of value which rule will be generate.
+         * @return This builder.
+         */
+        public <R> Builder<T> withSubList(String fieldName, Distribution distribution, List<R> values) {
+            Rule<List<R>> rule = new SubListRule<>(values, distribution);
+            return withRule(fieldName, rule);
+        }
+
+        /**
+         * Sets the possible list of values for the field with {@code fieldName} from which a random sub set should be
+         * chosen (including empty set).
+         *
+         * @param fieldName Name of the field in the type {@code <T>}.
+         * @param values Possible values.
+         * @param <R> Type of value which rule will be generate.
+         * @return This builder.
+         */
+        @SuppressWarnings("unchecked")
+        public <R> Builder<T> withSubSet(String fieldName, R... values) {
+            return withSubSet(fieldName, new HashSet<>(Arrays.asList(values)));
+        }
+
+        /**
+         * Sets the possible list of values for the field with {@code fieldName} from which a random sub set should be
+         * chosen (including empty set).
+         *
+         * @param fieldName Name of the field in the type {@code <T>}.
+         * @param values Possible values.
+         * @param <R> Type of value which rule will be generate.
+         * @return This builder.
+         */
+        public <R> Builder<T> withSubSet(String fieldName, Set<R> values) {
+            Rule<Set<R>> rule = new SubSetRule<>(values);
+            return withRule(fieldName, rule);
+        }
+
+        /**
+         * Sets the possible list of values for the field with {@code fieldName} from which a random sub set should be
+         * chosen (including empty set).
+         *
+         * @param fieldName Name of the field in the type {@code <T>}.
+         * @param distribution Distribution to be used when generating values.
+         * @param values Possible values.
+         * @param <R> Type of value which rule will be generate.
+         * @return This builder.
+         */
+        @SuppressWarnings("unchecked")
+        public <R> Builder<T> withSubSet(String fieldName, Distribution distribution, R... values) {
+            return withSubSet(fieldName, distribution, new HashSet<>(Arrays.asList(values)));
+        }
+
+        /**
+         * Sets the possible list of values for the field with {@code fieldName} from which a random sub set should be
+         * chosen (including empty set).
+         *
+         * @param fieldName Name of the field in the type {@code <T>}.
+         * @param distribution Distribution to be used when generating values.
+         * @param values Possible values.
+         * @param <R> Type of value which rule will be generate.
+         * @return This builder.
+         */
+        public <R> Builder<T> withSubSet(String fieldName, Distribution distribution, Set<R> values) {
+            Rule<Set<R>> rule = new SubSetRule<>(values, distribution);
+            return withRule(fieldName, rule);
         }
 
         /**
@@ -425,9 +469,9 @@ public class ObjectGenerator<T> implements Iterable<T> {
          * @param fieldName Name of the field in the type {@code <T>}.
          * @return This builder.
          */
-        public Builder<T> randomUUID(String fieldName) {
-            fieldRules.put(fieldName, new UUIDRule());
-            return this;
+        public Builder<T> withUUID(String fieldName) {
+            Rule<String> rule = new UUIDRule();
+            return withRule(fieldName, rule);
         }
 
         /**
@@ -450,21 +494,74 @@ public class ObjectGenerator<T> implements Iterable<T> {
             return new ObjectGenerator<>(this);
         }
 
-        @SafeVarargs
-        private static <C extends Comparable<C>> void checkRangeInput(C... markers) {
-            List<C> markersList = new LinkedList<>(Arrays.asList(markers));
-            if (markersList.size() % 2 != 0) {
-                throw new IllegalArgumentException(
-                        "Invalid ranges definition. Ranges must be defined with even number of elements.");
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        private Rule createRangeRule(List ranges) {
+            if (ranges.isEmpty()) {
+                throw new IllegalArgumentException("Ranges cannot be empty");
             }
-            C firstElement = markersList.remove(0);
-            for (C c : markersList) {
-                if (c.compareTo(firstElement) <= 0) {
-                    throw new IllegalArgumentException(
-                            "Invalid range bounds. Range definition must be stricly increasing.");
-                }
-                firstElement = c;
+            Object item = ranges.get(0);
+            if (item instanceof Date) {
+                return new RangeRuleDate(ranges);
             }
+            if (item instanceof LocalDateTime) {
+                List<Date> dates = ((List<LocalDateTime>) ranges).stream()
+                        .map(marker -> marker.toInstant(ZoneOffset.UTC)).map(instant -> Date.from(instant))
+                        .collect(Collectors.toList());
+                return new RangeRuleDate(dates);
+            }
+            if (item instanceof Double) {
+                return new RangeRuleDouble(ranges);
+            }
+            if (item instanceof Float) {
+                return new RangeRuleFloat(ranges);
+            }
+            if (item instanceof Long) {
+                return new RangeRuleLong(ranges);
+            }
+            if (item instanceof Integer) {
+                return new RangeRuleInt(ranges);
+            }
+            if (item instanceof Short) {
+                return new RangeRuleShort(ranges);
+            }
+            Class clazz = item.getClass();
+            throw new IllegalArgumentException(
+                    "Class: " + clazz.getName() + " is not supported to be used for ranges.");
+        }
+
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        private Rule createRangeRule(Distribution distribution, List ranges) {
+            if (ranges.isEmpty()) {
+                throw new IllegalArgumentException("Ranges cannot be empty");
+            }
+            Object item = ranges.get(0);
+            if (item instanceof Date) {
+                return new RangeRuleDate(ranges, distribution);
+            }
+            if (item instanceof LocalDateTime) {
+                List<Date> dates = ((List<LocalDateTime>) ranges).stream()
+                        .map(marker -> marker.toInstant(ZoneOffset.UTC)).map(instant -> Date.from(instant))
+                        .collect(Collectors.toList());
+                return new RangeRuleDate(dates, distribution);
+            }
+            if (item instanceof Double) {
+                return new RangeRuleDouble(ranges, distribution);
+            }
+            if (item instanceof Float) {
+                return new RangeRuleFloat(ranges, distribution);
+            }
+            if (item instanceof Long) {
+                return new RangeRuleLong(ranges, distribution);
+            }
+            if (item instanceof Integer) {
+                return new RangeRuleInt(ranges, distribution);
+            }
+            if (item instanceof Short) {
+                return new RangeRuleShort(ranges, distribution);
+            }
+            Class clazz = item.getClass();
+            throw new IllegalArgumentException(
+                    "Class: " + clazz.getName() + " is not supported to be used for ranges.");
         }
     }
 }

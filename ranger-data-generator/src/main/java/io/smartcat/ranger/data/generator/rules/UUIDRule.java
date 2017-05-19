@@ -8,8 +8,7 @@ import java.util.UUID;
 public class UUIDRule implements Rule<String> {
 
     @Override
-    public String getRandomAllowedValue() {
+    public String next() {
         return UUID.randomUUID().toString();
     }
-
 }

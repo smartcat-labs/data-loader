@@ -14,7 +14,8 @@ public class RangeRuleDoubleTest {
         Double endOfRange = 10.1;
 
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFrom("username", "subzero").randomFromRange("accountBalance", beginingOfRange, endOfRange)
+                .withValues("username", "subzero")
+                .withRanges("accountBalance", beginingOfRange, endOfRange)
                 .toBeGenerated(3).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()

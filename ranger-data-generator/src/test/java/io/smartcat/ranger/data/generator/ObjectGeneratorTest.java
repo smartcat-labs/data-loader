@@ -2,6 +2,7 @@ package io.smartcat.ranger.data.generator;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -16,8 +17,8 @@ public class ObjectGeneratorTest {
     @Test
     public void should_throw_illegal_argument_exception_when_dates_are_equal() {
         try {
-            new ObjectGenerator.Builder<User>(User.class).randomFromRange("dateField",
-                    LocalDateTime.of(2000, 1, 1, 0, 0), LocalDateTime.of(2000, 1, 1, 0, 0));
+            new ObjectGenerator.Builder<User>(User.class).withRanges("dateField", LocalDateTime.of(2000, 1, 1, 0, 0),
+                    LocalDateTime.of(2000, 1, 1, 0, 0));
             Assert.fail("should throw illegal argument exception because upper bound is equal to lower.");
         } catch (IllegalArgumentException e) {
             Assert.assertTrue(e != null);
@@ -29,8 +30,8 @@ public class ObjectGeneratorTest {
     @Test
     public void should_throw_illegal_argument_exception_when_lower_bound_date_is_greater_than_upper_bound_date() {
         try {
-            new ObjectGenerator.Builder<User>(User.class).randomFromRange("dateField",
-                    LocalDateTime.of(2000, 1, 1, 0, 1), LocalDateTime.of(2000, 1, 1, 0, 0));
+            new ObjectGenerator.Builder<User>(User.class).withRanges("dateField", LocalDateTime.of(2000, 1, 1, 0, 1),
+                    LocalDateTime.of(2000, 1, 1, 0, 0));
             Assert.fail("should throw illegal argument exception because lower bound is greater than upper.");
         } catch (IllegalArgumentException e) {
             Assert.assertTrue(e != null);
@@ -42,7 +43,7 @@ public class ObjectGeneratorTest {
     @Test
     public void should_throw_illegal_argument_exception_when_doubles_are_equal() {
         try {
-            new ObjectGenerator.Builder<User>(User.class).randomFromRange("double", 2.0, 2.0);
+            new ObjectGenerator.Builder<User>(User.class).withRanges("double", 2.0, 2.0);
             Assert.fail("should throw illegal argument exception because upper bound is equal to lower.");
         } catch (IllegalArgumentException e) {
             Assert.assertTrue(e != null);
@@ -54,7 +55,7 @@ public class ObjectGeneratorTest {
     @Test
     public void should_throw_illegal_argument_exception_when_lower_bound_double_is_greater_than_upper_bound_doublel() {
         try {
-            new ObjectGenerator.Builder<User>(User.class).randomFromRange("double", 2.01, 2.0);
+            new ObjectGenerator.Builder<User>(User.class).withRanges("double", 2.01, 2.0);
             Assert.fail("should throw illegal argument exception because lower bound is greater than upper.");
         } catch (IllegalArgumentException e) {
             Assert.assertTrue(e != null);
@@ -65,17 +66,9 @@ public class ObjectGeneratorTest {
 
     @Test
     public void should_throw_exception_when_range_elements_are_not_increasing() {
-        short lower1 = 0;
-        short upper1 = 5;
-        short lower2 = 10;
-        short upper2 = 15;
-        short lower3 = upper2;
-        short upper3 = 20;
-
         try {
             ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                    .randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3, upper3)
-                    .toBeGenerated(1000).build();
+                    .withRanges("numberOfShorts", 0, 5, 10, 15, 15, 20).toBeGenerated(1000).build();
             new AggregatedObjectGenerator.Builder<User>().withObjectGenerator(userGenerator).build();
             Assert.fail();
         } catch (IllegalArgumentException e) {
@@ -85,15 +78,9 @@ public class ObjectGeneratorTest {
 
     @Test
     public void should_throw_exception_when_ranges_are_defined_by_odd_number_of_elements() {
-        short lower1 = 0;
-        short upper1 = 5;
-        short lower2 = 10;
-        short upper2 = 15;
-        short lower3 = 15;
         try {
             ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                    .randomFromRange("numberOfShorts", lower1, upper1, lower2, upper2, lower3).toBeGenerated(1000)
-                    .build();
+                    .withRanges("numberOfShorts", 0, 5, 10, 15, 15).toBeGenerated(1000).build();
             new AggregatedObjectGenerator.Builder<User>().withObjectGenerator(userGenerator).build();
             Assert.fail();
         } catch (IllegalArgumentException e) {
@@ -110,7 +97,7 @@ public class ObjectGeneratorTest {
         LocalDateTime date2000 = LocalDateTime.of(2000, 1, 1, 0, 0);
 
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFromRange("birthDate", date1960, date1980, date1990, date2000).toBeGenerated(1000).build();
+                .withRanges("birthDate", date1960, date1980, date1990, date2000).toBeGenerated(1000).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(userGenerator).build();
@@ -147,9 +134,10 @@ public class ObjectGeneratorTest {
         Date date1980 = Date.from(LocalDateTime.of(1980, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
         Date date1990 = Date.from(LocalDateTime.of(1990, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
         Date date2000 = Date.from(LocalDateTime.of(2000, 1, 1, 0, 0).toInstant(ZoneOffset.UTC));
+        List<Date> dates = Arrays.asList(date1960, date1980, date1990, date2000);
 
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFromRange("birthDate", date1960, date1980, date1990, date2000).toBeGenerated(1000).build();
+                .withRanges("birthDate", dates).toBeGenerated(1000).build();
 
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(userGenerator).build();
@@ -183,7 +171,8 @@ public class ObjectGeneratorTest {
     @Test
     public void should_accept_multiple_ranges_for_long() {
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFromRange("numberOfCards", 1L, 10L, 20L, 30L).toBeGenerated(1000).build();
+                .withRanges("numberOfCards", 1L, 10L, 20L, 30L).toBeGenerated(1000)
+                .build();
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(userGenerator).build();
 
@@ -209,7 +198,8 @@ public class ObjectGeneratorTest {
     @Test
     public void should_accept_multiple_ranges_for_double() {
         ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-                .randomFromRange("accountBalance", 1.0, 10.1, 20.0, 30.1).toBeGenerated(1000).build();
+                .withRanges("accountBalance", 1.0, 10.1, 20.0, 30.1)
+                .toBeGenerated(1000).build();
         AggregatedObjectGenerator<User> aggregatedObjectGenerator = new AggregatedObjectGenerator.Builder<User>()
                 .withObjectGenerator(userGenerator).build();
 
