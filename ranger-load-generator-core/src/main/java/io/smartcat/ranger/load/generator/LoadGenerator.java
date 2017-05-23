@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.smartcat.ranger.load.generator.api.DataSource;
 import io.smartcat.ranger.load.generator.api.RateGenerator;
 import io.smartcat.ranger.load.generator.api.Worker;
+import io.smartcat.ranger.load.generator.worker.AsyncWorker;
 
 /**
  * Load generator used to execute work tasks with data from provided data source.
@@ -20,6 +21,8 @@ public class LoadGenerator<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadGenerator.class);
     private static final long NANOS_IN_SECOND = TimeUnit.SECONDS.toNanos(1);
     private static final long TICK_PERIOD_IN_NANOS = 1000;
+    private static final int DEFAULT_QUEUE_CAPACITY = 10_000;
+    private static final int DEFAULT_THREAD_COUNT_COEFFICIENT = 2;
 
     private final DataSource<T> dataSource;
     private final RateGenerator rateGenerator;
@@ -39,7 +42,7 @@ public class LoadGenerator<T> {
     public LoadGenerator(DataSource<T> dataSource, RateGenerator rateGenerator, Worker<T> worker) {
         this.dataSource = dataSource;
         this.rateGenerator = rateGenerator;
-        this.worker = worker;
+        this.worker = configureWorker(worker);
     }
 
     /**
@@ -84,6 +87,20 @@ public class LoadGenerator<T> {
     public void terminate() {
         terminate.set(true);
         LOGGER.info("Termination signal sent.");
+    }
+
+    /**
+     * Configures worker, default implementation will wrap worker into {@link AsyncWorker} if not already wrapped.
+     *
+     * @param worker Worker to be configured.
+     * @return Instance of {@link Worker} to be used by this load generator.
+     */
+    protected Worker<T> configureWorker(Worker<T> worker) {
+        if (worker instanceof AsyncWorker) {
+            return worker;
+        }
+        return new AsyncWorker<>(worker, DEFAULT_QUEUE_CAPACITY, (x) -> {
+        }, true, Runtime.getRuntime().availableProcessors() * DEFAULT_THREAD_COUNT_COEFFICIENT);
     }
 
     private void checkState() {
