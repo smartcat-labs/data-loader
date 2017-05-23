@@ -57,7 +57,7 @@ For showcase and usage examples, take a look at our [Ranger Demo](https://github
 
 Totally random test data is not so useful:
 
-![Random users table](../images/table-random-users.png)
+![Random users table](images/table-random-users.png)
 
 - It is hard to make it by certain rules
 - It is hard to reason about it
@@ -65,7 +65,7 @@ Totally random test data is not so useful:
 
 What we can do is use contextual data generator and create users whose attributes' values make sense in the domain context. We can also say, for example, that 70% of created users should be females. The table will then look like this:
 
-![Context users table](../images/table-not-so-random.png)
+![Context users table](images/table-not-so-random.png)
 
 # How it works
 
