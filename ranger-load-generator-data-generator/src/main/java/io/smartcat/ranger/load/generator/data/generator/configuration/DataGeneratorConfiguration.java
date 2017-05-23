@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.smartcat.ranger.configuration.ConfigurationParseException;
 import io.smartcat.ranger.configuration.DataSourceConfiguration;
 import io.smartcat.ranger.configuration.model.KafkaPayload;
 import io.smartcat.ranger.data.generator.AggregatedObjectGenerator;
@@ -22,7 +23,7 @@ public class DataGeneratorConfiguration implements DataSourceConfiguration {
     }
 
     @Override
-    public DataSource<?> getDataSource(Map<String, Object> configuration) {
+    public DataSource<?> getDataSource(Map<String, Object> configuration) throws ConfigurationParseException {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectConfiguration objectConfiguration = objectMapper.convertValue(configuration.get("objectConfiguration"),
                 ObjectConfiguration.class);

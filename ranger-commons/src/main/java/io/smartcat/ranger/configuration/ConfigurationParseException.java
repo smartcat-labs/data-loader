@@ -1,16 +1,16 @@
 package io.smartcat.ranger.configuration;
 
 /**
- * GlobalConfiguration exception.
+ * Indicates error while parsing configuration.
  */
-public class ConfigurationException extends Exception {
+public class ConfigurationParseException extends ConfigurationException {
 
-    private static final long serialVersionUID = -8589993260328531894L;
+    private static final long serialVersionUID = -7101805420460054579L;
 
     /**
      * Default constructor.
      */
-    public ConfigurationException() {
+    public ConfigurationParseException() {
     }
 
     /**
@@ -21,7 +21,7 @@ public class ConfigurationException extends Exception {
      * @param enableSuppression controls exception suppression.
      * @param writableStackTrace stack trace.
      */
-    public ConfigurationException(String message, Throwable cause, boolean enableSuppression,
+    public ConfigurationParseException(String message, Throwable cause, boolean enableSuppression,
             boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
@@ -32,7 +32,7 @@ public class ConfigurationException extends Exception {
      * @param message Error message.
      * @param cause Exception cause.
      */
-    public ConfigurationException(String message, Throwable cause) {
+    public ConfigurationParseException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -41,7 +41,7 @@ public class ConfigurationException extends Exception {
      *
      * @param message Error message.
      */
-    public ConfigurationException(String message) {
+    public ConfigurationParseException(String message) {
         super(message);
     }
 
@@ -50,7 +50,7 @@ public class ConfigurationException extends Exception {
      *
      * @param cause Exception cause.
      */
-    public ConfigurationException(Throwable cause) {
+    public ConfigurationParseException(Throwable cause) {
         super(cause);
     }
 }

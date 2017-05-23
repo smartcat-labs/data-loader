@@ -15,6 +15,8 @@ public interface DataSourceConfiguration extends BaseConfiguration {
      *
      * @param configuration Configuration specific to data source it should construct.
      * @return Instance of {@link DataSource}, never null.
+     *
+     * @throws ConfigurationParseException If there is an error during configuration parsing.
      */
-    DataSource<?> getDataSource(Map<String, Object> configuration);
+    DataSource<?> getDataSource(Map<String, Object> configuration) throws ConfigurationParseException;
 }

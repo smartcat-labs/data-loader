@@ -15,6 +15,8 @@ public interface WorkerConfiguration extends BaseConfiguration {
      *
      * @param configuration Configuration specific to this worker.
      * @return Instance of {@link Worker}, never null.
+     *
+     * @throws ConfigurationParseException If there is an error during configuration parsing.
      */
-    Worker<?> getWorker(Map<String, Object> configuration);
+    Worker<?> getWorker(Map<String, Object> configuration) throws ConfigurationParseException;
 }

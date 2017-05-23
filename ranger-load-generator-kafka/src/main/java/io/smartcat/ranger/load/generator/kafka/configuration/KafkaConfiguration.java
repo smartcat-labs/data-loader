@@ -2,6 +2,7 @@ package io.smartcat.ranger.load.generator.kafka.configuration;
 
 import java.util.Map;
 
+import io.smartcat.ranger.configuration.ConfigurationParseException;
 import io.smartcat.ranger.configuration.WorkerConfiguration;
 import io.smartcat.ranger.load.generator.api.Worker;
 import io.smartcat.ranger.load.generator.kafka.worker.KafkaWorker;
@@ -17,7 +18,7 @@ public class KafkaConfiguration implements WorkerConfiguration {
     }
 
     @Override
-    public Worker<?> getWorker(Map<String, Object> configuration) {
+    public Worker<?> getWorker(Map<String, Object> configuration) throws ConfigurationParseException {
         return new KafkaWorker(configuration);
     }
 }

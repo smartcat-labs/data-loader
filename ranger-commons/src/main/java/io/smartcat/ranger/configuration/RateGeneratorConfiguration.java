@@ -15,6 +15,8 @@ public interface RateGeneratorConfiguration extends BaseConfiguration {
      *
      * @param configuration Configuration specific to rate generator it should construct.
      * @return Instance of {@link RateGenerator}, never null.
+     *
+     * @throws ConfigurationParseException If there is an error during configuration parsing.
      */
-    RateGenerator getRateGenerator(Map<String, Object> configuration);
+    RateGenerator getRateGenerator(Map<String, Object> configuration) throws ConfigurationParseException;
 }
