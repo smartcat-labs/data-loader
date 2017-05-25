@@ -1,0 +1,185 @@
+#!/bin/sh
+
+# Verify 2 args, first is release version, second is next version
+if [ "$#" -ne 2 ]; then
+  echo "Two parameters required, first is release version, second is next version" >&2
+  exit 1
+fi
+
+# Verify that release version and next version are not the same
+if [ "$1" = "$2" ]; then
+  echo "Release version cannot be the same as next version" >&2
+  exit 1
+fi
+
+# Verify that release version is not already released
+if [ "$(git tag 2>/dev/null | grep "$1")" = "$1" ]; then
+  echo "Release version $1 already released" >&2
+  exit 1
+fi
+
+# Verify that next version is not already released
+if [ "$(git tag 2>/dev/null | grep "$2")" = "$2" ]; then
+  echo "Next version $2 already released" >&2
+  exit 1
+fi
+
+# Verify that there are no any local changes
+git diff-index --quiet HEAD --
+if [ $? -ne 0 ]; then
+  echo "Local branch must be clean, please stash, commit or revert local changes"
+  exit 1
+fi
+ 
+# Checkout 'dev' branch
+echo "Checkout 'dev' branch"
+git checkout dev >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to checkout 'dev' branch" >&2
+  exit 1
+fi
+
+# Pull latest changes
+echo "Pull latest changes from origin"
+git pull >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to pull latest changes from origin" >&2
+  exit 1
+fi
+
+# Run mvn clean install
+echo "Run 'mvn clean install'"
+mvn clean install >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "'mvn clean install' finished with error" >&2
+  exit 1
+fi
+
+# Run mvn clean install -P extras
+echo "Run 'mvn clean install -P extras'"
+mvn clean install -P extras >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "'mvn clean install -P extras' finished with error" >&2
+  exit 1
+fi
+
+# Set release version
+echo "Run 'mvn versions:set -DnewVersion=$1'"
+mvn versions:set -DnewVersion="$1" >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "'mvn versions:set -DnewVersion=$1' finished with error" >&2
+  exit 1
+fi
+
+# Commit release version
+echo "Run 'mvn versions:commit'"
+mvn versions:commit >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "'mvn versions:commit' finished with error" >&2
+  exit 1
+fi
+
+# Add changes to git index
+echo "Add release version changes to git index"
+git add -u >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to add release version changes to git index" >&2
+  exit 1
+fi
+
+# Commit changes to git
+echo "Commit release version changes"
+git commit -m "Released $1" >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to commit release version" >&2
+  exit 1
+fi
+
+# Deploy new version to repository
+echo "Run 'mvn clean deploy -P extras'"
+mvn clean deploy -P extras >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "'mvn clean deploy -P extras' finished with error" >&2
+  exit 1
+fi
+
+# Tag version
+echo "Tag version $1"
+git tag "$1" >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to tag version $1" >&2
+  exit 1
+fi
+
+# Set next version
+echo "Run 'mvn versions:set -DnewVersion=$2'"
+mvn versions:set -DnewVersion="$2" >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "'mvn versions:set -DnewVersion=$2' finished with error" >&2
+  exit 1
+fi
+
+# Commit next version
+echo "Run 'mvn versions:commit'"
+mvn versions:commit >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "'mvn versions:commit' finished with error" >&2
+  exit 1
+fi
+
+# Add changes to git index
+echo "Add release version changes to git index"
+git add -u >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to add release version changes to git index" >&2
+  exit 1
+fi
+
+# Commit changes to git
+echo "Commit next version changes"
+git commit -m "Set version to $2 for next iteration" >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to commit next version" >&2
+  exit 1
+fi
+
+# Push 'dev' to origin
+echo "Push 'dev' changes to origin"
+git push origin dev >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to push 'dev' changes to origin" >&2
+  exit 1
+fi
+
+# Checkout master branch
+echo "Checkout 'master' branch"
+git checkout master >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to checkout master branch" >&2
+  exit 1
+fi
+
+# Merge 'dev' into 'master'
+echo "Merge 'dev' branch into 'master'"
+git merge dev >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to merge 'dev' branch into 'master'" >&2
+  exit 1
+fi
+
+# Push changes to origin
+echo "Push 'master' changes to origin"
+git push origin master >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to push 'master' changes to origin" >&2
+  exit 1
+fi
+
+# Push tags to origin
+echo "Push tags to origin"
+git push --tags >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Failed to push tags to origin" >&2
+  exit 1
+fi
+
