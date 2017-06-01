@@ -39,7 +39,8 @@
         <version.slf4j-api>1.7.21</version.slf4j-api>
         <version.logback-classic>1.1.7</version.logback-classic>
         <version.commons-math3>3.6.1</version.commons-math3>
-
+        <version.jackson-databind>2.8.8.1</version.jackson-databind>
+        <version.snakeyaml>1.18</version.snakeyaml>
         <version.junit>4.12</version.junit>
         <version.pitest>1.1.11</version.pitest>
 
@@ -73,6 +74,21 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>${version.commons-math3}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${version.jackson-databind}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.parboiled</groupId>
+            <artifactId>parboiled-java</artifactId>
+            <version>1.1.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${version.snakeyaml}</version>
         </dependency>
 
         <dependency>
