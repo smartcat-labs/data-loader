@@ -1,0 +1,88 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11"
+    }
+}
+
+apply plugin: "java"
+apply plugin: "groovy"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "checkstyle"
+apply plugin: "maven-publish"
+apply plugin: "info.solidsoft.pitest"
+
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+group = "io.smartcat"
+version = theVersion
+description = "Contextual data generator"
+
+dependencies {
+    compile "org.slf4j:slf4j-api:$slf4jApiVersion"
+    compile "ch.qos.logback:logback-classic:$logbackClassicVersion"
+    compile "org.apache.commons:commons-math3:$commonsMath3Version"
+    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonDatabindVersion"
+    compile "org.parboiled:parboiled-java:$parboiledJavaVersion"
+    compile "org.yaml:snakeyaml:$snakeyamlVersion"
+
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.spockframework:spock-core:$spockCoreVersion"
+    testCompile "cglib:cglib-nodep:$cglibNodepVersion"
+    testCompile "org.codehaus.groovy:groovy-all:$groovyAllVersion"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact tasks.packageSource
+            artifact tasks.packageJavadoc
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username project.hasProperty("bintrayUsername") ? bintrayUsername : null
+                password project.hasProperty("bintrayPassword") ? bintrayPassword : null
+            }
+            url "https://api.bintray.com/maven/smartcat-labs/maven/ranger/;publish=1"
+        }
+    }
+}
+
+checkstyle {
+    configFile = file("checkstyle.xml")
+    configProperties = properties(file("checkstyle.properties"))
+}
+
+task packageSource(type: Jar) {
+    classifier "sources"
+    from sourceSets.main.allJava
+}
+
+task packageJavadoc(type: Jar) {
+    classifier = "javadoc"
+    from javadoc
+}
+
+check.dependsOn "pitest"
+build.dependsOn packageJavadoc
+
+def properties(file) {
+    Properties props = new Properties()
+    props.load(new FileInputStream(file))
+    props
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "3.5"
+}

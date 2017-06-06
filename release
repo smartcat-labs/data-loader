@@ -47,35 +47,19 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Run mvn clean install
-echo "Run 'mvn clean install'"
-mvn clean install >/dev/null 2>&1
+# Run gradle clean build
+echo "Run 'gradle clean build'"
+./gradlew clean build >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-  echo "'mvn clean install' finished with error" >&2
-  exit 1
-fi
-
-# Run mvn clean install -P extras
-echo "Run 'mvn clean install -P extras'"
-mvn clean install -P extras >/dev/null 2>&1
-if [ $? -ne 0 ]; then
-  echo "'mvn clean install -P extras' finished with error" >&2
+  echo "'gradle clean build' finished with error" >&2
   exit 1
 fi
 
 # Set release version
-echo "Run 'mvn versions:set -DnewVersion=$1'"
-mvn versions:set -DnewVersion="$1" >/dev/null 2>&1
+echo "Set new version to gradle.properties to $1"
+sed -i "1 s/^.*$/theVersion=$1/" gradle.properties >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-  echo "'mvn versions:set -DnewVersion=$1' finished with error" >&2
-  exit 1
-fi
-
-# Commit release version
-echo "Run 'mvn versions:commit'"
-mvn versions:commit >/dev/null 2>&1
-if [ $? -ne 0 ]; then
-  echo "'mvn versions:commit' finished with error" >&2
+  echo "Set new version to gradle.properties to $1 finished with error" >&2
   exit 1
 fi
 
@@ -96,10 +80,10 @@ if [ $? -ne 0 ]; then
 fi
 
 # Deploy new version to repository
-echo "Run 'mvn clean deploy -P extras'"
-mvn clean deploy -P extras >/dev/null 2>&1
+echo "Run 'gradle publish'"
+./gradlew publish >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-  echo "'mvn clean deploy -P extras' finished with error" >&2
+  echo "'gradlew publish' finished with error" >&2
   exit 1
 fi
 
@@ -112,18 +96,10 @@ if [ $? -ne 0 ]; then
 fi
 
 # Set next version
-echo "Run 'mvn versions:set -DnewVersion=$2'"
-mvn versions:set -DnewVersion="$2" >/dev/null 2>&1
+echo "Set new version to gradle.properties to $2"
+sed -i "1 s/^.*$/theVersion=$2/" gradle.properties >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-  echo "'mvn versions:set -DnewVersion=$2' finished with error" >&2
-  exit 1
-fi
-
-# Commit next version
-echo "Run 'mvn versions:commit'"
-mvn versions:commit >/dev/null 2>&1
-if [ $? -ne 0 ]; then
-  echo "'mvn versions:commit' finished with error" >&2
+  echo "Set new version to gradle.properties to $2 finished with error" >&2
   exit 1
 fi
 
