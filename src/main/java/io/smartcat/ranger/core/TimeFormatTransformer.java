@@ -21,6 +21,12 @@ public class TimeFormatTransformer extends Transformer<String> {
      * @param value Long value representing time in epoch milliseconds.
      */
     public TimeFormatTransformer(String format, Value<Long> value) {
+        if (format == null || format.isEmpty()) {
+            throw new IllegalArgumentException("Format string cannot be null nor empty.");
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("Value cannot be null.");
+        }
         this.value = value;
         this.formatter = DateTimeFormatter.ofPattern(format);
     }

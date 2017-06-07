@@ -21,28 +21,31 @@ public class CircularValue<T> extends Value<T> {
      * @param values List of possible values.
      */
     public CircularValue(List<Value<T>> values) {
+        if (values == null || values.isEmpty()) {
+            throw new IllegalArgumentException("List of values cannot be null nor empty.");
+        }
         this.values = new ArrayList<>(values);
         this.size = this.values.size();
-        this.currentIndex = 0;
+        this.currentIndex = -1;
     }
 
     @Override
     public void reset() {
         super.reset();
-        values.get(incrementIndex()).reset();
+        values.get(nextIndex()).reset();
     }
 
     @Override
     protected void eval() {
+        currentIndex = nextIndex();
         val = values.get(currentIndex).get();
     }
 
-    private int incrementIndex() {
+    private int nextIndex() {
         if (currentIndex == size - 1) {
-            currentIndex = 0;
+            return 0;
         } else {
-            currentIndex++;
+            return currentIndex + 1;
         }
-        return currentIndex;
     }
 }

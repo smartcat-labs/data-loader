@@ -64,6 +64,12 @@ checkstyle {
     configProperties = properties(file("checkstyle.properties"))
 }
 
+// timeout configured since RangeValueSpec tests are causing pitest to fail with default timeouts
+pitest {
+    timeoutFactor = 3
+    timeoutConstInMillis = 10000
+}
+
 task packageSource(type: Jar) {
     classifier "sources"
     from sourceSets.main.allJava

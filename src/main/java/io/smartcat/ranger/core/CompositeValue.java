@@ -18,6 +18,9 @@ public class CompositeValue extends Value<Map<String, Object>> {
      * @param values Initial child values.
      */
     public CompositeValue(Map<String, Value<?>> values) {
+        if (values == null || values.isEmpty()) {
+            throw new IllegalArgumentException("Values map cannot be null nor empty.");
+        }
         this.values = new HashMap<>(values);
         this.evaluatedValues = new HashMap<>();
         this.val = Collections.unmodifiableMap(this.evaluatedValues);

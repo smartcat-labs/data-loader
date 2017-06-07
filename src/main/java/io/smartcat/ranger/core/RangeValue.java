@@ -45,6 +45,9 @@ public abstract class RangeValue<T extends Comparable<T>> extends Value<T> {
      */
     public RangeValue(T beginning, T end, Distribution distribution) {
         checkRangeInput(beginning, end);
+        if (distribution == null) {
+            throw new IllegalArgumentException("Distribution cannot be null.");
+        }
         this.beginning = beginning;
         this.end = end;
         this.distribution = distribution;

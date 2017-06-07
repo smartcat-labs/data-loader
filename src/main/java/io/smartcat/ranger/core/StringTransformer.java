@@ -21,6 +21,12 @@ public class StringTransformer extends Transformer<String> {
      * @param values List of values.
      */
     public StringTransformer(String format, List<Value<?>> values) {
+        if (format == null || format.isEmpty()) {
+            throw new IllegalArgumentException("Format string cannot be null nor empty.");
+        }
+        if (values == null) {
+            throw new IllegalArgumentException("values cannot be null nor empty.");
+        }
         this.format = format;
         this.values = values;
         this.calculatedValues = new Object[this.values.size()];

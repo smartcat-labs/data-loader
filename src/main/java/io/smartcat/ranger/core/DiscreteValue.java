@@ -33,6 +33,12 @@ public class DiscreteValue<T> extends Value<T> {
      * @param distribution Distribution to use for value selection.
      */
     public DiscreteValue(List<Value<T>> values, Distribution distribution) {
+        if (values == null || values.isEmpty()) {
+            throw new IllegalArgumentException("List of values cannot be null nor empty.");
+        }
+        if (distribution == null) {
+            throw new IllegalArgumentException("Distribution cannot be null.");
+        }
         this.values = new ArrayList<>(values);
         this.distribution = distribution;
     }

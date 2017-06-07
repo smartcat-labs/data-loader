@@ -13,7 +13,6 @@ public class ValueProxy<T> extends Value<T> {
      * Constructs proxy without delegate.
      */
     public ValueProxy() {
-        this(null);
     }
 
     /**
@@ -22,7 +21,7 @@ public class ValueProxy<T> extends Value<T> {
      * @param delegate Value which will be evaluated and cached.
      */
     public ValueProxy(Value<T> delegate) {
-        this.delegate = delegate;
+        setDelegate(delegate);
     }
 
     /**
@@ -31,6 +30,9 @@ public class ValueProxy<T> extends Value<T> {
      * @param delegate Value which will be evaluated and cached.
      */
     public void setDelegate(Value<T> delegate) {
+        if (delegate == null) {
+            throw new IllegalArgumentException("Delegate cannot be null.");
+        }
         this.delegate = delegate;
     }
 

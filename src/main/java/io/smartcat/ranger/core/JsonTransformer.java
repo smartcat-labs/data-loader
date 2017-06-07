@@ -17,6 +17,9 @@ public class JsonTransformer extends Transformer<String> {
      * @param value Value which will be transformed into its JSON representation.
      */
     public JsonTransformer(Value<?> value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Value cannot be null.");
+        }
         this.value = value;
         this.objectMapper = new ObjectMapper();
     }

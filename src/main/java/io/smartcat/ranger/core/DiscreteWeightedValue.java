@@ -22,6 +22,9 @@ public class DiscreteWeightedValue<T> extends Value<T> {
      * @param weightedValues List of values with their corresponding weights.
      */
     public DiscreteWeightedValue(List<WeightedValue<T>> weightedValues) {
+        if (weightedValues == null || weightedValues.isEmpty()) {
+            throw new IllegalArgumentException("List of weighted values cannot be null nor empty.");
+        }
         this.enumeratedDistribution = new EnumeratedDistribution<>(mapToPairList(weightedValues));
         this.values = weightedValues.stream().map(x -> x.getValue()).collect(Collectors.toList());
     }
@@ -58,6 +61,12 @@ public class DiscreteWeightedValue<T> extends Value<T> {
          * @param weigth Weight of the value.
          */
         public WeightedValue(Value<T> value, double weigth) {
+            if (value == null) {
+                throw new IllegalArgumentException("Value cannot be null.");
+            }
+            if (weigth <= 0) {
+                throw new IllegalArgumentException("Weight must be greater than 0.");
+            }
             this.value = value;
             this.weight = weigth;
         }
