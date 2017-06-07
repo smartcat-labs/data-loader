@@ -270,7 +270,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Rule discreteValue() {
         return Sequence(
-                Sequence("random([", push(DISCRETE_VALUE_DELIMITER), value(), ZeroOrMore(comma(), value()), "])"),
+                Sequence("random([", ZeroOrMore(whitespace()), push(DISCRETE_VALUE_DELIMITER), value(),
+                        ZeroOrMore(comma(), value()), ZeroOrMore(whitespace()), "])"),
                 push(new DiscreteValue(getDiscreteValues())));
     }
 
@@ -280,8 +281,10 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Double range value definition rule.
      */
     public Rule rangeValueDouble() {
-        return Sequence(Sequence("random(", doubleLiteral(), "..", doubleLiteral(), ")"),
-                push(new RangeValueDouble((Double) pop(1), (Double) pop())));
+        return Sequence(
+                Sequence("random(", ZeroOrMore(whitespace()), FirstOf(doubleLiteral(), longLiteral()), "..",
+                        FirstOf(doubleLiteral(), longLiteral()), ZeroOrMore(whitespace()), ")"),
+                push(newDoubleRangeValue()));
     }
 
     /**
@@ -290,8 +293,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Long range value definition rule.
      */
     public Rule rangeValueLong() {
-        return Sequence(Sequence("random(", longLiteral(), "..", longLiteral(), ")"),
-                push(new RangeValueLong((Long) pop(1), (Long) pop())));
+        return Sequence(Sequence("random(", ZeroOrMore(whitespace()), longLiteral(), "..", longLiteral(),
+                ZeroOrMore(whitespace()), ")"), push(new RangeValueLong((Long) pop(1), (Long) pop())));
     }
 
     /**
@@ -300,7 +303,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Range value definition rule.
      */
     public Rule rangeValue() {
-        return FirstOf(rangeValueDouble(), rangeValueLong());
+        return FirstOf(rangeValueLong(), rangeValueDouble());
     }
 
     /**
@@ -327,8 +330,9 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return String transformer definition rule.
      */
     public Rule stringTransformer() {
-        return Sequence(Sequence("toString(", stringLiteral(), push(TO_STRING_VALUE_DELIMITER),
-                ZeroOrMore(comma(), value()), ")"), push(getToStringValue()));
+        return Sequence(Sequence("toString(", ZeroOrMore(whitespace()), stringLiteral(),
+                push(TO_STRING_VALUE_DELIMITER), ZeroOrMore(comma(), value()), ZeroOrMore(whitespace()), ")"),
+                push(getToStringValue()));
     }
 
     /**
@@ -337,7 +341,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return JSON transformer definition rule.
      */
     public Rule jsonTransformer() {
-        return Sequence("toJSON(", valueReference(), ")", push(new JsonTransformer((Value<?>) pop())));
+        return Sequence("toJSON(", ZeroOrMore(whitespace()), valueReference(), ZeroOrMore(whitespace()), ")",
+                push(new JsonTransformer((Value<?>) pop())));
     }
 
     /**
@@ -347,7 +352,9 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Rule timeFormatTransformer() {
-        return Sequence(Sequence("toTime(", stringLiteral(), comma(), value(), ")"),
+        return Sequence(
+                Sequence("toTime(", ZeroOrMore(whitespace()), stringLiteral(), comma(), value(),
+                        ZeroOrMore(whitespace()), ")"),
                 push(new TimeFormatTransformer((String) pop(1), (Value) pop())));
     }
 
@@ -367,6 +374,33 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule value() {
         return FirstOf(valueReference(), generator(), transformer(), literalValue());
+    }
+
+    /**
+     * Creates {@link RangeValueDouble} out of values from value stack.
+     *
+     * @return Instance of {@link RangeValueDouble}.
+     */
+    protected RangeValueDouble newDoubleRangeValue() {
+        Object first = pop(1);
+        Object second = pop();
+        Double firstDouble = null;
+        Double secondDouble = null;
+        if (first instanceof Double) {
+            firstDouble = (Double) first;
+        } else if (first instanceof Long) {
+            firstDouble = ((Long) first).doubleValue();
+        } else {
+            throw new RuntimeException("Unknown instance type: " + first.getClass().getName());
+        }
+        if (second instanceof Double) {
+            secondDouble = (Double) second;
+        } else if (second instanceof Long) {
+            secondDouble = ((Long) second).doubleValue();
+        } else {
+            throw new RuntimeException("Unknown instance type: " + first.getClass().getName());
+        }
+        return new RangeValueDouble(firstDouble, secondDouble);
     }
 
     /**

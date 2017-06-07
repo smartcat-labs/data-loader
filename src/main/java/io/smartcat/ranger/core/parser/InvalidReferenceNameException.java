@@ -1,7 +1,7 @@
 package io.smartcat.ranger.core.parser;
 
 /**
- * Signals that invalid reference name is used within configuraiton.
+ * Signals that invalid reference name is used within configuration.
  */
 public class InvalidReferenceNameException extends RuntimeException {
 

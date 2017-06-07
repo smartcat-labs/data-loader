@@ -44,8 +44,21 @@ public abstract class RangeValue<T extends Comparable<T>> extends Value<T> {
      * @param distribution Distribution to use for value selection.
      */
     public RangeValue(T beginning, T end, Distribution distribution) {
+        checkRangeInput(beginning, end);
         this.beginning = beginning;
         this.end = end;
         this.distribution = distribution;
+    }
+
+    private void checkRangeInput(T beginning, T end) {
+        if (beginning == null) {
+            throw new InvalidRangeBoundsException("Beginning of the range cannot be null.");
+        }
+        if (end == null) {
+            throw new InvalidRangeBoundsException("End of the range cannot be null.");
+        }
+        if (end.compareTo(beginning) <= 0) {
+            throw new InvalidRangeBoundsException("End of the range must be greater than the beginning of the range.");
+        }
     }
 }
