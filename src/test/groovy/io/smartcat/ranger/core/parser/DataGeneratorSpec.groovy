@@ -297,6 +297,30 @@ output: \$value
     }
 
     @Unroll
+    def "should parse circular value #expression"() {
+        given:
+        def config = """
+values:
+  value: circular([$expression])
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+        def result = []
+
+        when:
+        values.size().times { result << dataGenerator.next() }
+
+        then:
+        result == values
+
+        where:
+        expression                 | values
+        "  5,6, 7 ,8 , 9   ,  10"  | [5L, 6L, 7L, 8L, 9L, 10L]
+        "5.0, 3.4 , +.12, 0.23   " | [5d, 3.4d, 0.12d, 0.23d]
+        """"a", 'b' , 'c' ,"d" """ | ["a", "b", "c", "d"]
+    }
+
+    @Unroll
     def "should parse string transformer #expression"() {
         given:
         def config = """

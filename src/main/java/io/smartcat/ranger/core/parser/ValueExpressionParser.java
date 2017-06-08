@@ -15,7 +15,8 @@ import org.parboiled.Rule;
 public class ValueExpressionParser extends BaseParser<Object> {
 
     private static final String DISCRETE_VALUE_DELIMITER = "discreteValueDelimiter";
-    private static final String TO_STRING_VALUE_DELIMITER = "toStringVauleDelimiter";
+    private static final String CIRCULAR_VALUE_DELIMITER = "circularValueDelimiter";
+    private static final String STRING_VALUE_DELIMITER = "stringValueDelimiter";
 
     private final Map<String, ValueProxy<?>> proxyValues;
 
@@ -272,7 +273,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
         return Sequence(
                 Sequence("random([", ZeroOrMore(whitespace()), push(DISCRETE_VALUE_DELIMITER), value(),
                         ZeroOrMore(comma(), value()), ZeroOrMore(whitespace()), "])"),
-                push(new DiscreteValue(getDiscreteValues())));
+                push(new DiscreteValue(getValuesUpToDelimiter(DISCRETE_VALUE_DELIMITER))));
     }
 
     /**
@@ -316,12 +317,25 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Circular value definition.
+     *
+     * @return Circular value definition rule.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Rule circularValue() {
+        return Sequence(
+                Sequence("circular([", ZeroOrMore(whitespace()), push(CIRCULAR_VALUE_DELIMITER), value(),
+                        ZeroOrMore(comma(), value()), ZeroOrMore(whitespace()), "])"),
+                push(new CircularValue(getValuesUpToDelimiter(CIRCULAR_VALUE_DELIMITER))));
+    }
+
+    /**
      * Generator definition.
      *
      * @return Generator definition rule.
      */
     public Rule generator() {
-        return FirstOf(discreteValue(), rangeValue(), uuidValue());
+        return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue());
     }
 
     /**
@@ -330,9 +344,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return String transformer definition rule.
      */
     public Rule stringTransformer() {
-        return Sequence(Sequence("string(", ZeroOrMore(whitespace()), stringLiteral(),
-                push(TO_STRING_VALUE_DELIMITER), ZeroOrMore(comma(), value()), ZeroOrMore(whitespace()), ")"),
-                push(getToStringValue()));
+        return Sequence(Sequence("string(", ZeroOrMore(whitespace()), stringLiteral(), push(STRING_VALUE_DELIMITER),
+                ZeroOrMore(comma(), value()), ZeroOrMore(whitespace()), ")"), push(getToStringValue()));
     }
 
     /**
@@ -352,10 +365,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Rule timeFormatTransformer() {
-        return Sequence(
-                Sequence("time(", ZeroOrMore(whitespace()), stringLiteral(), comma(), value(),
-                        ZeroOrMore(whitespace()), ")"),
-                push(new TimeFormatTransformer((String) pop(1), (Value) pop())));
+        return Sequence(Sequence("time(", ZeroOrMore(whitespace()), stringLiteral(), comma(), value(),
+                ZeroOrMore(whitespace()), ")"), push(new TimeFormatTransformer((String) pop(1), (Value) pop())));
     }
 
     /**
@@ -452,23 +463,13 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
-     * Collects all discrete values.
-     *
-     * @return List of discrete values.
-     */
-    @SuppressWarnings({ "rawtypes" })
-    protected List getDiscreteValues() {
-        return getValuesUpToDelimiter(DISCRETE_VALUE_DELIMITER);
-    }
-
-    /**
      * Constructs {@link StringTransformer}.
      *
      * @return Instance of {@link StringTransformer}.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected Value<String> getToStringValue() {
-        List values = getValuesUpToDelimiter(TO_STRING_VALUE_DELIMITER);
+        List values = getValuesUpToDelimiter(STRING_VALUE_DELIMITER);
         String formatString = (String) pop();
         return new StringTransformer(formatString, values);
     }
