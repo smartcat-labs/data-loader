@@ -13,7 +13,7 @@ class DataGeneratorSpec extends Specification {
         def config = '''
 values:
   name: $firstName
-output: name
+output: $name
 '''
         when:
         def dataGenerator = buildGenerator(config)
@@ -36,7 +36,7 @@ values:
         c:
           x: $b
   y: $a.c.c.c.x
-output: y
+output: $y
 '''
         def dataGenerator = buildGenerator(config)
 
@@ -50,7 +50,7 @@ output: y
 values:
   a: $b
   b: 5
-output: a
+output: $a
 '''
         def dataGenerator = buildGenerator(config)
 
@@ -64,7 +64,7 @@ output: a
         def config = """
 values:
   name: $value
-output: name
+output: \$name
 """
         def dataGenerator = buildGenerator(config)
 
@@ -90,7 +90,7 @@ output: name
         def config = """
 values:
   age: $value
-output: age
+output: \$age
 """
         def dataGenerator = buildGenerator(config)
 
@@ -110,7 +110,7 @@ output: age
         def config = """
 values:
   age: $value
-output: age
+output: \$age
 """
         def dataGenerator = buildGenerator(config)
 
@@ -130,7 +130,7 @@ output: age
         def config = """
 values:
   age: $value
-output: age
+output: \$age
 """
         def dataGenerator = buildGenerator(config)
 
@@ -188,7 +188,7 @@ output: age
         def config = """
 values:
   age: null()
-output: age
+output: \$age
 """
         def dataGenerator = buildGenerator(config)
 
@@ -202,7 +202,7 @@ output: age
         def config = """
 values:
   age: random($expression)
-output: age
+output: \$age
 """
         def dataGenerator = buildGenerator(config)
 
@@ -229,7 +229,7 @@ output: age
         def config = """
 values:
   age: random($start..$end)
-output: age
+output: \$age
 """
         when:
         def dataGenerator = buildGenerator(config)
@@ -252,7 +252,7 @@ output: age
         def config = """
 values:
   age: random($expression)
-output: age
+output: \$age
 """
         def dataGenerator = buildGenerator(config)
 
@@ -279,7 +279,7 @@ output: age
         def config = """
 values:
   value: random([$expression])
-output: value
+output: \$value
 """
         def dataGenerator = buildGenerator(config)
 
@@ -301,8 +301,7 @@ output: value
         given:
         def config = """
 values:
-  value: string($expression)
-output: value
+output: string($expression)
 """
         def dataGenerator = buildGenerator(config)
 
@@ -330,8 +329,7 @@ values:
     x: 10
     y: 23.44
     z: "text"
-  value: json($expression)
-output: value
+output: json($expression)
 """
         def dataGenerator = buildGenerator(config)
 
@@ -356,8 +354,7 @@ output: value
         def config = """
 values:
   time: 1496815200000
-  formattedTime: time($expression)
-output: formattedTime
+output: time($expression)
 """
         def dataGenerator = buildGenerator(config)
 
@@ -393,7 +390,7 @@ values:
     w: 25
     q: random([null(), ""])
 
-output: result
+output: $result
 '''
         def dataGenerator = buildGenerator(config)
 
@@ -408,9 +405,23 @@ output: result
         result.q in [null, ""]
     }
 
+    def "should parse config when there are no values and output is primitive"() {
+        given:
+        def config = """
+values:
+output: 3
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result  == 3
+    }
+
     def buildGenerator(config) {
         def root = YamlUtils.load(config)
-        def outputValue = root.output
-        new DataGenerator.Builder(root.values, outputValue).build()
+        new DataGenerator.Builder(root).build()
     }
 }

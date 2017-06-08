@@ -37,8 +37,11 @@ public class DataGenerator {
      */
     public static class Builder {
 
-        private final Map<String, Object> config;
-        private final String outputValueName;
+        private static final String VALUES = "values";
+        private static final String OUTPUT = "output";
+
+        private final Map<String, Object> values;
+        private final Object outputExpression;
         private final Map<String, ValueProxy<?>> proxyValues;
         private final ValueExpressionParser parser;
         private final ReportingParseRunner<Value<?>> parseRunner;
@@ -47,11 +50,13 @@ public class DataGenerator {
          * Constructs Builder that will build {@link DataGenerator}.
          *
          * @param config Data generator configuration.
-         * @param outputValueName Name of output value.
          */
-        public Builder(Map<String, Object> config, String outputValueName) {
-            this.config = config;
-            this.outputValueName = outputValueName;
+        @SuppressWarnings("unchecked")
+        public Builder(Map<String, Object> config) {
+            checkSectionExistence(config, VALUES);
+            checkSectionExistence(config, OUTPUT);
+            this.values = (Map<String, Object>) config.get(VALUES);
+            this.outputExpression = config.get(OUTPUT);
             this.proxyValues = new HashMap<>();
             this.parser = Parboiled.createParser(ValueExpressionParser.class, proxyValues);
             this.parseRunner = new ReportingParseRunner<>(parser.value());
@@ -63,13 +68,21 @@ public class DataGenerator {
          * @return Instance of {@link DataGenerator}.
          */
         public DataGenerator build() {
-            createProxies();
-            parseCompositeValue("", config);
-            return new DataGenerator(proxyValues.get(outputValueName));
+            if (values != null) {
+                createProxies();
+                parseValues();
+            }
+            return new DataGenerator(parseSimpleValue("", outputExpression));
+        }
+
+        private void checkSectionExistence(Map<String, Object> config, String name) {
+            if (!config.containsKey(name)) {
+                throw new RuntimeException("Configuraiton must contain '" + name + "' section.");
+            }
         }
 
         private void createProxies() {
-            for (Map.Entry<String, Object> entry : config.entrySet()) {
+            for (Map.Entry<String, Object> entry : values.entrySet()) {
                 createProxy(entry.getKey(), entry.getValue());
             }
         }
@@ -81,6 +94,16 @@ public class DataGenerator {
                 for (Map.Entry<String, Object> entry : ((Map<String, Object>) value).entrySet()) {
                     createProxy(key + "." + entry.getKey(), entry.getValue());
                 }
+            }
+        }
+
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        private void parseValues() {
+            for (Map.Entry<String, Object> entry : values.entrySet()) {
+                Value<?> val = parse(entry.getKey(), entry.getValue());
+                ValueProxy proxy = proxyValues.get(entry.getKey());
+                proxy.setDelegate(val);
+                entry.setValue(proxy);
             }
         }
 
@@ -97,7 +120,7 @@ public class DataGenerator {
         private Value<?> parseCompositeValue(String parentName, Map<String, Object> def) {
             Map<String, Value<?>> values = new HashMap<>();
             for (String property : def.keySet()) {
-                String fullName = parentName.isEmpty() ? property : parentName + "." + property;
+                String fullName = parentName + "." + property;
                 Value<?> val = parse(fullName, def.get(property));
                 ValueProxy proxy = proxyValues.get(fullName);
                 proxy.setDelegate(val);
