@@ -301,7 +301,7 @@ output: value
         given:
         def config = """
 values:
-  value: toString($expression)
+  value: string($expression)
 output: value
 """
         def dataGenerator = buildGenerator(config)
@@ -330,7 +330,7 @@ values:
     x: 10
     y: 23.44
     z: "text"
-  value: toJSON($expression)
+  value: json($expression)
 output: value
 """
         def dataGenerator = buildGenerator(config)
@@ -356,7 +356,7 @@ output: value
         def config = """
 values:
   time: 1496815200000
-  formattedTime: toTime($expression)
+  formattedTime: time($expression)
 output: formattedTime
 """
         def dataGenerator = buildGenerator(config)
@@ -384,7 +384,7 @@ output: formattedTime
 values:
   base:
     a: random([ 5,  random(10..15),20])
-    b: toTime("YYYY-MM-dd", 1496815200000)
+    b: time("YYYY-MM-dd", 1496815200000)
     c: constant string
   result:
     x: $base.a

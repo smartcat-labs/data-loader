@@ -330,7 +330,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return String transformer definition rule.
      */
     public Rule stringTransformer() {
-        return Sequence(Sequence("toString(", ZeroOrMore(whitespace()), stringLiteral(),
+        return Sequence(Sequence("string(", ZeroOrMore(whitespace()), stringLiteral(),
                 push(TO_STRING_VALUE_DELIMITER), ZeroOrMore(comma(), value()), ZeroOrMore(whitespace()), ")"),
                 push(getToStringValue()));
     }
@@ -341,7 +341,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return JSON transformer definition rule.
      */
     public Rule jsonTransformer() {
-        return Sequence("toJSON(", ZeroOrMore(whitespace()), valueReference(), ZeroOrMore(whitespace()), ")",
+        return Sequence("json(", ZeroOrMore(whitespace()), valueReference(), ZeroOrMore(whitespace()), ")",
                 push(new JsonTransformer((Value<?>) pop())));
     }
 
@@ -353,7 +353,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Rule timeFormatTransformer() {
         return Sequence(
-                Sequence("toTime(", ZeroOrMore(whitespace()), stringLiteral(), comma(), value(),
+                Sequence("time(", ZeroOrMore(whitespace()), stringLiteral(), comma(), value(),
                         ZeroOrMore(whitespace()), ")"),
                 push(new TimeFormatTransformer((String) pop(1), (Value) pop())));
     }
