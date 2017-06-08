@@ -321,6 +321,29 @@ output: \$value
     }
 
     @Unroll
+    def "should parse weighted value #expression"() {
+        given:
+        def config = """
+values:
+  value: weighted([$expression])
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result in values
+
+        where:
+        expression                                       | values
+        " (2,2.5),(7, 10) , (4 ,3.5), (8, 8)"            | [2L, 7L, 4L, 8L]
+        "(5.1,5.2), (8.0, 1) ,(3.3, 5), (100.1, 10.2)"   | [5.1d, 8.0d, 3.3d, 100.1d]
+        """("a", 2),('b', 3.2) , ("c", 2), ("d", 5.3)""" | ["a", "b", "c", "d"]
+    }
+
+    @Unroll
     def "should parse string transformer #expression"() {
         given:
         def config = """

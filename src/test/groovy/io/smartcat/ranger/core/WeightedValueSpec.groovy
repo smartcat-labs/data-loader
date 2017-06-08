@@ -1,13 +1,13 @@
 package io.smartcat.ranger.core
 
-import io.smartcat.ranger.core.DiscreteWeightedValue.WeightedValue
+import io.smartcat.ranger.core.WeightedValue.WeightedValuePair
 import spock.lang.Unroll
 
-class DiscreteWeightedValueSpec extends BaseValueSpec {
+class WeightedValueSpec extends BaseValueSpec {
 
     def "get should not evaluate value after first call"() {
         given:
-        def value = new DiscreteWeightedValue([new WeightedValue(val(1), 50), new WeightedValue(val(2), 50)])
+        def value = new WeightedValue([new WeightedValuePair(val(1), 50), new WeightedValuePair(val(2), 50)])
         def firstValue = value.get()
         def result = []
 
@@ -22,8 +22,8 @@ class DiscreteWeightedValueSpec extends BaseValueSpec {
     @Unroll
     def "distribution should be equal to weights when number of generated objects is #executeNumber"() {
         given:
-        def value = new DiscreteWeightedValue([new WeightedValue(val(0), 50),new WeightedValue(val(1), 20),
-            new WeightedValue(val(2), 30)])
+        def value = new WeightedValue([new WeightedValuePair(val(0), 50),new WeightedValuePair(val(1), 20),
+            new WeightedValuePair(val(2), 30)])
         def delta = 0.01
         def nums = [0, 0, 0] as int[]
 

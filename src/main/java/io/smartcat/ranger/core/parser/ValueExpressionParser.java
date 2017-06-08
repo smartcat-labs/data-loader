@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import io.smartcat.ranger.core.*;
+import io.smartcat.ranger.core.WeightedValue.WeightedValuePair;
+
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 
@@ -16,6 +18,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
 
     private static final String DISCRETE_VALUE_DELIMITER = "discreteValueDelimiter";
     private static final String CIRCULAR_VALUE_DELIMITER = "circularValueDelimiter";
+    private static final String WEIGHTED_VALUE_DELIMITER = "weightedValueDelimiter";
     private static final String STRING_VALUE_DELIMITER = "stringValueDelimiter";
 
     private final Map<String, ValueProxy<?>> proxyValues;
@@ -330,12 +333,39 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Weighted value pair definition.
+     *
+     * @return Weighted value pair definition rule.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Rule weightedValuePair() {
+        return Sequence(
+                Sequence("(", ZeroOrMore(whitespace()), value(), comma(), FirstOf(doubleLiteral(), longLiteral()),
+                        ZeroOrMore(whitespace()), ")"),
+                push(new WeightedValuePair((Value) pop(1),
+                        (Double) (peek() instanceof Double ? pop() : ((Long) pop()).doubleValue()))));
+    }
+
+    /**
+     * Weighted value definition.
+     *
+     * @return Weighted value definition rule.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Rule weightedValue() {
+        return Sequence(
+                Sequence("weighted([", ZeroOrMore(whitespace()), push(WEIGHTED_VALUE_DELIMITER), weightedValuePair(),
+                        ZeroOrMore(comma(), weightedValuePair()), ZeroOrMore(whitespace()), "])"),
+                push(new WeightedValue(getWeightedValuePairs())));
+    }
+
+    /**
      * Generator definition.
      *
      * @return Generator definition rule.
      */
     public Rule generator() {
-        return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue());
+        return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue(), weightedValue());
     }
 
     /**
@@ -472,6 +502,27 @@ public class ValueExpressionParser extends BaseParser<Object> {
         List values = getValuesUpToDelimiter(STRING_VALUE_DELIMITER);
         String formatString = (String) pop();
         return new StringTransformer(formatString, values);
+    }
+
+    /**
+     * Collects all weighted value pairs.
+     *
+     * @param <T> Type value would evaluate to.
+     * @return List of weighted value pairs.
+     */
+    @SuppressWarnings({ "unchecked" })
+    protected <T> List<WeightedValuePair<T>> getWeightedValuePairs() {
+        List<WeightedValuePair<T>> result = new ArrayList<>();
+        while (true) {
+            Object val = pop();
+            if (val instanceof String && ((String) val).equals(WEIGHTED_VALUE_DELIMITER)) {
+                break;
+            } else {
+                result.add((WeightedValuePair<T>) val);
+            }
+        }
+        Collections.reverse(result);
+        return result;
     }
 
     /**

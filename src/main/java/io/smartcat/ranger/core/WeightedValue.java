@@ -11,7 +11,7 @@ import org.apache.commons.math3.util.Pair;
  *
  * @param <T> Type this value would evaluate to.
  */
-public class DiscreteWeightedValue<T> extends Value<T> {
+public class WeightedValue<T> extends Value<T> {
 
     private final EnumeratedDistribution<Value<T>> enumeratedDistribution;
     private final List<Value<T>> values;
@@ -19,14 +19,14 @@ public class DiscreteWeightedValue<T> extends Value<T> {
     /**
      * Constructs discrete weighted value with specified <code>values</code> and <code>weights</code>.
      *
-     * @param weightedValues List of values with their corresponding weights.
+     * @param weightedValuePairs List of values with their corresponding weights.
      */
-    public DiscreteWeightedValue(List<WeightedValue<T>> weightedValues) {
-        if (weightedValues == null || weightedValues.isEmpty()) {
+    public WeightedValue(List<WeightedValuePair<T>> weightedValuePairs) {
+        if (weightedValuePairs == null || weightedValuePairs.isEmpty()) {
             throw new IllegalArgumentException("List of weighted values cannot be null nor empty.");
         }
-        this.enumeratedDistribution = new EnumeratedDistribution<>(mapToPairList(weightedValues));
-        this.values = weightedValues.stream().map(x -> x.getValue()).collect(Collectors.toList());
+        this.enumeratedDistribution = new EnumeratedDistribution<>(mapToPairList(weightedValuePairs));
+        this.values = weightedValuePairs.stream().map(x -> x.getValue()).collect(Collectors.toList());
     }
 
     @Override
@@ -40,8 +40,8 @@ public class DiscreteWeightedValue<T> extends Value<T> {
         val = enumeratedDistribution.sample().get();
     }
 
-    private List<Pair<Value<T>, Double>> mapToPairList(List<WeightedValue<T>> weightedValues) {
-        return weightedValues.stream().map(x -> new Pair<Value<T>, Double>(x.getValue(), x.getWeight()))
+    private List<Pair<Value<T>, Double>> mapToPairList(List<WeightedValuePair<T>> weightedValuePairs) {
+        return weightedValuePairs.stream().map(x -> new Pair<Value<T>, Double>(x.getValue(), x.getWeight()))
                 .collect(Collectors.toList());
     }
 
@@ -50,17 +50,17 @@ public class DiscreteWeightedValue<T> extends Value<T> {
      *
      * @param <T> Type which value will return.
      */
-    public static class WeightedValue<T> {
+    public static class WeightedValuePair<T> {
         private final Value<T> value;
         private final double weight;
 
         /**
-         * Constructs weighted value with specified <code>value</code> and <code>weight</code>.
+         * Constructs weighted value pair with specified <code>value</code> and <code>weight</code>.
          *
          * @param value The value.
          * @param weigth Weight of the value.
          */
-        public WeightedValue(Value<T> value, double weigth) {
+        public WeightedValuePair(Value<T> value, double weigth) {
             if (value == null) {
                 throw new IllegalArgumentException("Value cannot be null.");
             }
