@@ -2,6 +2,8 @@ package io.smartcat.ranger.core.parser
 
 import io.smartcat.ranger.core.InvalidRangeBoundsException
 import io.smartcat.ranger.core.parser.DataGenerator.Builder
+import io.smartcat.ranger.distribution.NormalDistribution
+import io.smartcat.ranger.distribution.UniformDistribution
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -223,6 +225,51 @@ output: \$age
         "5..10  "       | 5     | 10
     }
 
+    def "should parse long range value with uniform distribution when specified"() {
+        given:
+        def config = """
+values:
+  age: random(-20..10, uniform ())
+output: \$age
+"""
+        when:
+        def dataGenerator = buildGenerator(config)
+
+        then:
+        dataGenerator.value.delegate.distribution.class == UniformDistribution
+    }
+    
+    def "should parse long range value with default normal distribution when specified"() {
+        given:
+        def config = """
+values:
+  age: random(-20..10, normal ( ) )
+output: \$age
+"""
+        when:
+        def dataGenerator = buildGenerator(config)
+
+        then:
+        dataGenerator.value.delegate.distribution.class == NormalDistribution
+    }
+    
+    def "should parse long range value with specific normal distribution when specified"() {
+        given:
+        def config = """
+values:
+  age: random(-20..10, normal(2.1, 1.1, .3, 12))
+output: \$age
+"""
+        when:
+        def dataGenerator = buildGenerator(config)
+
+        then:
+        def distribution = dataGenerator.value.delegate.distribution
+        distribution.class == NormalDistribution
+        distribution.lower == 0.3
+        distribution.upper == 12
+    }
+
     @Unroll
     def "should throw InvalidRangeBoundsException for range #start .. #end"() {
         given:
@@ -273,8 +320,53 @@ output: \$age
         ".23..2.12e3"           | 0.23     | 2.12E3
     }
 
+    def "should parse double range value with uniform distribution when specified"() {
+        given:
+        def config = """
+values:
+  age: random(-10.332..-.023E-10, uniform())
+output: \$age
+"""
+        when:
+        def dataGenerator = buildGenerator(config)
+
+        then:
+        dataGenerator.value.delegate.distribution.class == UniformDistribution
+    }
+
+    def "should parse double range value with default normal distribution when specified"() {
+        given:
+        def config = """
+values:
+  age: random(-10.332..-.023E-10,normal ())
+output: \$age
+"""
+        when:
+        def dataGenerator = buildGenerator(config)
+
+        then:
+        dataGenerator.value.delegate.distribution.class == NormalDistribution
+    }
+
+    def "should parse double range value with specific normal distribution when specified"() {
+        given:
+        def config = """
+values:
+  age: random(-10.332..-.023E-10, normal(1.1, 2.2, 3.3, 4.4))
+output: \$age
+"""
+        when:
+        def dataGenerator = buildGenerator(config)
+
+        then:
+        def distribution = dataGenerator.value.delegate.distribution
+        distribution.class == NormalDistribution
+        distribution.lower == 3.3
+        distribution.upper == 4.4
+    }
+    
     @Unroll
-    def "should parse discrete values #expression"() {
+    def "should parse discrete value #expression"() {
         given:
         def config = """
 values:
@@ -294,6 +386,66 @@ output: \$value
         "  5,6, 7 ,8 , 9   ,  10"  | [5L, 6L, 7L, 8L, 9L, 10L]
         "5.0, 3.4 , +.12, 0.23   " | [5d, 3.4d, 0.12d, 0.23d]
         """"a", 'b' , 'c' ,"d" """ | ["a", "b", "c", "d"]
+    }
+
+    def "should parse discrete value with uniform distribution when specified"() {
+        given:
+        def config = """
+values:
+  value: random([1, 2, 4], uniform ( ))
+output: \$value
+"""
+        when:
+        def dataGenerator = buildGenerator(config)
+
+        then:
+        dataGenerator.value.delegate.distribution.class == UniformDistribution
+    }
+
+    def "should parse discrete value with default normal distribution when specified"() {
+        given:
+        def config = """
+values:
+  value: random([1, 2, 4], normal())
+output: \$value
+"""
+        when:
+        def dataGenerator = buildGenerator(config)
+
+        then:
+        dataGenerator.value.delegate.distribution.class == NormalDistribution
+    }
+
+    def "should parse discrete value with specific normal distribution when specified"() {
+        given:
+        def config = """
+values:
+  value: random([1, 2, 4], normal( 2,3.2, 0.5 , 1))
+output: \$value
+"""
+        when:
+        def dataGenerator = buildGenerator(config)
+
+        then:
+        def distribution = dataGenerator.value.delegate.distribution
+        distribution.class == NormalDistribution
+        distribution.lower == 0.5
+        distribution.upper == 1
+    }
+
+    def "should throw exception when discrete value with normal distribution have wrong num of params"() {
+        given:
+        def config = """
+values:
+  value: random([1, 2, 4], normal( 2, 0.5 , 1))
+output: \$value
+"""
+        when:
+        def dataGenerator = buildGenerator(config)
+
+        then:
+        Exception e = thrown()
+        e.cause.class == RuntimeException
     }
 
     @Unroll

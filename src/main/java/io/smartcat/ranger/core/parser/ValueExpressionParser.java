@@ -5,11 +5,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import io.smartcat.ranger.core.*;
-import io.smartcat.ranger.core.WeightedValue.WeightedValuePair;
-
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
+
+import io.smartcat.ranger.core.CircularValue;
+import io.smartcat.ranger.core.DiscreteValue;
+import io.smartcat.ranger.core.JsonTransformer;
+import io.smartcat.ranger.core.NullValue;
+import io.smartcat.ranger.core.PrimitiveValue;
+import io.smartcat.ranger.core.RangeValueDouble;
+import io.smartcat.ranger.core.RangeValueLong;
+import io.smartcat.ranger.core.StringTransformer;
+import io.smartcat.ranger.core.TimeFormatTransformer;
+import io.smartcat.ranger.core.UUIDValue;
+import io.smartcat.ranger.core.Value;
+import io.smartcat.ranger.core.ValueProxy;
+import io.smartcat.ranger.core.WeightedValue;
+import io.smartcat.ranger.core.WeightedValue.WeightedValuePair;
+import io.smartcat.ranger.distribution.Distribution;
+import io.smartcat.ranger.distribution.NormalDistribution;
+import io.smartcat.ranger.distribution.UniformDistribution;
 
 /**
  * Parser for configuration value expressions.
@@ -205,6 +220,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
     public Rule numberLiteral() {
         return Sequence(FirstOf(doubleLiteral(), longLiteral()), push(((Number) pop()).doubleValue()));
     }
+
     /**
      * Double value definition.
      *
@@ -345,7 +361,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return List definition rule.
      */
     protected Rule list(Rule rule) {
-        return Sequence(Sequence(push("args"), rule, ZeroOrMore(comma(), rule)), push(getItemsUpToDelimiter("args")));
+        return Sequence(Sequence(push("args"), Optional(rule, ZeroOrMore(comma(), rule))),
+                push(getItemsUpToDelimiter("args")));
     }
 
     /**
@@ -359,13 +376,40 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Uniform distribution definition.
+     *
+     * @return Uniform distribution definition rule.
+     */
+    public Rule uniformDistribution() {
+        return Sequence(function("uniform"), push(new UniformDistribution()));
+    }
+
+    /**
+     * Normal distribution definition.
+     *
+     * @return Normal distribution definition rule.
+     */
+    public Rule normalDistribution() {
+        return Sequence(function("normal", list(numberLiteral())), push(createNormalDistribution()));
+    }
+
+    /**
+     * Distribution definition.
+     *
+     * @return Distribution definition rule.
+     */
+    public Rule distribution() {
+        return FirstOf(uniformDistribution(), normalDistribution());
+    }
+
+    /**
      * Discrete value definition.
      *
      * @return Discrete value definition rule.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Rule discreteValue() {
-        return Sequence(function("random", bracketList(value())), push(new DiscreteValue((List) pop())));
+        return Sequence(function("random", Sequence(bracketList(value()), Optional(comma(), distribution()))),
+                push(createDiscreteValue()));
     }
 
     /**
@@ -374,9 +418,9 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Double range value definition rule.
      */
     public Rule rangeValueDouble() {
-        return Sequence(function("random",
-                Sequence(numberLiteral(), "..", numberLiteral())),
-                push(new RangeValueDouble((double) pop(1), (double) pop())));
+        return Sequence(
+                function("random", Sequence(numberLiteral(), "..", numberLiteral(), Optional(comma(), distribution()))),
+                push(createRangeValueDouble()));
     }
 
     /**
@@ -385,8 +429,9 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Long range value definition rule.
      */
     public Rule rangeValueLong() {
-        return Sequence(function("random", Sequence(longLiteral(), "..", longLiteral())),
-                push(new RangeValueLong((Long) pop(1), (Long) pop())));
+        return Sequence(
+                function("random", Sequence(longLiteral(), "..", longLiteral(), Optional(comma(), distribution()))),
+                push(createRangeValueLong()));
     }
 
     /**
@@ -493,6 +538,56 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule value() {
         return FirstOf(valueReference(), generator(), transformer(), literalValue());
+    }
+
+    /**
+     * Creates normal distribution.
+     *
+     * @return Instance of {@link NormalDistribution}.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected NormalDistribution createNormalDistribution() {
+        List<Double> args = (List) pop();
+        if (args.isEmpty()) {
+            return new NormalDistribution();
+        }
+        if (args.size() != 4) {
+            throw new RuntimeException("Normal distribution must have following parameters:"
+                    + " mean, standard deviation, lower bound and upper bound.");
+        }
+        return new NormalDistribution(args.get(0), args.get(1), args.get(2), args.get(3));
+    }
+
+    /**
+     * Creates discrete value.
+     *
+     * @return Instance of {@link DiscreteValue}.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected DiscreteValue createDiscreteValue() {
+        return peek() instanceof Distribution ? new DiscreteValue((List) pop(1), (Distribution) pop())
+                : new DiscreteValue((List) pop());
+    }
+
+    /**
+     * Creates double range value.
+     *
+     * @return Instance of {@link RangeValueDouble}.
+     */
+    protected RangeValueDouble createRangeValueDouble() {
+        return peek() instanceof Distribution
+                ? new RangeValueDouble((double) pop(2), (double) pop(1), (Distribution) pop())
+                : new RangeValueDouble((double) pop(1), (double) pop());
+    }
+
+    /**
+     * Creates long range value.
+     *
+     * @return Instance of {@link RangeValueLong}.
+     */
+    protected RangeValueLong createRangeValueLong() {
+        return peek() instanceof Distribution ? new RangeValueLong((Long) pop(2), (Long) pop(1), (Distribution) pop())
+                : new RangeValueLong((Long) pop(1), (Long) pop());
     }
 
     /**
