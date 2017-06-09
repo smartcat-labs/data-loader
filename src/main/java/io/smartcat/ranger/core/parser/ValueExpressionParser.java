@@ -16,9 +16,6 @@ import org.parboiled.Rule;
  */
 public class ValueExpressionParser extends BaseParser<Object> {
 
-    private static final String DISCRETE_VALUE_DELIMITER = "discreteValueDelimiter";
-    private static final String CIRCULAR_VALUE_DELIMITER = "circularValueDelimiter";
-    private static final String WEIGHTED_VALUE_DELIMITER = "weightedValueDelimiter";
     private static final String STRING_VALUE_DELIMITER = "stringValueDelimiter";
 
     private final Map<String, ValueProxy<?>> proxyValues;
@@ -68,6 +65,42 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule comma() {
         return Sequence(ZeroOrMore(whitespace()), ",", ZeroOrMore(whitespace()));
+    }
+
+    /**
+     * Open parenthesis definition.
+     *
+     * @return Open parenthesis definition rule.
+     */
+    public Rule openParenthesis() {
+        return Sequence(ZeroOrMore(whitespace()), "(", ZeroOrMore(whitespace()));
+    }
+
+    /**
+     * Closed parenthesis definition.
+     *
+     * @return Closed parenthesis definition rule.
+     */
+    public Rule closedParenthesis() {
+        return Sequence(ZeroOrMore(whitespace()), ")", ZeroOrMore(whitespace()));
+    }
+
+    /**
+     * Open bracket definition.
+     *
+     * @return Open bracket definition rule.
+     */
+    public Rule openBracket() {
+        return Sequence(ZeroOrMore(whitespace()), "[", ZeroOrMore(whitespace()));
+    }
+
+    /**
+     * Closed bracket definition.
+     *
+     * @return Closed bracket definition rule.
+     */
+    public Rule closedBracket() {
+        return Sequence(ZeroOrMore(whitespace()), "]", ZeroOrMore(whitespace()));
     }
 
     /**
@@ -130,7 +163,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Null value definition rule.
      */
     public Rule nullValue() {
-        return Sequence("null()", push(new NullValue()));
+        return Sequence("null", openParenthesis(), closedParenthesis(), push(new NullValue()));
     }
 
     /**
@@ -164,6 +197,14 @@ public class ValueExpressionParser extends BaseParser<Object> {
                 push(Double.parseDouble(match())));
     }
 
+    /**
+     * Number definition.
+     *
+     * @return Number definition rule.
+     */
+    public Rule numberLiteral() {
+        return Sequence(FirstOf(doubleLiteral(), longLiteral()), push(((Number) pop()).doubleValue()));
+    }
     /**
      * Double value definition.
      *
@@ -257,6 +298,57 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Function definition.
+     *
+     * @param functionName Name of a function.
+     * @return Function definition rule.
+     */
+    protected Rule function(String functionName) {
+        return function(functionName, fromStringLiteral(""));
+    }
+
+    /**
+     * Function definition.
+     *
+     * @param functionArgument Function argument rule.
+     * @return Function definition rule.
+     */
+    protected Rule function(Rule functionArgument) {
+        return function("", functionArgument);
+    }
+
+    /**
+     * Function definition.
+     *
+     * @param functionName Name of a function.
+     * @param functionArgument Function argument rule.
+     * @return Function definition rule.
+     */
+    protected Rule function(String functionName, Rule functionArgument) {
+        return Sequence(functionName, openParenthesis(), functionArgument, closedParenthesis());
+    }
+
+    /**
+     * List of items enclosed in brackets.
+     *
+     * @param rule Rule of a list item.
+     * @return Bracket list definition rule.
+     */
+    protected Rule bracketList(Rule rule) {
+        return Sequence(openBracket(), list(rule), closedBracket());
+    }
+
+    /**
+     * List of items.
+     *
+     * @param rule Rule of a list item.
+     * @return List definition rule.
+     */
+    protected Rule list(Rule rule) {
+        return Sequence(Sequence(push("args"), rule, ZeroOrMore(comma(), rule)), push(getItemsUpToDelimiter("args")));
+    }
+
+    /**
      * Value reference definition.
      *
      * @return Value reference definition rule.
@@ -273,10 +365,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Rule discreteValue() {
-        return Sequence(
-                Sequence("random([", ZeroOrMore(whitespace()), push(DISCRETE_VALUE_DELIMITER), value(),
-                        ZeroOrMore(comma(), value()), ZeroOrMore(whitespace()), "])"),
-                push(new DiscreteValue(getValuesUpToDelimiter(DISCRETE_VALUE_DELIMITER))));
+        return Sequence(function("random", bracketList(value())), push(new DiscreteValue((List) pop())));
     }
 
     /**
@@ -285,10 +374,9 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Double range value definition rule.
      */
     public Rule rangeValueDouble() {
-        return Sequence(
-                Sequence("random(", ZeroOrMore(whitespace()), FirstOf(doubleLiteral(), longLiteral()), "..",
-                        FirstOf(doubleLiteral(), longLiteral()), ZeroOrMore(whitespace()), ")"),
-                push(newDoubleRangeValue()));
+        return Sequence(function("random",
+                Sequence(numberLiteral(), "..", numberLiteral())),
+                push(new RangeValueDouble((double) pop(1), (double) pop())));
     }
 
     /**
@@ -297,8 +385,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Long range value definition rule.
      */
     public Rule rangeValueLong() {
-        return Sequence(Sequence("random(", ZeroOrMore(whitespace()), longLiteral(), "..", longLiteral(),
-                ZeroOrMore(whitespace()), ")"), push(new RangeValueLong((Long) pop(1), (Long) pop())));
+        return Sequence(function("random", Sequence(longLiteral(), "..", longLiteral())),
+                push(new RangeValueLong((Long) pop(1), (Long) pop())));
     }
 
     /**
@@ -316,7 +404,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return UUID value definition rule.
      */
     public Rule uuidValue() {
-        return Sequence(fromStringLiteral("uuid()"), push(new UUIDValue()));
+        return Sequence(function("uuid"), push(new UUIDValue()));
     }
 
     /**
@@ -326,10 +414,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Rule circularValue() {
-        return Sequence(
-                Sequence("circular([", ZeroOrMore(whitespace()), push(CIRCULAR_VALUE_DELIMITER), value(),
-                        ZeroOrMore(comma(), value()), ZeroOrMore(whitespace()), "])"),
-                push(new CircularValue(getValuesUpToDelimiter(CIRCULAR_VALUE_DELIMITER))));
+        return Sequence(function("circular", bracketList(value())), push(new CircularValue((List) pop())));
     }
 
     /**
@@ -339,11 +424,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Rule weightedValuePair() {
-        return Sequence(
-                Sequence("(", ZeroOrMore(whitespace()), value(), comma(), FirstOf(doubleLiteral(), longLiteral()),
-                        ZeroOrMore(whitespace()), ")"),
-                push(new WeightedValuePair((Value) pop(1),
-                        (Double) (peek() instanceof Double ? pop() : ((Long) pop()).doubleValue()))));
+        return Sequence(function(Sequence(value(), comma(), numberLiteral())),
+                push(new WeightedValuePair((Value) pop(1), (double) pop())));
     }
 
     /**
@@ -353,10 +435,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Rule weightedValue() {
-        return Sequence(
-                Sequence("weighted([", ZeroOrMore(whitespace()), push(WEIGHTED_VALUE_DELIMITER), weightedValuePair(),
-                        ZeroOrMore(comma(), weightedValuePair()), ZeroOrMore(whitespace()), "])"),
-                push(new WeightedValue(getWeightedValuePairs())));
+        return Sequence(function("weighted", bracketList(weightedValuePair())), push(new WeightedValue((List) pop())));
     }
 
     /**
@@ -374,8 +453,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return String transformer definition rule.
      */
     public Rule stringTransformer() {
-        return Sequence(Sequence("string(", ZeroOrMore(whitespace()), stringLiteral(), push(STRING_VALUE_DELIMITER),
-                ZeroOrMore(comma(), value()), ZeroOrMore(whitespace()), ")"), push(getToStringValue()));
+        return Sequence(Sequence("string", openParenthesis(), stringLiteral(), push(STRING_VALUE_DELIMITER),
+                ZeroOrMore(comma(), value()), closedParenthesis()), push(getStringValue()));
     }
 
     /**
@@ -384,8 +463,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return JSON transformer definition rule.
      */
     public Rule jsonTransformer() {
-        return Sequence("json(", ZeroOrMore(whitespace()), valueReference(), ZeroOrMore(whitespace()), ")",
-                push(new JsonTransformer((Value<?>) pop())));
+        return Sequence(function("json", valueReference()), push(new JsonTransformer((Value<?>) pop())));
     }
 
     /**
@@ -395,8 +473,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Rule timeFormatTransformer() {
-        return Sequence(Sequence("time(", ZeroOrMore(whitespace()), stringLiteral(), comma(), value(),
-                ZeroOrMore(whitespace()), ")"), push(new TimeFormatTransformer((String) pop(1), (Value) pop())));
+        return Sequence(function("time", Sequence(stringLiteral(), comma(), value())),
+                push(new TimeFormatTransformer((String) pop(1), (Value) pop())));
     }
 
     /**
@@ -415,33 +493,6 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule value() {
         return FirstOf(valueReference(), generator(), transformer(), literalValue());
-    }
-
-    /**
-     * Creates {@link RangeValueDouble} out of values from value stack.
-     *
-     * @return Instance of {@link RangeValueDouble}.
-     */
-    protected RangeValueDouble newDoubleRangeValue() {
-        Object first = pop(1);
-        Object second = pop();
-        Double firstDouble = null;
-        Double secondDouble = null;
-        if (first instanceof Double) {
-            firstDouble = (Double) first;
-        } else if (first instanceof Long) {
-            firstDouble = ((Long) first).doubleValue();
-        } else {
-            throw new RuntimeException("Unknown instance type: " + first.getClass().getName());
-        }
-        if (second instanceof Double) {
-            secondDouble = (Double) second;
-        } else if (second instanceof Long) {
-            secondDouble = ((Long) second).doubleValue();
-        } else {
-            throw new RuntimeException("Unknown instance type: " + first.getClass().getName());
-        }
-        return new RangeValueDouble(firstDouble, secondDouble);
     }
 
     /**
@@ -498,49 +549,28 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Instance of {@link StringTransformer}.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected Value<String> getToStringValue() {
-        List values = getValuesUpToDelimiter(STRING_VALUE_DELIMITER);
+    protected Value<String> getStringValue() {
+        List values = getItemsUpToDelimiter(STRING_VALUE_DELIMITER);
         String formatString = (String) pop();
         return new StringTransformer(formatString, values);
     }
 
     /**
-     * Collects all weighted value pairs.
+     * Collects all items up to specified delimiter.
      *
-     * @param <T> Type value would evaluate to.
-     * @return List of weighted value pairs.
+     * @param delimiter Delimiter up to which to collect all the items.
+     * @param <T> Type of item.
+     * @return List of items up to specified delimiter.
      */
     @SuppressWarnings({ "unchecked" })
-    protected <T> List<WeightedValuePair<T>> getWeightedValuePairs() {
-        List<WeightedValuePair<T>> result = new ArrayList<>();
-        while (true) {
-            Object val = pop();
-            if (val instanceof String && ((String) val).equals(WEIGHTED_VALUE_DELIMITER)) {
-                break;
-            } else {
-                result.add((WeightedValuePair<T>) val);
-            }
-        }
-        Collections.reverse(result);
-        return result;
-    }
-
-    /**
-     * Collects all values up to specified delimiter.
-     *
-     * @param delimiter Delimiter up to which to collect all the values.
-     * @param <T> Type value would evaluate to.
-     * @return List of values up to specified delimiter.
-     */
-    @SuppressWarnings({ "unchecked" })
-    protected <T> List<Value<T>> getValuesUpToDelimiter(String delimiter) {
-        List<Value<T>> result = new ArrayList<>();
+    protected <T> List<T> getItemsUpToDelimiter(String delimiter) {
+        List<T> result = new ArrayList<>();
         while (true) {
             Object val = pop();
             if (val instanceof String && ((String) val).equals(delimiter)) {
                 break;
             } else {
-                result.add((Value<T>) val);
+                result.add((T) val);
             }
         }
         Collections.reverse(result);
