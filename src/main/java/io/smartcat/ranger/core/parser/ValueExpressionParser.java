@@ -15,6 +15,7 @@ import io.smartcat.ranger.core.DiscreteValue;
 import io.smartcat.ranger.core.JsonTransformer;
 import io.smartcat.ranger.core.NullValue;
 import io.smartcat.ranger.core.PrimitiveValue;
+import io.smartcat.ranger.core.RandomLengthStringValue;
 import io.smartcat.ranger.core.Range;
 import io.smartcat.ranger.core.RangeValueDouble;
 import io.smartcat.ranger.core.RangeValueLong;
@@ -158,6 +159,15 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Escape sequence definition.
+     *
+     * @return Escape sequence definition rule.
+     */
+    public Rule escape() {
+        return Sequence('\\', AnyOf("btnfr\"\'\\"));
+    }
+
+    /**
      * Unsigned integer definition.
      *
      * @return Unsigned integer definition rule.
@@ -182,6 +192,15 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule nullValue() {
         return Sequence("null", openParenthesis(), closedParenthesis(), push(new NullValue()));
+    }
+
+    /**
+     * Integer definition.
+     *
+     * @return Integer definition rule.
+     */
+    public Rule intLiteral() {
+        return Sequence(Sequence(Optional(sign()), unsignedIntegerLiteral()), push(Integer.parseInt(match())));
     }
 
     /**
@@ -253,6 +272,16 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Character literal definition.
+     *
+     * @return Character literal definition rule.
+     */
+    public Rule charLiteral() {
+        return Sequence(Sequence('\'', FirstOf(escape(), Sequence(TestNot(AnyOf("'\\")), ANY)), '\''),
+                push(new Character(match().charAt(1) == '\\' ? match().charAt(2) : match().charAt(1))));
+    }
+
+    /**
      * Naked string definition.
      *
      * @return Naked string definition rule.
@@ -267,7 +296,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Single quote string definition rule.
      */
     public Rule singleQuoteStringLiteral() {
-        return Sequence(Sequence("'", ZeroOrMore(TestNot(AnyOf("\r\n'\\")), ANY), "'"), push(trimOffEnds(match())));
+        return Sequence(Sequence("'", ZeroOrMore(FirstOf(escape(), Sequence(TestNot(AnyOf("\r\n'\\")), ANY))), "'"),
+                push(trimOffEnds(match())));
     }
 
     /**
@@ -276,7 +306,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Double quote string definition rule.
      */
     public Rule doubleQuoteStringLiteral() {
-        return Sequence(Sequence('"', ZeroOrMore(TestNot(AnyOf("\r\n\"\\")), ANY), '"'), push(trimOffEnds(match())));
+        return Sequence(Sequence('"', ZeroOrMore(FirstOf(escape(), Sequence(TestNot(AnyOf("\r\n\"\\")), ANY))), '"'),
+                push(trimOffEnds(match())));
     }
 
     /**
@@ -335,6 +366,17 @@ public class ValueExpressionParser extends BaseParser<Object> {
     public Rule doubleRange() {
         return Sequence(Sequence(numberLiteral(), "..", numberLiteral()),
                 push(new Range(((Number) pop(1)).doubleValue(), ((Number) pop()).doubleValue())));
+    }
+
+    /**
+     * Character range definition.
+     *
+     * @return Character range definition rule.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Rule charRange() {
+        return Sequence(Sequence(charLiteral(), "..", charLiteral()),
+                push(new Range((Character) pop(1), (Character) pop())));
     }
 
     /**
@@ -442,8 +484,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Double range value definition rule.
      */
     public Rule rangeValueDouble() {
-        return Sequence(
-                function("random", Sequence(doubleRange(), Optional(comma(), distribution()))),
+        return Sequence(function("random", Sequence(doubleRange(), Optional(comma(), distribution()))),
                 push(createRangeValueDouble()));
     }
 
@@ -453,8 +494,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Long range value definition rule.
      */
     public Rule rangeValueLong() {
-        return Sequence(
-                function("random", Sequence(longRange(), Optional(comma(), distribution()))),
+        return Sequence(function("random", Sequence(longRange(), Optional(comma(), distribution()))),
                 push(createRangeValueLong()));
     }
 
@@ -539,13 +579,24 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Random length value definition.
+     *
+     * @return Random length value definition rule.
+     */
+    public Rule randomLengthStringValue() {
+        return Sequence(
+                function("randomLengthString", Sequence(intLiteral(), Optional(comma(), bracketList(charRange())))),
+                push(createRandomLengthStringValue()));
+    }
+
+    /**
      * Generator definition.
      *
      * @return Generator definition rule.
      */
     public Rule generator() {
         return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue(), circularRangeValue(),
-                weightedValue());
+                weightedValue(), randomLengthStringValue());
     }
 
     /**
@@ -632,8 +683,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected RangeValueDouble createRangeValueDouble() {
-        return peek() instanceof Distribution
-                ? new RangeValueDouble((Range) pop(1), (Distribution) pop())
+        return peek() instanceof Distribution ? new RangeValueDouble((Range) pop(1), (Distribution) pop())
                 : new RangeValueDouble((Range) pop());
     }
 
@@ -646,6 +696,17 @@ public class ValueExpressionParser extends BaseParser<Object> {
     protected RangeValueLong createRangeValueLong() {
         return peek() instanceof Distribution ? new RangeValueLong((Range) pop(1), (Distribution) pop())
                 : new RangeValueLong((Range) pop());
+    }
+
+    /**
+     * Creates random length value.
+     *
+     * @return Instance of {@link RandomLengthStringValue}.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected RandomLengthStringValue createRandomLengthStringValue() {
+        return peek() instanceof List ? new RandomLengthStringValue((Integer) pop(1), (List) pop())
+                : new RandomLengthStringValue((Integer) pop());
     }
 
     /**

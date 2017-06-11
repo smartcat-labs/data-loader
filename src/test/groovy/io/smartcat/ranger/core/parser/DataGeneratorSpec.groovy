@@ -1,9 +1,11 @@
 package io.smartcat.ranger.core.parser
 
 import io.smartcat.ranger.core.InvalidRangeBoundsException
+import io.smartcat.ranger.core.RandomLengthStringValue
 import io.smartcat.ranger.core.parser.DataGenerator.Builder
 import io.smartcat.ranger.distribution.NormalDistribution
 import io.smartcat.ranger.distribution.UniformDistribution
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -542,6 +544,30 @@ output: \$value
         " (2,2.5),(7, 10) , (4 ,3.5), (8, 8)"            | [2L, 7L, 4L, 8L]
         "(5.1,5.2), (8.0, 1) ,(3.3, 5), (100.1, 10.2)"   | [5.1d, 8.0d, 3.3d, 100.1d]
         """("a", 2),('b', 3.2) , ("c", 2), ("d", 5.3)""" | ["a", "b", "c", "d"]
+    }
+
+    @Unroll
+    def "should parse random length value #expression"() {
+        given:
+        def config = """
+values:
+  value: randomLengthString($expression)
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result.length() == length
+        result.every { it in values }
+
+        where:
+        expression                                                       | length | values
+        "4"                                                              | 4      | ('a'..'z').collect { it } + ('A'..'Z').collect { it } + ('0'..'9').collect { it }
+        "5, ['3'..'8', 'A'..'C'] "                                       | 5      | ('3'..'8').collect { it } + ('A'..'C').collect { it }
+        """6, ['\\''..'.', '.'..';', ','..'/', '"'..'.', '#'..'\\\\']""" | 6      | ('"'..'}').collect { it }
     }
 
     @Unroll
