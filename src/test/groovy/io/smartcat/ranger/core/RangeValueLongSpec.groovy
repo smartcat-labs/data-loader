@@ -6,9 +6,9 @@ import spock.lang.Unroll
 
 class RangeValueLongSpec extends Specification {
 
-    def "cannot create range value when beginning is less than end"() {
+    def "cannot create range value when beginning is greater than the end"() {
         when:
-        new RangeValueLong(15, 10)
+        new RangeValueLong(new Range<Long>(15L, 10L))
 
         then:
         thrown(InvalidRangeBoundsException)
@@ -19,7 +19,7 @@ class RangeValueLongSpec extends Specification {
         def dist = Mock(Distribution) {
             nextLong(7, 35) >> 15
         }
-        def value = new RangeValueLong(7, 35, dist)
+        def value = new RangeValueLong(new Range<Long>(7L, 35L), dist)
 
         when:
         def result = value.get()
@@ -33,7 +33,7 @@ class RangeValueLongSpec extends Specification {
         def dist = Mock(Distribution) {
             nextLong(11, 100) >>> 13 >> 31 >> 18 >> 20
         }
-        def value = new RangeValueLong(11, 100, dist)
+        def value = new RangeValueLong(new Range<Long>(11L, 100L), dist)
         def result = []
 
         when:
@@ -49,7 +49,7 @@ class RangeValueLongSpec extends Specification {
         def dist = Mock(Distribution) {
             nextLong(11, 100) >>> 13 >> 31 >> 18 >> 20
         }
-        def value = new RangeValueLong(11, 100, dist)
+        def value = new RangeValueLong(new Range<Long>(11L, 100L), dist)
         value.get()
 
         when:

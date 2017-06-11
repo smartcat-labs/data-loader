@@ -1,15 +1,13 @@
 package io.smartcat.ranger.core
 
-import javax.security.auth.Subject.SecureSet
-
 import io.smartcat.ranger.distribution.Distribution
 import spock.lang.Specification
 
 class RangeValueDoubleSpec extends Specification {
 
-    def "cannot create range value when beginning is less than end"() {
+    def "cannot create range value when beginning is greater than the end"() {
         when:
-        new RangeValueDouble(15.2, 10.01)
+        new RangeValueDouble(new Range<Double>(51.2d, 10.01d))
 
         then:
         thrown(InvalidRangeBoundsException)
@@ -20,7 +18,7 @@ class RangeValueDoubleSpec extends Specification {
         def dist = Mock(Distribution) {
             nextDouble(11.2, 123.3) >> 28.5
         }
-        def value = new RangeValueDouble(11.2, 123.3, dist)
+        def value = new RangeValueDouble(new Range<Double>(11.2d, 123.3d), dist)
 
         when:
         def result = value.get()
@@ -34,7 +32,7 @@ class RangeValueDoubleSpec extends Specification {
         def dist = Mock(Distribution) {
             nextDouble(11.2, 123.3) >>> 28.5 >> 31.5 >> 18.2 >> 20
         }
-        def value = new RangeValueDouble(11.2, 123.3, dist)
+        def value = new RangeValueDouble(new Range<Double>(11.2d, 123.3d), dist)
         def result = []
 
         when:
@@ -50,7 +48,7 @@ class RangeValueDoubleSpec extends Specification {
         def dist = Mock(Distribution) {
             nextDouble(11.2, 123.3) >>> 28.5 >> 31.5 >> 18.2 >> 20
         }
-        def value = new RangeValueDouble(11.2, 123.3, dist)
+        def value = new RangeValueDouble(new Range<Double>(11.2d, 123.3d), dist)
         value.get()
 
         when:

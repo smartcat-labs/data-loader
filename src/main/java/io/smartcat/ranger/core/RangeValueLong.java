@@ -9,25 +9,23 @@ import io.smartcat.ranger.distribution.Distribution;
 public class RangeValueLong extends RangeValue<Long> {
 
     /**
-     * Constructs range with specified <code>beginning</code> and <code>end</code>. <code>distribution</code> is set to
+     * Constructs range with specified <code>range</code>. <code>distribution</code> is set to
      * Uniform distribution.
      *
-     * @param beginning Beginning of the range.
-     * @param end End of the range.
+     * @param range Long range.
      */
-    public RangeValueLong(Long beginning, Long end) {
-        super(beginning, end);
+    public RangeValueLong(Range<Long> range) {
+        super(range);
     }
 
     /**
-     * Constructs range with specified <code>beginning</code>, <code>end</code> and <code>distribution</code>.
+     * Constructs range with specified <code>range</code> and <code>distribution</code>.
      *
-     * @param beginning Beginning of the range.
-     * @param end End of the range.
+     * @param range Long range.
      * @param distribution Distribution to use for value selection.
      */
-    public RangeValueLong(Long beginning, Long end, Distribution distribution) {
-        super(beginning, end, distribution);
+    public RangeValueLong(Range<Long> range, Distribution distribution) {
+        super(range, distribution);
     }
 
     @Override

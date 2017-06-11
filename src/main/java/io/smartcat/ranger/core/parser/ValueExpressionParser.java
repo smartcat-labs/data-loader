@@ -8,11 +8,14 @@ import java.util.Map;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 
+import io.smartcat.ranger.core.CircularRangeValueDouble;
+import io.smartcat.ranger.core.CircularRangeValueLong;
 import io.smartcat.ranger.core.CircularValue;
 import io.smartcat.ranger.core.DiscreteValue;
 import io.smartcat.ranger.core.JsonTransformer;
 import io.smartcat.ranger.core.NullValue;
 import io.smartcat.ranger.core.PrimitiveValue;
+import io.smartcat.ranger.core.Range;
 import io.smartcat.ranger.core.RangeValueDouble;
 import io.smartcat.ranger.core.RangeValueLong;
 import io.smartcat.ranger.core.StringTransformer;
@@ -314,6 +317,27 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Long range definition.
+     *
+     * @return Long range definition rule.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Rule longRange() {
+        return Sequence(Sequence(longLiteral(), "..", longLiteral()), push(new Range((Long) pop(1), (Long) pop())));
+    }
+
+    /**
+     * Double range definition.
+     *
+     * @return Double range definition rule.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Rule doubleRange() {
+        return Sequence(Sequence(numberLiteral(), "..", numberLiteral()),
+                push(new Range(((Number) pop(1)).doubleValue(), ((Number) pop()).doubleValue())));
+    }
+
+    /**
      * Function definition.
      *
      * @param functionName Name of a function.
@@ -419,7 +443,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule rangeValueDouble() {
         return Sequence(
-                function("random", Sequence(numberLiteral(), "..", numberLiteral(), Optional(comma(), distribution()))),
+                function("random", Sequence(doubleRange(), Optional(comma(), distribution()))),
                 push(createRangeValueDouble()));
     }
 
@@ -430,7 +454,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule rangeValueLong() {
         return Sequence(
-                function("random", Sequence(longLiteral(), "..", longLiteral(), Optional(comma(), distribution()))),
+                function("random", Sequence(longRange(), Optional(comma(), distribution()))),
                 push(createRangeValueLong()));
     }
 
@@ -463,6 +487,37 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Circular long range value definition.
+     *
+     * @return Circular long range value definition rule.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Rule circularRangeValueLong() {
+        return Sequence(function("circular", Sequence(longRange(), comma(), longLiteral())),
+                push(new CircularRangeValueLong((Range) pop(1), (Long) pop())));
+    }
+
+    /**
+     * Circular double range value definition.
+     *
+     * @return Circular double range value definition rule.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Rule circularRangeValueDouble() {
+        return Sequence(function("circular", Sequence(doubleRange(), comma(), doubleLiteral())),
+                push(new CircularRangeValueDouble((Range) pop(1), (Double) pop())));
+    }
+
+    /**
+     * Circular range value definition.
+     *
+     * @return Circular range value definition rule.
+     */
+    public Rule circularRangeValue() {
+        return FirstOf(circularRangeValueLong(), circularRangeValueDouble());
+    }
+
+    /**
      * Weighted value pair definition.
      *
      * @return Weighted value pair definition rule.
@@ -489,7 +544,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Generator definition rule.
      */
     public Rule generator() {
-        return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue(), weightedValue());
+        return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue(), circularRangeValue(),
+                weightedValue());
     }
 
     /**
@@ -574,10 +630,11 @@ public class ValueExpressionParser extends BaseParser<Object> {
      *
      * @return Instance of {@link RangeValueDouble}.
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected RangeValueDouble createRangeValueDouble() {
         return peek() instanceof Distribution
-                ? new RangeValueDouble((double) pop(2), (double) pop(1), (Distribution) pop())
-                : new RangeValueDouble((double) pop(1), (double) pop());
+                ? new RangeValueDouble((Range) pop(1), (Distribution) pop())
+                : new RangeValueDouble((Range) pop());
     }
 
     /**
@@ -585,9 +642,10 @@ public class ValueExpressionParser extends BaseParser<Object> {
      *
      * @return Instance of {@link RangeValueLong}.
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected RangeValueLong createRangeValueLong() {
-        return peek() instanceof Distribution ? new RangeValueLong((Long) pop(2), (Long) pop(1), (Distribution) pop())
-                : new RangeValueLong((Long) pop(1), (Long) pop());
+        return peek() instanceof Distribution ? new RangeValueLong((Range) pop(1), (Distribution) pop())
+                : new RangeValueLong((Range) pop());
     }
 
     /**

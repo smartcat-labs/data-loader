@@ -26,42 +26,33 @@ public abstract class RangeValue<T extends Comparable<T>> extends Value<T> {
     protected Distribution distribution;
 
     /**
-     * Constructs range with specified <code>beginning</code> and <code>end</code>. <code>distribution</code> is set to
+     * Constructs range value with specified <code>range</code>. <code>distribution</code> is set to
      * Uniform distribution.
      *
-     * @param beginning Beginning of the range.
-     * @param end End of the range.
+     * @param range Range.
      */
-    public RangeValue(T beginning, T end) {
-        this(beginning, end, new UniformDistribution());
+    public RangeValue(Range<T> range) {
+        this(range, new UniformDistribution());
     }
 
     /**
-     * Constructs range with specified <code>beginning</code>, <code>end</code> and <code>distribution</code>.
+     * Constructs range value with specified <code>range</code> and <code>distribution</code>.
      *
-     * @param beginning Beginning of the range.
-     * @param end End of the range.
+     * @param range Range.
      * @param distribution Distribution to use for value selection.
      */
-    public RangeValue(T beginning, T end, Distribution distribution) {
-        checkRangeInput(beginning, end);
+    public RangeValue(Range<T> range, Distribution distribution) {
+        if (range == null) {
+            throw new IllegalArgumentException("Range cannot be null.");
+        }
+        if (!range.isIncreasing()) {
+            throw new InvalidRangeBoundsException("End of the range must be greater than the beginning of the range.");
+        }
         if (distribution == null) {
             throw new IllegalArgumentException("Distribution cannot be null.");
         }
-        this.beginning = beginning;
-        this.end = end;
+        this.beginning = range.getBeginning();
+        this.end = range.getEnd();
         this.distribution = distribution;
-    }
-
-    private void checkRangeInput(T beginning, T end) {
-        if (beginning == null) {
-            throw new InvalidRangeBoundsException("Beginning of the range cannot be null.");
-        }
-        if (end == null) {
-            throw new InvalidRangeBoundsException("End of the range cannot be null.");
-        }
-        if (end.compareTo(beginning) <= 0) {
-            throw new InvalidRangeBoundsException("End of the range must be greater than the beginning of the range.");
-        }
     }
 }

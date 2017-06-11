@@ -4,7 +4,6 @@ import io.smartcat.ranger.core.InvalidRangeBoundsException
 import io.smartcat.ranger.core.parser.DataGenerator.Builder
 import io.smartcat.ranger.distribution.NormalDistribution
 import io.smartcat.ranger.distribution.UniformDistribution
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -470,6 +469,56 @@ output: \$value
         "  5,6, 7 ,8 , 9   ,  10"  | [5L, 6L, 7L, 8L, 9L, 10L]
         "5.0, 3.4 , +.12, 0.23   " | [5d, 3.4d, 0.12d, 0.23d]
         """"a", 'b' , 'c' ,"d" """ | ["a", "b", "c", "d"]
+    }
+
+    @Unroll
+    def "should parse circular range value long #expression"() {
+        given:
+        def config = """
+values:
+  value: circular($expression)
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+        def result = []
+
+        when:
+        values.size().times { result << dataGenerator.next() }
+
+        then:
+        result == values
+
+        where:
+        expression     | values
+        " 3..12 , 2"   | [3, 5, 7, 9, 11, 3, 5]
+        " 1..-6,-1"    | [1, 0, -1, -2, -3, -4, -5, -6, 1, 0, -1]
+        " 0..100 , 10" | [0, 10, 20, 30, 40, 50]
+    }
+
+    @Unroll
+    def "should parse circular range value double #expression"() {
+        given:
+        def config = """
+values:
+  value: circular($expression)
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+        def result = []
+
+        when:
+        values.size().times { result << dataGenerator.next() }
+
+        then:
+        for (int i = 0; i < values.size(); i++) {
+            Math.abs(values[i] - result[i]) < 0.00001
+        }
+
+        where:
+        expression        | values
+        "2.1..2.55, 0.05" | [2.1, 2.15, 2.20, 2.25, 2.30, 2.35, 3.40, 2.45, 2.50, 2.55, 2.1]
+        "9.5..7, -0.5"    | [9.5, 9.0, 8.5, 8.0, 7.5, 7.0, 9.5]
+        "2.0..-4.5, -1.5" | [2.0, 0.5, -1.0, -2.5, -4.0, 2.0]
     }
 
     @Unroll

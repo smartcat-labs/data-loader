@@ -28,8 +28,9 @@ public class DataGenerator {
      * @return Next value.
      */
     public Object next() {
+        Object result = value.get();
         value.reset();
-        return value.get();
+        return result;
     }
 
     /**
