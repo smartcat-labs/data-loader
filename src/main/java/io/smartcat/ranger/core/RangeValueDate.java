@@ -1,16 +1,13 @@
 package io.smartcat.ranger.core;
 
+import java.util.Date;
+
 import io.smartcat.ranger.distribution.Distribution;
 
 /**
- * Randomly generates {@link Double} value within specified range.
+ * Randomly generates {@link Date} value within specified range.
  */
-public class RangeValueDouble extends RangeValue<Double> {
-
-    /**
-     * Epsilon value used for edge cases.
-     */
-    public static final Double EPSILON = 1E-11;
+public class RangeValueDate extends RangeValue<Date> {
 
     private boolean beginningEdgeCaseUsed = false;
     private boolean endEdgeCaseUsed = false;
@@ -20,7 +17,7 @@ public class RangeValueDouble extends RangeValue<Double> {
      *
      * @param range Double range.
      */
-    public RangeValueDouble(Range<Double> range) {
+    public RangeValueDate(Range<Date> range) {
         super(range);
     }
 
@@ -30,7 +27,7 @@ public class RangeValueDouble extends RangeValue<Double> {
      * @param range Double range.
      * @param useEdgeCases Indicates whether to create edge cases as first two values or not.
      */
-    public RangeValueDouble(Range<Double> range, boolean useEdgeCases) {
+    public RangeValueDate(Range<Date> range, boolean useEdgeCases) {
         super(range, useEdgeCases);
     }
 
@@ -41,7 +38,7 @@ public class RangeValueDouble extends RangeValue<Double> {
      * @param useEdgeCases Indicates whether to create edge cases as first two values or not.
      * @param distribution Distribution to use for value selection.
      */
-    public RangeValueDouble(Range<Double> range, boolean useEdgeCases, Distribution distribution) {
+    public RangeValueDate(Range<Date> range, boolean useEdgeCases, Distribution distribution) {
         super(range, useEdgeCases, distribution);
     }
 
@@ -49,14 +46,14 @@ public class RangeValueDouble extends RangeValue<Double> {
     protected void eval() {
         if (useEdgeCases && !beginningEdgeCaseUsed) {
             beginningEdgeCaseUsed = true;
-            val = beginning;
+            val = new Date(beginning.getTime());
             return;
         }
         if (useEdgeCases && !endEdgeCaseUsed) {
             endEdgeCaseUsed = true;
-            val = end - EPSILON;
+            val = new Date(end.getTime() - 1);
             return;
         }
-        val = distribution.nextDouble(beginning, end);
+        val = new Date(distribution.nextLong(beginning.getTime(), end.getTime()));
     }
 }

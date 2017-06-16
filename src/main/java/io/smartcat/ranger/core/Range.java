@@ -23,6 +23,9 @@ public class Range<T extends Comparable<T>> {
         if (end == null) {
             throw new InvalidRangeBoundsException("End of the range cannot be null.");
         }
+        if (!beginning.getClass().equals(end.getClass())) {
+            throw new InvalidRangeBoundsException("Beginning and end must be of the same type.");
+        }
         this.beginning = beginning;
         this.end = end;
     }

@@ -3,14 +3,9 @@ package io.smartcat.ranger.core;
 import io.smartcat.ranger.distribution.Distribution;
 
 /**
- * Randomly generates {@link Double} value within specified range.
+ * Randomly generates {@link Integer} value within specified range.
  */
-public class RangeValueDouble extends RangeValue<Double> {
-
-    /**
-     * Epsilon value used for edge cases.
-     */
-    public static final Double EPSILON = 1E-11;
+public class RangeValueInt extends RangeValue<Integer> {
 
     private boolean beginningEdgeCaseUsed = false;
     private boolean endEdgeCaseUsed = false;
@@ -18,30 +13,30 @@ public class RangeValueDouble extends RangeValue<Double> {
     /**
      * Constructs range with specified <code>range</code>.
      *
-     * @param range Double range.
+     * @param range Integer range.
      */
-    public RangeValueDouble(Range<Double> range) {
+    public RangeValueInt(Range<Integer> range) {
         super(range);
     }
 
     /**
      * Constructs range with specified <code>range</code> and <code>useEdgeCases</code>.
      *
-     * @param range Double range.
+     * @param range Integer range.
      * @param useEdgeCases Indicates whether to create edge cases as first two values or not.
      */
-    public RangeValueDouble(Range<Double> range, boolean useEdgeCases) {
+    public RangeValueInt(Range<Integer> range, boolean useEdgeCases) {
         super(range, useEdgeCases);
     }
 
     /**
      * Constructs range with specified <code>range</code>, <code>useEdgeCases</code> and <code>distribution</code>.
      *
-     * @param range Double range.
+     * @param range Integer range.
      * @param useEdgeCases Indicates whether to create edge cases as first two values or not.
      * @param distribution Distribution to use for value selection.
      */
-    public RangeValueDouble(Range<Double> range, boolean useEdgeCases, Distribution distribution) {
+    public RangeValueInt(Range<Integer> range, boolean useEdgeCases, Distribution distribution) {
         super(range, useEdgeCases, distribution);
     }
 
@@ -54,9 +49,9 @@ public class RangeValueDouble extends RangeValue<Double> {
         }
         if (useEdgeCases && !endEdgeCaseUsed) {
             endEdgeCaseUsed = true;
-            val = end - EPSILON;
+            val = end - 1;
             return;
         }
-        val = distribution.nextDouble(beginning, end);
+        val = distribution.nextInt(beginning, end);
     }
 }

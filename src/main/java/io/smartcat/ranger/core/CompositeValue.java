@@ -1,7 +1,7 @@
 package io.smartcat.ranger.core;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -21,8 +21,8 @@ public class CompositeValue extends Value<Map<String, Object>> {
         if (values == null || values.isEmpty()) {
             throw new IllegalArgumentException("Values map cannot be null nor empty.");
         }
-        this.values = new HashMap<>(values);
-        this.evaluatedValues = new HashMap<>();
+        this.values = new LinkedHashMap<>(values);
+        this.evaluatedValues = new LinkedHashMap<>();
         this.val = Collections.unmodifiableMap(this.evaluatedValues);
     }
 

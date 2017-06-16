@@ -58,17 +58,17 @@ public class WeightedValue<T> extends Value<T> {
          * Constructs weighted value pair with specified <code>value</code> and <code>weight</code>.
          *
          * @param value The value.
-         * @param weigth Weight of the value.
+         * @param weight Weight of the value.
          */
-        public WeightedValuePair(Value<T> value, double weigth) {
+        public WeightedValuePair(Value<T> value, double weight) {
             if (value == null) {
                 throw new IllegalArgumentException("Value cannot be null.");
             }
-            if (weigth <= 0) {
+            if (weight <= 0) {
                 throw new IllegalArgumentException("Weight must be greater than 0.");
             }
             this.value = value;
-            this.weight = weigth;
+            this.weight = weight;
         }
 
         /**

@@ -2,13 +2,12 @@ package io.smartcat.ranger.core
 
 import io.smartcat.ranger.distribution.Distribution
 import spock.lang.Specification
-import spock.lang.Unroll
 
-class RangeValueLongSpec extends Specification {
+class RangeVauleIntSpec extends Specification {
 
     def "cannot create range value when beginning is greater than the end"() {
         when:
-        new RangeValueLong(new Range<Long>(15L, 10L))
+        new RangeValueInt(new Range<Integer>(15, 10))
 
         then:
         thrown(InvalidRangeBoundsException)
@@ -17,9 +16,9 @@ class RangeValueLongSpec extends Specification {
     def "should use distribution's sample method with proper bounds"() {
         given:
         def dist = Mock(Distribution) {
-            nextLong(7, 35) >> 15
+            nextInt(7, 35) >> 15
         }
-        def value = new RangeValueLong(new Range<Long>(7L, 35L), false, dist)
+        def value = new RangeValueInt(new Range<Integer>(7, 35), false, dist)
 
         when:
         def result = value.get()
@@ -31,9 +30,9 @@ class RangeValueLongSpec extends Specification {
     def "calling get multiple times without reset should return same value"() {
         given:
         def dist = Mock(Distribution) {
-            nextLong(11, 100) >>> 13 >> 31 >> 18 >> 20
+            nextInt(11, 100) >>> 13 >> 31 >> 18 >> 20
         }
-        def value = new RangeValueLong(new Range<Long>(11L, 100L), false, dist)
+        def value = new RangeValueInt(new Range<Integer>(11, 100), false, dist)
         def result = []
 
         when:
@@ -47,9 +46,9 @@ class RangeValueLongSpec extends Specification {
     def "multiple reset should not change state"() {
         given:
         def dist = Mock(Distribution) {
-            nextLong(11, 100) >>> 13 >> 31 >> 18 >> 20
+            nextInt(11, 100) >>> 13 >> 31 >> 18 >> 20
         }
-        def value = new RangeValueLong(new Range<Long>(11L, 100L), false, dist)
+        def value = new RangeValueInt(new Range<Integer>(11, 100), false, dist)
         value.get()
 
         when:
@@ -61,15 +60,15 @@ class RangeValueLongSpec extends Specification {
 
     def "should return edge cases when edge cases are turned on"() {
         given:
-        def beginning = 10L
-        def end = 25L
-        def val1 = 20L
-        def val2 = 13L
-        def val3 = 18L
+        def beginning = 10
+        def end = 25
+        def val1 = 20
+        def val2 = 13
+        def val3 = 18
         def dist = Mock(Distribution) {
-            nextLong(beginning, end) >>> val1 >> val2 >> val3
+            nextInt(beginning, end) >>> val1 >> val2 >> val3
         }
-        def value = new RangeValueLong(new Range<Long>(beginning, end), true, dist)
+        def value = new RangeValueInt(new Range<Integer>(beginning, end), true, dist)
 
         when:
         def result1 = value.get()
