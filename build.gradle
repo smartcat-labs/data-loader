@@ -74,7 +74,10 @@ task packageJavadoc(type: Jar) {
     from javadoc
 }
 
+tasks.find { it.name == "pitest" }.dependsOn test
+
 check.dependsOn "pitest"
+
 build.dependsOn packageJavadoc
 
 def properties(file) {
