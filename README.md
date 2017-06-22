@@ -3,38 +3,23 @@
 
 # Ranger
 
-It allows developers to quickly and in a simple manner define and create large number of objects whose attributes have randomly selected values from the configured set.
+Ranger is a Java open source library that allows developers to quickly and in a simple manner define and create large number of objects whose attributes have randomly selected values from the configured set.
 
-It can be used for following:
+Two main purposes of Ranger are:
 
-- quickly populate the database with meaningful values
-- create data based on defined rules (e.g. create 100 users out of which 10 have first name 'John' and they are born in 1980) in order to create test data for automated unit and integration tests
-- have meaningful data for load testing
+- create unit and integration test data based on defined rules
+- data source for [Berserker](https://github.com/smartcat-labs/berserker)
 
-```java
-ObjectGenerator<User> userGenerator = new ObjectGenerator.Builder<User>(User.class)
-  .withValues("username", "destroyerOfW0rldz", "only_lol_catz", "aragorn_the_gray")
-  .withValues("firstname", "Alice", "Bob", "Charlie", "David")
-  .withValues("lastname", "Zed", "Yvette","Xavier")
-  .withRanges("numberOfCards", 1L, 5L)
-  .withRanges("accountBalance", 2.72, 2.73)
-  .withSubList("favoriteMovies", "Predator")
-  .withSubSet("nicknames", "al", "billie", "gray")
-  .withRanges("birthDate", LocalDateTime.of(1975, 1, 1, 0, 0), LocalDateTime.of(2001, 1, 1, 0, 0))
-  .withObjectGenerator("address", addressGenerator)
-  .toBeGenerated(1000).build();
+Ranger can be also used as data source for a custom tool of your choice.
 
-AggregatedObjectGenerator<User> aggregatedUserGenerator = new AggregatedObjectGenerator.Builder<>()
-  .withObjectGenerator(userGenerator).build();
-List<User> users = aggregatedUserGenerator.generateAll();
-```
+# Quick guide
 
-It can be used as a Java library, programatically in unit and integration tests, and from the command line (though the last one is not yet implemented).
+Quick guide provides a way to have running Ranger example within 5 minutes from which you can start and build solution for your own needs.
+Please take a look at [API documentation](#api) for more details what can be acomplished with Ranger.
 
-# How to use?
+## Repository
 
 Artifact can be fetched from bintray.
-
 Add following `<repository>` element to your `<repositories>` section in `pom.xml`:
 
 ```xml
@@ -45,19 +30,96 @@ Add following `<repository>` element to your `<repositories>` section in `pom.xm
 </repository>
 ```
 
-Add the `<dependency>` element to your `<dependencies>` section in `pom.xml` with specific `version` you need:
+## Dependency
+
+Add the `<dependency>` element to your `<dependencies>` section in `pom.xml` with specific `version.ranger` you need:
 
 ```xml
 <dependency>
   <groupId>io.smartcat</groupId>
   <artifactId>ranger</artifactId>
-  <version>version</version>
+  <version>${version.ranger}</version>
 </dependency>
 ```
 
 Similarly, dependency can be added to any other build tool supporting maven dependencies.
 
-For showcase and usage examples, take a look at our [Ranger Demo](https://github.com/smartcat-labs/ranger-demo) application.
+## Code
+
+Copy the code and run it.
+
+___Example.java___
+```java
+import static io.smartcat.ranger.BuilderMethods.*;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import io.smartcat.ranger.ObjectGenerator;
+import io.smartcat.ranger.ObjectGeneratorBuilder;
+
+public class Example {
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+    public static void main(String[] args) throws ParseException {
+        ObjectGenerator<Address> address = new ObjectGeneratorBuilder()
+                .prop("city", random("New York", "Washington", "San Francisco"))
+                .prop("street", random("2nd St", "5th Avenue", "21st St", "Main St"))
+                .prop("houseNumber", random(range(1, 55))).build(Address.class);
+
+        Date januaryFifth1985 = DATE_FORMAT.parse("1985-01-05");
+        Date decemberTwentySecond2000 = DATE_FORMAT.parse("2000-12-22");
+
+        ObjectGenerator<User> user = new ObjectGeneratorBuilder()
+              .prop("id", circular(range(1L, 2_000_000L), 1L))
+              .prop("username", string("{}{}", random("aragorn", "johnsnow", "mike", "batman"), random(range(1, 100))))
+              .prop("firstName", random("Peter", "Rodger", "Michael"))
+              .prop("lastName", random("Smith", "Cooper", "Stark", "Grayson", "Atkinson", "Durant"))
+              .prop("birthDate", random(range(januaryFifth1985, decemberTwentySecond2000)))
+              .prop("maried", false)
+              .prop("accountBalance", random(range(0.0d, 10_000.0d)))
+              .prop("address", address).build(User.class);
+
+        for (int i = 0; i < 100; i++) {
+            System.out.println(user.next());
+        }
+    }
+
+    private static class Address {
+
+        public String city;
+        public String street;
+        public long houseNumber;
+
+        @Override
+        public String toString() {
+            return "Address [city=" + city + ", street=" + street + ", houseNumber=" + houseNumber + "]";
+        }
+    }
+
+    private static class User {
+
+        public long id;
+        public String username;
+        public String firstName;
+        public String lastName;
+        public Date birthDate;
+        public boolean maried;
+        public Double accountBalance;
+        public Address address;
+
+        @Override
+        public String toString() {
+            return "User [id=" + id + ", username=" + username + ", firstName=" + firstName + ", lastName=" + lastName
+                    + ", birthDate=" + birthDate + ", maried=" + maried + ", accountBalance=" + accountBalance
+                    + ", address=" + address + "]";
+        }
+    }
+}
+
+```
 
 # Why?
 
@@ -75,67 +137,13 @@ What we can do is use contextual data generator and create users whose attribute
 
 # How it works?
 
-Ranger uses reflection to set the property with value generated by the rule. Rule can be specified in several ways, usually specifying list of allowed values or range and distribution to use.
+Ranger builds a tree of dependent value generators based on user configuration (either Java API or YAML configuration). Then it uses that tree
+to construct map with generated values. If type is not specified by builder or configuration parser, `Map<String, Object>` is return type. If type is specified, Jackson library is used to convert map to specified type. All rules and limitations of Jackson apply here also.
+
+# API
+
+Ranger supports two ways of configuring generator. [Java API](java-api.md) and [YAML Configuration](yaml-configuration.md).
 
 # Examples
 
-Create 1000 instances of User entity, out of which exactly 100 users have first name John or Joan.
-
-```java
-ObjectGenerator<User> randomUserGenerator = new ObjectGenerator.Builder<User>(User.class)
-  .withValues("username", "destroyerOfW0rldz", "only_lol_catz", "aragorn_the_gray")
-  .withValues("firstname", "Alice", "Bob", "Charlie", "David")
-  ...
-  .toBeGenerated(900).build();
-
-ObjectGenerator<User> johnUserGenerator = new ObjectGenerator.Builder<User>(User.class)
-  .withValues("username", "destroyerOfW0rldz", "only_lol_catz", "aragorn_the_gray")
-  .withValues("firstname", "John", "Joan")
-  ...
-  .toBeGenerated(100).build();
-
-AggregatedObjectGenerator<User> generator = new AggregatedObjectGenerator.Builder<>()
-  .withObjectGenerator(randomUserBuilder)
-  .withObjectGenerator(johnUserBuilder).build();
-List<User> users = generator.generateAll();
-```
-
-Create 1000 instances of User entity, out of which exactly 100 users are born between 1980 and 1990.
-
-```java
-ObjectGenerator<User> randomUserGenerator = new RandomBuilder.Builder<User>(User.class)
-  .withValues("username", "destroyerOfW0rldz", "only_lol_catz", "aragorn_the_gray")
-  .withRanges("birthdate", 
-    LocalDateTime.of(1975, 1, 1, 0, 0), LocalDateTime.of(1980, 1, 1, 0, 0), 
-    LocalDateTime.of(1990, 1, 1, 0, 0), LocalDateTime.of(2001, 1, 1, 0, 0)) // creates values from two ranges [1975, 1980) and [1990,2001)
-  ...
-  .toBeGenerated(900).build();
-
-ObjectGenerator<User> millenialUserBuilder = new ObjectGenerator.Builder<User>(User.class)
-  .withValues("username", "destroyerOfW0rldz", "only_lol_catz", "aragorn_the_gray")
-  .withRanges("birthdate", LocalDateTime.of(1980, 1, 1, 0, 0), LocalDateTime.of(1990, 1, 1, 0, 0))
-  ...
-  .toBeGenerated(100).build();
-
-AggregatedObjectGenerator<User> userGenerator = new AggregatedObjectGenerator.Builder<>()
-  .withObjectGenerator(randomUserBuilder)
-  .withObjectGenerator(millenialUserBuilder).build();
-List<User> users = userGenerator.generateAll();
-```
-
-Create 100 instances of User entity with addreses generated by declared builder:
-
-```java
-ObjectGenerator<Address> randomAddressGenerator = new ObjectGenerator.Builder<Address>(Address.class)
-  .withValues("city", "New York", "San Francisko", "Boston", "Los Angelese", "Las Vegas", "Austin", "Denver", "Seatle")
-  .withValues("street", "Anderson Mill Road", "14 Tee Dr", "3 Oaks Cir", "Adobe Trail", "Clayton Ln", "Foy Cir")
-  .withRanges("houseNumber", 1L, 150L).build();
-
-ObjectGenerator<User> randomUserGenerator = new ObjectGenerator.Builder<User>(User.class)
-  .withValues("username", "destroyerOfW0rldz")
-  .withObjectGenerator("address", randomAddressGenerator).toBeGenerated(100).build();
-
-AggregatedObjectGenerator<User> generator = new AggregatedObjectGenerator.Builder<>()
-  .withObjectGenerator(randomUserBuilder).build();
-List<User> users = generator.generateAll();
-```
+All examples are located at [src/example/java](src/example/java).
