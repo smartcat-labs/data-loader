@@ -18,6 +18,7 @@ import io.smartcat.ranger.core.JsonTransformer;
 import io.smartcat.ranger.core.NowDateValue;
 import io.smartcat.ranger.core.NowLocalDateTimeValue;
 import io.smartcat.ranger.core.NowLocalDateValue;
+import io.smartcat.ranger.core.NowValue;
 import io.smartcat.ranger.core.PrimitiveValue;
 import io.smartcat.ranger.core.RandomLengthStringValue;
 import io.smartcat.ranger.core.RangeValueDate;
@@ -304,6 +305,15 @@ public class BuilderMethods {
      */
     public static <T> Range<T> range(T beginning, T end) {
         return new Range<>(beginning, end);
+    }
+
+    /**
+     * Creates an instance of {@link ObjectGenerator} which generates current time in milliseconds.
+     *
+     * @return An instance of {@link ObjectGenerator} which generates current time in milliseconds.
+     */
+    public static ObjectGenerator<Long> now() {
+        return new ObjectGenerator<>(new NowValue());
     }
 
     /**

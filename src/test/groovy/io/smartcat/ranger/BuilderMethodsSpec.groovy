@@ -186,6 +186,7 @@ class BuilderMethodsSpec extends Specification {
 
         where:
         method             | nowString
+        "now"              | new SimpleDateFormat("yyyy-MM-dd").format(new Date())
         "nowDate"          | new SimpleDateFormat("yyyy-MM-dd").format(new Date())
         "nowLocalDate"     | LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         "nowLocalDateTime" | LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))

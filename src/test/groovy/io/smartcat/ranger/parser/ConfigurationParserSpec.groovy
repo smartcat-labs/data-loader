@@ -650,6 +650,24 @@ output: \$value
         "2.0..-4.5, -1.5" | [2.0, 0.5, -1.0, -2.5, -4.0, 2.0]
     }
 
+    def "should parse now"() {
+        given:
+        def config = """
+values:
+  value: now()
+output: \$value
+"""
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd")
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result instanceof Long
+        formatter.format(new Date(result)) == formatter.format(new Date())
+    }
+
     def "should parse nowDate"() {
         given:
         def config = """
@@ -883,6 +901,7 @@ output: time($expression)
         '   \'dd.MM.YYYY.\',$time'         | "07.06.2017."
         '"YYYY-MM-dd", $time'              | "2017-06-07"
         '   "MM/dd/YYYY",$time  '          | "06/07/2017"
+        '"yyyy-MM-dd", now()'              | new SimpleDateFormat("yyyy-MM-dd").format(new Date())
         '"yyyy-MM-dd", nowDate()'          | new SimpleDateFormat("yyyy-MM-dd").format(new Date())
         '"yyyy-MM-dd", nowLocalDate()'     | new SimpleDateFormat("yyyy-MM-dd").format(new Date())
         '"yyyy-MM-dd", nowLocalDateTime()' | new SimpleDateFormat("yyyy-MM-dd").format(new Date())

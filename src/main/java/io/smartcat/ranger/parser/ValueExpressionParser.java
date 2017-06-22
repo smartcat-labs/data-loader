@@ -18,6 +18,7 @@ import io.smartcat.ranger.core.JsonTransformer;
 import io.smartcat.ranger.core.NowDateValue;
 import io.smartcat.ranger.core.NowLocalDateTimeValue;
 import io.smartcat.ranger.core.NowLocalDateValue;
+import io.smartcat.ranger.core.NowValue;
 import io.smartcat.ranger.core.NullValue;
 import io.smartcat.ranger.core.PrimitiveValue;
 import io.smartcat.ranger.core.RandomLengthStringValue;
@@ -631,6 +632,15 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Now definition.
+     *
+     * @return Now definition rule.
+     */
+    public Rule now() {
+        return Sequence(function("now"), push(new NowValue()));
+    }
+
+    /**
      * Now date definition.
      *
      * @return Now date definition rule.
@@ -664,7 +674,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule generator() {
         return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue(), circularRangeValue(),
-                weightedValue(), exactWeightedValue(), randomLengthStringValue(), nowDate(), nowLocalDate(),
+                weightedValue(), exactWeightedValue(), randomLengthStringValue(), now(), nowDate(), nowLocalDate(),
                 nowLocalDateTime());
     }
 

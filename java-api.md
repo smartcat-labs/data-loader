@@ -201,8 +201,11 @@ Second generator would generate strings of length 8 from specified range of char
 
 ## Now methods
 
-These methods return current time, there are three variations: `nowDate()`, `nowLocalDate()` and `nowLocalDateTime()`.
-They return values of type `Date`, `LocalDate` and `LocalDateTime` respectively.
+These methods return current time:
+* `now()` returns `long` UTC time in milliseconds
+* `nowDate()` returns `Date`
+* `nowLocalDate()` returns `LocalDate`
+* `nowLocalDateTime()` returns `LocalDateTime`
 
 ## String transformer
 
