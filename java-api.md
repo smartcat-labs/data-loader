@@ -199,6 +199,11 @@ Second generator would generate strings of length 8 from specified range of char
 "EF893232", "2E49D0AB", "BE129E15", "938FFC1C", "BB8A43ED", "829D1CA2", ...
 ```
 
+## Now methods
+
+These methods return current time, there are three variations: `nowDate()`, `nowLocalDate()` and `nowLocalDateTime()`.
+They return values of type `Date`, `LocalDate` and `LocalDateTime` respectively.
+
 ## String transformer
 
 Creates a formatted string using the specified format string and values.
@@ -217,7 +222,7 @@ Possible generated values are:
 
 ## Time transformer
 
-Transforms long value which represents epoch milliseconds into date format.
+Transforms long, Date, LocalDate and LocalDateTime value into date format.
 
 ```java
 ObjectGenerator<Long> dateRange = random(range(1483228800000, 1514764800000));
@@ -228,6 +233,12 @@ Possible generated values are:
 ```
 "2017-03-25", "2017-08-08", "2017-10-11", ...
 ```
+
+```java
+ObjectGenerator<String> date = time("yyyy-MM-dd HH:mm:ss.SSS", nowLocalDate());
+```
+
+This will generate string time stamps, which can be helpful in many cases.
 
 ## JSON transformer
 

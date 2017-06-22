@@ -2,9 +2,13 @@ package io.smartcat.ranger
 
 import static io.smartcat.ranger.BuilderMethods.*;
 
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class BuilderMethodsSpec extends Specification {
 
@@ -156,7 +160,7 @@ class BuilderMethodsSpec extends Specification {
         result.output == """{"name":"Peter","lastName":"Smith","age":25}"""
     }
 
-    def "use time"() {
+    def "use time with long"() {
         given:
         def gen = new ObjectGeneratorBuilder()
         .prop("examDate", time("YYYY-MM-dd", circular(1493640000000, 1493650000000))).build()
@@ -166,6 +170,25 @@ class BuilderMethodsSpec extends Specification {
 
         then:
         result.examDate == "2017-05-01"
+    }
+
+    @Unroll
+    def "use time with #method"() {
+        given:
+        def gen = new ObjectGeneratorBuilder()
+        .prop("today", time("yyyy-MM-dd", BuilderMethods."$method"())).build()
+
+        when:
+        def result = gen.next()
+
+        then:
+        result.today == nowString
+
+        where:
+        method             | nowString
+        "nowDate"          | new SimpleDateFormat("yyyy-MM-dd").format(new Date())
+        "nowLocalDate"     | LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        "nowLocalDateTime" | LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
     }
 
     def "use exactly"() {

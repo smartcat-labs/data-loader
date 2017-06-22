@@ -1,14 +1,16 @@
 package io.smartcat.ranger.parser
 
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 import io.smartcat.ranger.core.InvalidRangeBoundsException
 import io.smartcat.ranger.core.RangeValueDouble
 import io.smartcat.ranger.core.ExactWeightedValue.ExactWeightedValueDepletedException
 import io.smartcat.ranger.distribution.NormalDistribution
 import io.smartcat.ranger.distribution.UniformDistribution
-import io.smartcat.ranger.parser.ConfigurationParser
-import io.smartcat.ranger.parser.InvalidReferenceNameException
 import io.smartcat.ranger.util.YamlUtils
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -648,6 +650,60 @@ output: \$value
         "2.0..-4.5, -1.5" | [2.0, 0.5, -1.0, -2.5, -4.0, 2.0]
     }
 
+    def "should parse nowDate"() {
+        given:
+        def config = """
+values:
+  value: nowDate()
+output: \$value
+"""
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd")
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result instanceof Date
+        formatter.format(result) == formatter.format(new Date())
+    }
+
+    def "should parse nowLocalDate"() {
+        given:
+        def config = """
+values:
+  value: nowLocalDate()
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+        def formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result instanceof LocalDate
+        result.format(formatter) == LocalDate.now().format(formatter)
+    }
+
+    def "should parse nowLocalDateTime"() {
+        given:
+        def config = """
+values:
+  value: nowLocalDateTime()
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+        def formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result instanceof LocalDateTime
+        result.format(formatter) == LocalDateTime.now().format(formatter)
+    }
+
     @Unroll
     def "should parse weighted value #expression"() {
         given:
@@ -819,14 +875,17 @@ output: time($expression)
         result == value
 
         where:
-        expression                 | value
-        '"YYYY-MM-dd", $time'      | "2017-06-07"
-        '\'YYYY-MM-dd\',$time'     | "2017-06-07"
-        '  "YYYY"  ,   $time'      | "2017"
-        '"MM-dd",$time'            | "06-07"
-        '   \'dd.MM.YYYY.\',$time' | "07.06.2017."
-        '"YYYY-MM-dd", $time'      | "2017-06-07"
-        '   "MM/dd/YYYY",$time  '  | "06/07/2017"
+        expression                         | value
+        '"YYYY-MM-dd", $time'              | "2017-06-07"
+        '\'YYYY-MM-dd\',$time'             | "2017-06-07"
+        '  "YYYY"  ,   $time'              | "2017"
+        '"MM-dd",$time'                    | "06-07"
+        '   \'dd.MM.YYYY.\',$time'         | "07.06.2017."
+        '"YYYY-MM-dd", $time'              | "2017-06-07"
+        '   "MM/dd/YYYY",$time  '          | "06/07/2017"
+        '"yyyy-MM-dd", nowDate()'          | new SimpleDateFormat("yyyy-MM-dd").format(new Date())
+        '"yyyy-MM-dd", nowLocalDate()'     | new SimpleDateFormat("yyyy-MM-dd").format(new Date())
+        '"yyyy-MM-dd", nowLocalDateTime()' | new SimpleDateFormat("yyyy-MM-dd").format(new Date())
     }
 
     def "should parse nested expression"() {

@@ -15,6 +15,9 @@ import io.smartcat.ranger.core.DiscreteValue;
 import io.smartcat.ranger.core.ExactWeightedValue;
 import io.smartcat.ranger.core.ExactWeightedValue.CountValuePair;
 import io.smartcat.ranger.core.JsonTransformer;
+import io.smartcat.ranger.core.NowDateValue;
+import io.smartcat.ranger.core.NowLocalDateTimeValue;
+import io.smartcat.ranger.core.NowLocalDateValue;
 import io.smartcat.ranger.core.PrimitiveValue;
 import io.smartcat.ranger.core.RandomLengthStringValue;
 import io.smartcat.ranger.core.RangeValueDate;
@@ -304,6 +307,33 @@ public class BuilderMethods {
     }
 
     /**
+     * Creates an instance of {@link ObjectGenerator} which generates current date-time as {@link Date} object.
+     *
+     * @return An instance of {@link ObjectGenerator} which generates current date-time as {@link Date} object.
+     */
+    public static ObjectGenerator<Date> nowDate() {
+        return new ObjectGenerator<>(new NowDateValue());
+    }
+
+    /**
+     * Creates an instance of {@link ObjectGenerator} which generates current date as {@link LocalDate} object.
+     *
+     * @return An instance of {@link ObjectGenerator} which generates current date as {@link LocalDate} object.
+     */
+    public static ObjectGenerator<LocalDate> nowLocalDate() {
+        return new ObjectGenerator<>(new NowLocalDateValue());
+    }
+
+    /**
+     * Creates an instance of {@link ObjectGenerator} which generates current date-time as {@link LocalDateTime} object.
+     *
+     * @return An instance of {@link ObjectGenerator} which generates current date-time as {@link LocalDateTime} object.
+     */
+    public static ObjectGenerator<LocalDateTime> nowLocalDateTime() {
+        return new ObjectGenerator<>(new NowLocalDateTimeValue());
+    }
+
+    /**
      * Creates an instance of {@link ObjectGenerator} which converts specified instance of {@link ObjectGenerator} to
      * JSON.
      *
@@ -321,11 +351,12 @@ public class BuilderMethods {
      *
      * @param format Format string.
      * @param generator Instance of {@link ObjectGenerator} which value will be formated to string. It must return
-     *            {@link Long}.
+     *            {@link Long}, {@link Date}, {@link LocalDate} or {@link LocalDateTime}.
+     * @param <T> Type of value count pair contains.
      * @return An instance of {@link ObjectGenerator} which converts specified instance of {@link ObjectGenerator} to
      *         time format.
      */
-    public static ObjectGenerator<String> time(String format, ObjectGenerator<Long> generator) {
+    public static <T> ObjectGenerator<String> time(String format, ObjectGenerator<T> generator) {
         return wrap(new TimeFormatTransformer(format, generator.value));
     }
 

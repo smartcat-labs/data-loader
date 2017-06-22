@@ -15,6 +15,9 @@ import io.smartcat.ranger.core.DiscreteValue;
 import io.smartcat.ranger.core.ExactWeightedValue;
 import io.smartcat.ranger.core.ExactWeightedValue.CountValuePair;
 import io.smartcat.ranger.core.JsonTransformer;
+import io.smartcat.ranger.core.NowDateValue;
+import io.smartcat.ranger.core.NowLocalDateTimeValue;
+import io.smartcat.ranger.core.NowLocalDateValue;
 import io.smartcat.ranger.core.NullValue;
 import io.smartcat.ranger.core.PrimitiveValue;
 import io.smartcat.ranger.core.RandomLengthStringValue;
@@ -628,13 +631,41 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Now date definition.
+     *
+     * @return Now date definition rule.
+     */
+    public Rule nowDate() {
+        return Sequence(function("nowDate"), push(new NowDateValue()));
+    }
+
+    /**
+     * Now local date definition.
+     *
+     * @return Now local date definition rule.
+     */
+    public Rule nowLocalDate() {
+        return Sequence(function("nowLocalDate"), push(new NowLocalDateValue()));
+    }
+
+    /**
+     * Now local date time definition.
+     *
+     * @return Now local date time definition rule.
+     */
+    public Rule nowLocalDateTime() {
+        return Sequence(function("nowLocalDateTime"), push(new NowLocalDateTimeValue()));
+    }
+
+    /**
      * Generator definition.
      *
      * @return Generator definition rule.
      */
     public Rule generator() {
         return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue(), circularRangeValue(),
-                weightedValue(), exactWeightedValue(), randomLengthStringValue());
+                weightedValue(), exactWeightedValue(), randomLengthStringValue(), nowDate(), nowLocalDate(),
+                nowLocalDateTime());
     }
 
     /**
