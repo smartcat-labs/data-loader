@@ -18,7 +18,7 @@ public class CompositeValue extends Value<Map<String, Object>> {
      * @param values Initial child values.
      */
     public CompositeValue(Map<String, Value<?>> values) {
-        if (values == null || values.isEmpty()) {
+        if (values == null) {
             throw new IllegalArgumentException("Values map cannot be null nor empty.");
         }
         this.values = new LinkedHashMap<>(values);
