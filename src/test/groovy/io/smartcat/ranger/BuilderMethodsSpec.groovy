@@ -7,6 +7,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+import io.smartcat.ranger.model.Address
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -110,6 +111,23 @@ class BuilderMethodsSpec extends Specification {
 
         then:
         result2.name == "secondName"
+    }
+
+    def "use list"() {
+        given:
+        def gen = new ObjectGeneratorBuilder().prop("names", list("Peter", "Rodger", circular("Mike", "Steve"))).build()
+
+        when:
+        def result1 = gen.next()
+
+        then:
+        result1.names == ["Peter", "Rodger", "Mike"]
+
+        when:
+        def result2 = gen.next()
+
+        then:
+        result2.names == ["Peter", "Rodger", "Steve"]
     }
 
     def "use random length string without ranges"() {

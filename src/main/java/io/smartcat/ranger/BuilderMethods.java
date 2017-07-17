@@ -15,6 +15,7 @@ import io.smartcat.ranger.core.DiscreteValue;
 import io.smartcat.ranger.core.ExactWeightedValue;
 import io.smartcat.ranger.core.ExactWeightedValue.CountValuePair;
 import io.smartcat.ranger.core.JsonTransformer;
+import io.smartcat.ranger.core.ListValue;
 import io.smartcat.ranger.core.NowDateValue;
 import io.smartcat.ranger.core.NowLocalDateTimeValue;
 import io.smartcat.ranger.core.NowLocalDateValue;
@@ -225,7 +226,7 @@ public class BuilderMethods {
     }
 
     /**
-     * Creates an instance of {@link ObjectGenerator} which generates values in order they are specified. WHen values
+     * Creates an instance of {@link ObjectGenerator} which generates values in order they are specified. When values
      * are depleted, it starts again from the beginning of the list.
      *
      * @param values List of values.
@@ -238,7 +239,7 @@ public class BuilderMethods {
     }
 
     /**
-     * Creates an instance of {@link ObjectGenerator} which generates values in order they are specified. WHen values
+     * Creates an instance of {@link ObjectGenerator} which generates values in order they are specified. When values
      * are depleted, it starts again from the beginning of the list.
      *
      * @param values List of values.
@@ -247,6 +248,29 @@ public class BuilderMethods {
      */
     public static <T> ObjectGenerator<T> circular(List<T> values) {
         return wrap(new CircularValue<>(unwrap(values)));
+    }
+
+    /**
+     * Creates an instance of {@link ObjectGenerator} which generates list containing all values specified.
+     *
+     * @param values List of values.
+     * @param <T> Type instance of {@link ObjectGenerator} will generate.
+     * @return An instance of {@link ObjectGenerator} which generates list containing all values specified.
+     */
+    @SafeVarargs
+    public static <T> ObjectGenerator<List<T>> list(T... values) {
+        return list(Arrays.asList(values));
+    }
+
+    /**
+     * Creates an instance of {@link ObjectGenerator} which generates list containing all values specified.
+     *
+     * @param values List of values.
+     * @param <T> Type instance of {@link ObjectGenerator} will generate.
+     * @return An instance of {@link ObjectGenerator} which generates list containing all values specified.
+     */
+    public static <T> ObjectGenerator<List<T>> list(List<T> values) {
+        return wrap(new ListValue<>(unwrap(values)));
     }
 
     /**

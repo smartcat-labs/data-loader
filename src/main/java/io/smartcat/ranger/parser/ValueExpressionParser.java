@@ -15,6 +15,7 @@ import io.smartcat.ranger.core.DiscreteValue;
 import io.smartcat.ranger.core.ExactWeightedValue;
 import io.smartcat.ranger.core.ExactWeightedValue.CountValuePair;
 import io.smartcat.ranger.core.JsonTransformer;
+import io.smartcat.ranger.core.ListValue;
 import io.smartcat.ranger.core.NowDateValue;
 import io.smartcat.ranger.core.NowLocalDateTimeValue;
 import io.smartcat.ranger.core.NowLocalDateValue;
@@ -578,6 +579,16 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * List value definition.
+     *
+     * @return List value definition rule.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Rule listValue() {
+        return Sequence(function("list", bracketList(value())), push(new ListValue((List) pop())));
+    }
+
+    /**
      * Weighted value pair definition.
      *
      * @return Weighted value pair definition rule.
@@ -673,7 +684,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Generator definition rule.
      */
     public Rule generator() {
-        return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue(), circularRangeValue(),
+        return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue(), circularRangeValue(), listValue(),
                 weightedValue(), exactWeightedValue(), randomLengthStringValue(), now(), nowDate(), nowLocalDate(),
                 nowLocalDateTime());
     }

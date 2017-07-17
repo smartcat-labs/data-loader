@@ -650,6 +650,28 @@ output: \$value
         "2.0..-4.5, -1.5" | [2.0, 0.5, -1.0, -2.5, -4.0, 2.0]
     }
 
+    def "should parse list value #expression"() {
+        when:
+        def config = """
+values:
+  value: list(["Ema", circular(["Mike", "Steve", "John"]), "Ned", circular(["Jessica", "Lisa"])])
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+
+        then:
+        dataGenerator.next() == ["Ema", "Mike", "Ned", "Jessica"]
+
+        then:
+        dataGenerator.next() == ["Ema", "Steve", "Ned", "Lisa"]
+
+        then:
+        dataGenerator.next() == ["Ema", "John", "Ned", "Jessica"]
+
+        then:
+        dataGenerator.next() == ["Ema", "Mike", "Ned", "Lisa"]
+    }
+
     def "should parse now"() {
         given:
         def config = """

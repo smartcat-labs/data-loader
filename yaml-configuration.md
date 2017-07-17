@@ -214,6 +214,26 @@ And second would generate:
 1, 2, 3, 4, 5, 6, ..., 363, 364, 365, 1, 2, 3, ...
 ```
 
+## List
+
+Generates list out of specified values.
+
+```yaml
+values:
+  names: list(["Ema", circular(["Mike", "Steve", "John"]), "Ned", circular(["Jessica", "Lisa"])])
+```
+
+This would create `ObjectGenerator` which will generate following sequence:
+```
+["Ema", "Mike", "Ned", "Jessica"]
+["Ema", "Steve", "Ned", "Lisa"]
+["Ema", "John", "Ned", "Jessica"]
+["Ema", "Mike", "Ned", "Lisa"]
+.
+.
+.
+```
+
 ## Weighted distribution
 
 Generates values with probability based on their weights.
