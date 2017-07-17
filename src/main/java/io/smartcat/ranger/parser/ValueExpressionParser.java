@@ -303,7 +303,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Naked string definition rule.
      */
     public Rule nakedStringLiteral() {
-        return Sequence(ZeroOrMore(TestNot(AnyOf("\r\n\"'\\")), ANY), push(match()));
+        return Sequence(TestNot(AnyOf("\r\n\"'\\")), ZeroOrMore(ANY), push(match()));
     }
 
     /**

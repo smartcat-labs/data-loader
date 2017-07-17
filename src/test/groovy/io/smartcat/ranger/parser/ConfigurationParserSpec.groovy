@@ -80,16 +80,18 @@ output: \$name
         dataGenerator.next() == parsedValue
 
         where:
-        value        | parsedValue | text
-        "'value 1'"  | "value 1"   | "single quoted"
-        '"value 1"'  | "value 1"   | "double quoted"
-        "value 1"    | "value 1"   | "naked"
-        "'value 1 '" | "value 1 "  | "single quoted with trailing space"
-        '"value 1 "' | "value 1 "  | "double quoted with trailing space"
-        "value 1 "   | "value 1"   | "naked with trailing space"
-        "' value 1'" | " value 1"  | "single quoted with leading space"
-        '" value 1"' | " value 1"  | "double quoted with leading space"
-        " value 1"   | "value 1"   | "naked with leading space"
+        value           | parsedValue    | text
+        "'value 1'"     | "value 1"      | "single quoted"
+        '"value 1"'     | "value 1"      | "double quoted"
+        "value 1"       | "value 1"      | "naked"
+        "'value 1 '"    | "value 1 "     | "single quoted with trailing space"
+        '"value 1 "'    | "value 1 "     | "double quoted with trailing space"
+        "value 1 "      | "value 1"      | "naked with trailing space"
+        "' value 1'"    | " value 1"     | "single quoted with leading space"
+        '" value 1"'    | " value 1"     | "double quoted with leading space"
+        " value 1"      | "value 1"      | "naked with leading space"
+        " val 1 'a ' x" | "val 1 'a ' x" | "naked with nested single quote"
+        ' val 1 "a " x' | 'val 1 "a " x' | "naked with nested double quote"
     }
 
     @Unroll
