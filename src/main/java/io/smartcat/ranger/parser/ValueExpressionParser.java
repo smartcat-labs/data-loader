@@ -144,7 +144,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Letter definition rule.
      */
     public Rule letter() {
-        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'));
+        return FirstOf('_', CharRange('a', 'z'), CharRange('A', 'Z'));
     }
 
     /**

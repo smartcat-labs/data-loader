@@ -31,6 +31,20 @@ output: $name
         e.cause instanceof InvalidReferenceNameException
     }
 
+    def "should be able to define reference with underscore"() {
+        given:
+        def config = '''
+values:
+  some_value1: 10
+  _other2_value: $some_value1
+output: $_other2_value
+'''
+        def dataGenerator = buildGenerator(config)
+
+        expect:
+        dataGenerator.next() == 10
+    }
+
     def "should use value from closest visible context for given reference"() {
         given:
         def config = '''
