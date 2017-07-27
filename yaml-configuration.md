@@ -43,16 +43,26 @@ Value can be either [primitive](#value-primitives), [reference](#value-reference
 
 ## Value primitives
 
-Value can be primitive (string, integer, double, boolean and date).
+Value can be of any primitive type (boolean, byte, short, integer, long, float, double, string and date). Following section depicts type usage.
 
 ```yaml
 values:
+  booleanTrueVal1: true
+  booleanTrueVal2: True
+  booleanFalseVal1: false
+  booleanFalseVal2: False
+  byteVal: byte(23)
+  shortVal: short(-832)
+  implicitIntegerVal: 3242
+  explicitIntegerVal: int(3221)
+  implicitLongVal: 332848429842932
+  explicitLongVal: long(323)
+  explicitFloatVal: float(-88.64)
+  implicitDoubleVal: 32.23
+  explicitDoubleVal: double(-0.11)
   stringVal1: some text
   stringVal2: 'some text'
   stringVal3: "some text"
-  integerVal: 23
-  doubleVal: 23.12
-  booleanVal: true
   dateVal: 2017-21-06
 ```
 
@@ -103,7 +113,7 @@ Has two meanings depending on the arguments.
 ### Random with discrete values
 
 Generates random value from list of possible values. Has optional `distribution` which can be set.
-Default `distribution` is `UniformDistribution`.
+Default `distribution` is `UniformDistribution`. Elements of the list can be of any type and it does not need to be same type for all the elements, although it is probably rare use cases that different types within the list will be needed.
 There are two parameter variations:
 
 ```yaml
@@ -128,7 +138,7 @@ There are several parameter variations:
 values:
   age: random(1..100)
   age: random(1..100, false)
-  age: random(1..100, false, uniform())
+  age: random(int(1)..int(100), false, uniform())
 output: $age
 ```
 
@@ -141,7 +151,7 @@ If `useEdgeCases` is set to true, first value from sequence will be one set for 
 
 ```yaml
 values:
-  age: random(1..100, true)
+  age: random(short(1)..short(100), true)
 output: $age
 ```
 
@@ -169,8 +179,8 @@ And `normal(mean, standardDeviation, lowerBound, upperBound)`.
 ```yaml
 values:
   age:
-    age1: random(1..100, true, normal())
-    age2: random(1..100, false, normal(0, 1, -4, 4))
+    age1: random(byte(1)..byte(100), true, normal())
+    age2: random(double(1)..double(100), false, normal(0, 1, -4, 4))
 output: $age
 ```
 
@@ -200,7 +210,7 @@ Currently supports long and double ranges.
 
 ```yaml
 values:
-  temperature: circular(12.0..25.0), 0.2)
+  temperature: circular(float(12.0)..float(25.0), float(0.2))
   dayOfYear: circular(1..365, 1)
 ```
 

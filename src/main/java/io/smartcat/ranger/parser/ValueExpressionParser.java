@@ -8,8 +8,7 @@ import java.util.Map;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 
-import io.smartcat.ranger.core.CircularRangeValueDouble;
-import io.smartcat.ranger.core.CircularRangeValueLong;
+import io.smartcat.ranger.core.CircularRangeValueFactory;
 import io.smartcat.ranger.core.CircularValue;
 import io.smartcat.ranger.core.DiscreteValue;
 import io.smartcat.ranger.core.ExactWeightedValue;
@@ -24,7 +23,8 @@ import io.smartcat.ranger.core.NullValue;
 import io.smartcat.ranger.core.PrimitiveValue;
 import io.smartcat.ranger.core.RandomLengthStringValue;
 import io.smartcat.ranger.core.Range;
-import io.smartcat.ranger.core.RangeValueDouble;
+import io.smartcat.ranger.core.RangeValue;
+import io.smartcat.ranger.core.RangeValueFactory;
 import io.smartcat.ranger.core.RangeValueLong;
 import io.smartcat.ranger.core.StringTransformer;
 import io.smartcat.ranger.core.TimeFormatTransformer;
@@ -46,6 +46,16 @@ public class ValueExpressionParser extends BaseParser<Object> {
 
     private final Map<String, ValueProxy<?>> proxyValues;
 
+    /**
+     * Range value factory.
+     */
+    protected final RangeValueFactory rangeValueFactory;
+
+    /**
+     * Circular range value factory.
+     */
+    protected final CircularRangeValueFactory circularRangeValueFactory;
+
     private String parentName;
 
     /**
@@ -55,6 +65,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public ValueExpressionParser(Map<String, ValueProxy<?>> proxyValues) {
         this.proxyValues = proxyValues;
+        this.rangeValueFactory = new RangeValueFactory();
+        this.circularRangeValueFactory = new CircularRangeValueFactory();
     }
 
     /**
@@ -202,12 +214,71 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Byte definition.
+     *
+     * @return Byte definition rule.
+     */
+    public Rule explicitByteLiteral() {
+        return Sequence(function("byte", Sequence(Sequence(Optional(sign()), unsignedIntegerLiteral()), push(match()))),
+                push(Byte.parseByte((String) pop())));
+    }
+
+    /**
+     * Short definition.
+     *
+     * @return Short definition rule.
+     */
+    public Rule explicitShortLiteral() {
+        return Sequence(
+                function("short", Sequence(Sequence(Optional(sign()), unsignedIntegerLiteral()), push(match()))),
+                push(Short.parseShort((String) pop())));
+    }
+
+    /**
+     * Implicit integer definition.
+     *
+     * @return Implicit integer definition rule.
+     */
+    public Rule implicitIntegerLiteral() {
+        return Sequence(Sequence(Optional(sign()), unsignedIntegerLiteral()), ACTION(tryParseInt()));
+    }
+
+    /**
+     * Explicit integer definition.
+     *
+     * @return Explicit integer definition rule.
+     */
+    public Rule explicitIntegerLiteral() {
+        return Sequence(function("int", Sequence(Sequence(Optional(sign()), unsignedIntegerLiteral()), push(match()))),
+                push(Integer.parseInt((String) pop())));
+    }
+
+    /**
      * Integer definition.
      *
      * @return Integer definition rule.
      */
-    public Rule intLiteral() {
-        return Sequence(Sequence(Optional(sign()), unsignedIntegerLiteral()), push(Integer.parseInt(match())));
+    public Rule integerLiteral() {
+        return FirstOf(explicitIntegerLiteral(), implicitIntegerLiteral());
+    }
+
+    /**
+     * Implicit integer definition.
+     *
+     * @return Implicit integer definition rule.
+     */
+    public Rule implicitLongLiteral() {
+        return Sequence(Sequence(Optional(sign()), unsignedIntegerLiteral()), push(Long.parseLong(match())));
+    }
+
+    /**
+     * Explicit integer definition.
+     *
+     * @return Explicit integer definition rule.
+     */
+    public Rule explicitLongLiteral() {
+        return Sequence(function("long", Sequence(Sequence(Optional(sign()), unsignedIntegerLiteral()), push(match()))),
+                push(Long.parseLong((String) pop())));
     }
 
     /**
@@ -216,24 +287,33 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Long definition rule.
      */
     public Rule longLiteral() {
-        return Sequence(Sequence(Optional(sign()), unsignedIntegerLiteral()), push(Long.parseLong(match())));
+        return FirstOf(explicitLongLiteral(), implicitLongLiteral());
     }
 
     /**
-     * Long value definition.
+     * Float definition.
      *
-     * @return Long value definition rule.
+     * @return Float definition rule.
      */
-    public Rule longLiteralValue() {
-        return Sequence(longLiteral(), push(PrimitiveValue.of(pop())));
+    public Rule explicitFloatLiteral() {
+        return Sequence(
+                function("float",
+                        Sequence(
+                                Sequence(Optional(sign()),
+                                        FirstOf(Sequence(unsignedIntegerLiteral(), '.', unsignedIntegerLiteral(),
+                                                Optional(exponent())),
+                                                Sequence('.', unsignedIntegerLiteral(), Optional(exponent())),
+                                                Sequence(unsignedIntegerLiteral(), Optional(exponent())))),
+                                push(match()))),
+                push(Float.parseFloat((String) pop())));
     }
 
     /**
-     * Double definition.
+     * Implicit double definition.
      *
-     * @return Double definition rule.
+     * @return Implicit double definition rule.
      */
-    public Rule doubleLiteral() {
+    public Rule implicitDoubleLiteral() {
         return Sequence(
                 Sequence(Optional(sign()),
                         FirstOf(Sequence(unsignedIntegerLiteral(), '.', unsignedIntegerLiteral(), Optional(exponent())),
@@ -242,21 +322,50 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Explicit double definition.
+     *
+     * @return Explicit double definition rule.
+     */
+    public Rule explicitDoubleLiteral() {
+        return Sequence(
+                function("double",
+                        Sequence(
+                                Sequence(Optional(sign()),
+                                        FirstOf(Sequence(unsignedIntegerLiteral(), '.', unsignedIntegerLiteral(),
+                                                Optional(exponent())),
+                                                Sequence('.', unsignedIntegerLiteral(), Optional(exponent())),
+                                                Sequence(unsignedIntegerLiteral(), Optional(exponent())))),
+                                push(match()))),
+                push(Double.parseDouble((String) pop())));
+    }
+
+    /**
+     * Double definition.
+     *
+     * @return Double definition rule.
+     */
+    public Rule doubleLiteral() {
+        return FirstOf(explicitDoubleLiteral(), implicitDoubleLiteral());
+    }
+
+    /**
      * Number definition.
      *
      * @return Number definition rule.
      */
     public Rule numberLiteral() {
-        return Sequence(FirstOf(doubleLiteral(), longLiteral()), push(((Number) pop()).doubleValue()));
+        return FirstOf(explicitByteLiteral(), explicitShortLiteral(), explicitIntegerLiteral(), explicitLongLiteral(),
+                explicitFloatLiteral(), explicitDoubleLiteral(), implicitDoubleLiteral(), implicitIntegerLiteral(),
+                implicitLongLiteral());
     }
 
     /**
-     * Double value definition.
+     * Number value definition.
      *
-     * @return Double value definition rule.
+     * @return Number value definition rule.
      */
-    public Rule doubleLiteralValue() {
-        return Sequence(doubleLiteral(), push(PrimitiveValue.of(pop())));
+    public Rule numberLiteralValue() {
+        return Sequence(numberLiteral(), push(PrimitiveValue.of(pop())));
     }
 
     /**
@@ -341,8 +450,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Literal definition rule.
      */
     public Rule literalValue() {
-        return FirstOf(nullValue(), doubleLiteralValue(), longLiteralValue(), booleanLiteralValue(),
-                stringLiteralValue());
+        return FirstOf(nullValue(), numberLiteralValue(), booleanLiteralValue(), stringLiteralValue());
     }
 
     /**
@@ -364,24 +472,13 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
-     * Long range definition.
+     * Number range definition.
      *
-     * @return Long range definition rule.
+     * @return Number range definition rule.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Rule longRange() {
-        return Sequence(Sequence(longLiteral(), "..", longLiteral()), push(new Range((Long) pop(1), (Long) pop())));
-    }
-
-    /**
-     * Double range definition.
-     *
-     * @return Double range definition rule.
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Rule doubleRange() {
+    public Rule numberRange() {
         return Sequence(Sequence(numberLiteral(), "..", numberLiteral()),
-                push(new Range(((Number) pop(1)).doubleValue(), ((Number) pop()).doubleValue())));
+                push(createNumberRange((Number) pop(1), (Number) pop())));
     }
 
     /**
@@ -495,37 +592,16 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
-     * Double range value definition.
-     *
-     * @return Double range value definition rule.
-     */
-    public Rule rangeValueDouble() {
-        return Sequence(
-                function("random",
-                        Sequence(doubleRange(),
-                                Optional(comma(), booleanLiteral(), Optional(comma(), distribution())))),
-                push(createRangeValueDouble()));
-    }
-
-    /**
      * Long range value definition.
      *
      * @return Long range value definition rule.
      */
-    public Rule rangeValueLong() {
+    public Rule rangeValue() {
         return Sequence(
                 function("random",
-                        Sequence(longRange(), Optional(comma(), booleanLiteral(), Optional(comma(), distribution())))),
-                push(createRangeValueLong()));
-    }
-
-    /**
-     * Range value definition.
-     *
-     * @return Range value definition rule.
-     */
-    public Rule rangeValue() {
-        return FirstOf(rangeValueLong(), rangeValueDouble());
+                        Sequence(numberRange(),
+                                Optional(comma(), booleanLiteral(), Optional(comma(), distribution())))),
+                push(createRangeValue()));
     }
 
     /**
@@ -548,34 +624,14 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
-     * Circular long range value definition.
-     *
-     * @return Circular long range value definition rule.
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Rule circularRangeValueLong() {
-        return Sequence(function("circular", Sequence(longRange(), comma(), longLiteral())),
-                push(new CircularRangeValueLong((Range) pop(1), (Long) pop())));
-    }
-
-    /**
-     * Circular double range value definition.
-     *
-     * @return Circular double range value definition rule.
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Rule circularRangeValueDouble() {
-        return Sequence(function("circular", Sequence(doubleRange(), comma(), doubleLiteral())),
-                push(new CircularRangeValueDouble((Range) pop(1), (Double) pop())));
-    }
-
-    /**
      * Circular range value definition.
      *
      * @return Circular range value definition rule.
      */
+    @SuppressWarnings({ "rawtypes" })
     public Rule circularRangeValue() {
-        return FirstOf(circularRangeValueLong(), circularRangeValueDouble());
+        return Sequence(function("circular", Sequence(numberRange(), comma(), numberLiteral())),
+                push(circularRangeValueFactory.create((Range) pop(1), (Number) pop())));
     }
 
     /**
@@ -596,7 +652,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Rule weightedValuePair() {
         return Sequence(function(Sequence(value(), comma(), numberLiteral())),
-                push(new WeightedValuePair((Value) pop(1), (double) pop())));
+                push(new WeightedValuePair((Value) pop(1), ((Number) pop()).doubleValue())));
     }
 
     /**
@@ -638,7 +694,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule randomLengthStringValue() {
         return Sequence(
-                function("randomLengthString", Sequence(intLiteral(), Optional(comma(), bracketList(charRange())))),
+                function("randomLengthString", Sequence(integerLiteral(), Optional(comma(), bracketList(charRange())))),
                 push(createRandomLengthStringValue()));
     }
 
@@ -738,13 +794,30 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * Tries to parse matched string to Integer.
+     *
+     * @return True if matched string is parsed to Integer, otherwise false.
+     */
+    protected boolean tryParseInt() {
+        String match = match();
+        Integer i = null;
+        try {
+            i = Integer.parseInt(match);
+            push(i);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
      * Creates normal distribution.
      *
      * @return Instance of {@link NormalDistribution}.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected NormalDistribution createNormalDistribution() {
-        List<Double> args = (List) pop();
+        List<Number> args = (List) pop();
         if (args.isEmpty()) {
             return new NormalDistribution();
         }
@@ -752,7 +825,8 @@ public class ValueExpressionParser extends BaseParser<Object> {
             throw new RuntimeException("Normal distribution must have following parameters:"
                     + " mean, standard deviation, lower bound and upper bound.");
         }
-        return new NormalDistribution(args.get(0), args.get(1), args.get(2), args.get(3));
+        return new NormalDistribution(args.get(0).doubleValue(), args.get(1).doubleValue(), args.get(2).doubleValue(),
+                args.get(3).doubleValue());
     }
 
     /**
@@ -767,16 +841,32 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
-     * Creates double range value.
+     * Creates appropriate number range depending on number types.
      *
-     * @return Instance of {@link RangeValueDouble}.
+     * @param beginning Beginning of the range.
+     * @param end End of the range.
+     * @return An instance of {@link Range}.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected RangeValueDouble createRangeValueDouble() {
-        return peek() instanceof Distribution
-                ? new RangeValueDouble((Range) pop(2), (Boolean) pop(1), (Distribution) pop())
-                : peek() instanceof Boolean ? new RangeValueDouble((Range) pop(1), (Boolean) pop())
-                        : new RangeValueDouble((Range) pop());
+    protected Range<?> createNumberRange(Number beginning, Number end) {
+        if (beginning instanceof Double || end instanceof Double) {
+            return new Range<Double>(beginning.doubleValue(), end.doubleValue());
+        }
+        if (beginning instanceof Float || end instanceof Float) {
+            return new Range<Float>(beginning.floatValue(), end.floatValue());
+        }
+        if (beginning instanceof Long || end instanceof Long) {
+            return new Range<Long>(beginning.longValue(), end.longValue());
+        }
+        if (beginning instanceof Integer || end instanceof Integer) {
+            return new Range<Integer>(beginning.intValue(), end.intValue());
+        }
+        if (beginning instanceof Short || end instanceof Short) {
+            return new Range<Short>(beginning.shortValue(), end.shortValue());
+        }
+        if (beginning instanceof Byte || end instanceof Byte) {
+            return new Range<Byte>(beginning.byteValue(), end.byteValue());
+        }
+        throw new RuntimeException("Unsupported number type: " + beginning.getClass().getName());
     }
 
     /**
@@ -784,12 +874,12 @@ public class ValueExpressionParser extends BaseParser<Object> {
      *
      * @return Instance of {@link RangeValueLong}.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected RangeValueLong createRangeValueLong() {
-        return peek() instanceof Distribution
-                ? new RangeValueLong((Range) pop(2), (Boolean) pop(1), (Distribution) pop())
-                : peek() instanceof Boolean ? new RangeValueLong((Range) pop(1), (Boolean) pop())
-                        : new RangeValueLong((Range) pop());
+    @SuppressWarnings({ "rawtypes" })
+    protected RangeValue createRangeValue() {
+        Distribution dist = peek() instanceof Distribution ? (Distribution) pop() : null;
+        Boolean useEdgeCases = peek() instanceof Boolean ? (Boolean) pop() : null;
+        Range range = (Range) pop();
+        return rangeValueFactory.create(range, useEdgeCases, dist);
     }
 
     /**

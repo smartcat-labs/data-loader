@@ -37,7 +37,7 @@ public abstract class RangeValue<T extends Comparable<T>> extends Value<T> {
      * @param range Range.
      */
     public RangeValue(Range<T> range) {
-        this(range, true);
+        this(range, defaultUseEdgeCases());
     }
 
     /**
@@ -48,7 +48,7 @@ public abstract class RangeValue<T extends Comparable<T>> extends Value<T> {
      * @param useEdgeCases Indicates whether to create edge cases as first two values or not.
      */
     public RangeValue(Range<T> range, boolean useEdgeCases) {
-        this(range, useEdgeCases, new UniformDistribution());
+        this(range, useEdgeCases, defaultDistrbution());
     }
 
     /**
@@ -73,5 +73,23 @@ public abstract class RangeValue<T extends Comparable<T>> extends Value<T> {
         this.end = range.getEnd();
         this.useEdgeCases = useEdgeCases;
         this.distribution = distribution;
+    }
+
+    /**
+     * Default value for <code>useEdgeCases</code> property.
+     *
+     * @return Default value for <code>useEdgeCases</code> property.
+     */
+    public static boolean defaultUseEdgeCases() {
+        return false;
+    }
+
+    /**
+     * Default value for <code>distribution</code> property.
+     *
+     * @return Default value for <code>distribution</code> property.
+     */
+    public static Distribution defaultDistrbution() {
+        return new UniformDistribution();
     }
 }

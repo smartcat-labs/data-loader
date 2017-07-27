@@ -7,9 +7,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import io.smartcat.ranger.core.CircularRangeValueByte;
 import io.smartcat.ranger.core.CircularRangeValueDouble;
+import io.smartcat.ranger.core.CircularRangeValueFloat;
 import io.smartcat.ranger.core.CircularRangeValueInt;
 import io.smartcat.ranger.core.CircularRangeValueLong;
+import io.smartcat.ranger.core.CircularRangeValueShort;
 import io.smartcat.ranger.core.CircularValue;
 import io.smartcat.ranger.core.DiscreteValue;
 import io.smartcat.ranger.core.ExactWeightedValue;
@@ -22,12 +25,16 @@ import io.smartcat.ranger.core.NowLocalDateValue;
 import io.smartcat.ranger.core.NowValue;
 import io.smartcat.ranger.core.PrimitiveValue;
 import io.smartcat.ranger.core.RandomLengthStringValue;
+import io.smartcat.ranger.core.RangeValue;
+import io.smartcat.ranger.core.RangeValueByte;
 import io.smartcat.ranger.core.RangeValueDate;
 import io.smartcat.ranger.core.RangeValueDouble;
+import io.smartcat.ranger.core.RangeValueFloat;
 import io.smartcat.ranger.core.RangeValueInt;
 import io.smartcat.ranger.core.RangeValueLocalDate;
 import io.smartcat.ranger.core.RangeValueLocalDateTime;
 import io.smartcat.ranger.core.RangeValueLong;
+import io.smartcat.ranger.core.RangeValueShort;
 import io.smartcat.ranger.core.StringTransformer;
 import io.smartcat.ranger.core.TimeFormatTransformer;
 import io.smartcat.ranger.core.UUIDValue;
@@ -35,7 +42,6 @@ import io.smartcat.ranger.core.Value;
 import io.smartcat.ranger.core.WeightedValue;
 import io.smartcat.ranger.core.WeightedValue.WeightedValuePair;
 import io.smartcat.ranger.distribution.Distribution;
-import io.smartcat.ranger.distribution.UniformDistribution;
 
 /**
  * Set of helper methods to use with {@link ObjectGeneratorBuilder}.
@@ -142,7 +148,7 @@ public class BuilderMethods {
      *         range.
      */
     public static <T> ObjectGenerator<T> random(Range<T> range) {
-        return random(range, true);
+        return random(range, RangeValue.defaultUseEdgeCases());
     }
 
     /**
@@ -156,7 +162,7 @@ public class BuilderMethods {
      *         range.
      */
     public static <T> ObjectGenerator<T> random(Range<T> range, boolean useEdgeCases) {
-        return random(range, useEdgeCases, new UniformDistribution());
+        return random(range, useEdgeCases, RangeValue.defaultDistrbution());
     }
 
     /**
@@ -186,11 +192,20 @@ public class BuilderMethods {
             return (ObjectGenerator<T>) wrap(new RangeValueLocalDateTime((LocalDateTime) range.beginning,
                     (LocalDateTime) range.end, useEdgeCases, distribution));
         }
-        if (range.beginning instanceof Long) {
-            return (ObjectGenerator<T>) wrap(new RangeValueLong(toRange(range), useEdgeCases, distribution));
+        if (range.beginning instanceof Byte) {
+            return (ObjectGenerator<T>) wrap(new RangeValueByte(toRange(range), useEdgeCases, distribution));
+        }
+        if (range.beginning instanceof Short) {
+            return (ObjectGenerator<T>) wrap(new RangeValueShort(toRange(range), useEdgeCases, distribution));
         }
         if (range.beginning instanceof Integer) {
             return (ObjectGenerator<T>) wrap(new RangeValueInt(toRange(range), useEdgeCases, distribution));
+        }
+        if (range.beginning instanceof Long) {
+            return (ObjectGenerator<T>) wrap(new RangeValueLong(toRange(range), useEdgeCases, distribution));
+        }
+        if (range.beginning instanceof Float) {
+            return (ObjectGenerator<T>) wrap(new RangeValueFloat(toRange(range), useEdgeCases, distribution));
         }
         if (range.beginning instanceof Double) {
             return (ObjectGenerator<T>) wrap(new RangeValueDouble(toRange(range), useEdgeCases, distribution));
@@ -213,11 +228,20 @@ public class BuilderMethods {
      */
     @SuppressWarnings("unchecked")
     public static <T> ObjectGenerator<T> circular(Range<T> range, T step) {
-        if (range.beginning instanceof Long) {
-            return (ObjectGenerator<T>) wrap(new CircularRangeValueLong(toRange(range), (Long) step));
+        if (range.beginning instanceof Byte) {
+            return (ObjectGenerator<T>) wrap(new CircularRangeValueByte(toRange(range), (Byte) step));
+        }
+        if (range.beginning instanceof Short) {
+            return (ObjectGenerator<T>) wrap(new CircularRangeValueShort(toRange(range), (Short) step));
         }
         if (range.beginning instanceof Integer) {
             return (ObjectGenerator<T>) wrap(new CircularRangeValueInt(toRange(range), (Integer) step));
+        }
+        if (range.beginning instanceof Long) {
+            return (ObjectGenerator<T>) wrap(new CircularRangeValueLong(toRange(range), (Long) step));
+        }
+        if (range.beginning instanceof Float) {
+            return (ObjectGenerator<T>) wrap(new CircularRangeValueFloat(toRange(range), (Float) step));
         }
         if (range.beginning instanceof Double) {
             return (ObjectGenerator<T>) wrap(new CircularRangeValueDouble(toRange(range), (Double) step));

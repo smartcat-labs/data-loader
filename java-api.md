@@ -25,6 +25,7 @@ This will result in generator always generating value 4.
 
 # Builder methods
 
+Almost all methods support all Java primitive number types (byte, short, int, long, float, double), there is no need for limiting only on int, long or double types if other types are more suitable in particular case.
 Below is given a list of helper methods for construction of `ObjectGenerator`. Methods are provided by `BuilderMethods` class.
 
 ## Random

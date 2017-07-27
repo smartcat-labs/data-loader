@@ -11,6 +11,7 @@ import io.smartcat.ranger.core.ExactWeightedValue.ExactWeightedValueDepletedExce
 import io.smartcat.ranger.distribution.NormalDistribution
 import io.smartcat.ranger.distribution.UniformDistribution
 import io.smartcat.ranger.util.YamlUtils
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -109,6 +110,54 @@ output: \$name
     }
 
     @Unroll
+    def "should parse primitive byte #value"() {
+        given:
+        def config = """
+values:
+  name: $value
+output: \$name
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def val = dataGenerator.next()
+
+        then:
+        val instanceof Byte
+        val == parsedValue
+
+        where:
+        value       | parsedValue
+        "byte(12)"  | (byte) 12
+        "byte(+5)"  | (byte) 5
+        "byte(-35)" | (byte) -35
+    }
+
+    @Unroll
+    def "should parse primitive short #value"() {
+        given:
+        def config = """
+values:
+  name: $value
+output: \$name
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def val = dataGenerator.next()
+
+        then:
+        val instanceof Short
+        val == parsedValue
+
+        where:
+        value         | parsedValue
+        "short(132)"  | (short) 132
+        "short(+221)" | (short) 221
+        "short(-342)" | (short) -342
+    }
+
+    @Unroll
     def "should parse primitive integer #value"() {
         given:
         def config = """
@@ -118,14 +167,21 @@ output: \$age
 """
         def dataGenerator = buildGenerator(config)
 
-        expect:
-        dataGenerator.next() == parsedValue
+        when:
+        def val = dataGenerator.next()
+
+        then:
+        val instanceof Integer
+        val == parsedValue
 
         where:
-        value    | parsedValue
-        "21465"  | 21465
-        "+84982" | 84982
-        "-72310" | -72310
+        value        | parsedValue
+        "21465"      | 21465
+        "+84982"     | 84982
+        "-72310"     | -72310
+        "int(33322)" | 33322
+        "int(+8484)" | 8484
+        "int( -433)" | -433
     }
 
     @Unroll
@@ -138,14 +194,85 @@ output: \$age
 """
         def dataGenerator = buildGenerator(config)
 
-        expect:
-        dataGenerator.next() == parsedValue
+        when:
+        def val = dataGenerator.next()
+
+        then:
+        val instanceof Long
+        val == parsedValue
 
         where:
         value          | parsedValue
         "21474836590"  | 21474836590
         "+21474836590" | 21474836590
         "-21474836590" | -21474836590
+        "long(2332)"   | 2332
+        "long(+32)"    | 32
+        "long(-878)"   | -878
+    }
+
+    @Unroll
+    def "should parse primitive float #value"() {
+        given:
+        def config = """
+values:
+  age: $value
+output: \$age
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def val = dataGenerator.next()
+
+        then:
+        val instanceof Float
+        val == parsedValue
+
+        where:
+        value                | parsedValue
+        "float(323)"         | 323f
+        "float(.12345)"      | 0.12345f
+        "float(.6789e9)"     | 0.6789E9f
+        "float(.6789e+3)"    | 0.6789E3f
+        "float(.6789e-4)"    | 0.6789E-4f
+        "float(.6789E7)"     | 0.6789E7f
+        "float(.6789E+2)"    | 0.6789E2f
+        "float(.6789E-5)"    | 0.6789E-5f
+        "float(+.12345)"     | 0.12345f
+        "float(+.6789e6)"    | 0.6789E6f
+        "float(+.6789e+4)"   | 0.6789E4f
+        "float(+.6789e-3)"   | 0.6789E-3f
+        "float(+.6789E5)"    | 0.6789E5f
+        "float(+.6789E+2)"   | 0.6789E2f
+        "float(+.6789E-7)"   | 0.6789E-7f
+        "float(-.12345)"     | -0.12345f
+        "float(-.6789e4)"    | -0.6789E4f
+        "float(-.6789e+2)"   | -0.6789E2f
+        "float(-.6789e-3)"   | -0.6789E-3f
+        "float(-.6789E3)"    | -0.6789E3f
+        "float(-.6789E+5)"   | -0.6789E5f
+        "float(-.6789E-8)"   | -0.6789E-8f
+        "float(54.6789)"     | 54.6789f
+        "float(54.6789e5)"   | 54.6789E5f
+        "float(54.6789e+6)"  | 54.6789E6f
+        "float(54.6789e-7)"  | 54.6789E-7f
+        "float(54.6789E8)"   | 54.6789E8f
+        "float(54.6789E+2)"  | 54.6789E2f
+        "float(54.6789E-5)"  | 54.6789E-5f
+        "float(+54.6789)"    | 54.6789f
+        "float(+54.6789e3)"  | 54.6789E3f
+        "float(+54.6789e+6)" | 54.6789E6f
+        "float(+54.6789e-8)" | 54.6789E-8f
+        "float(+54.6789E5)"  | 54.6789E5f
+        "float(+54.6789E+3)" | 54.6789E3f
+        "float(+54.6789E-8)" | 54.6789E-8f
+        "float(-54.6789)"    | -54.6789f
+        "float(-54.6789e4)"  | -54.6789E4f
+        "float(-54.6789e+5)" | -54.6789E+5f
+        "float(-54.6789e-7)" | -54.6789E-7f
+        "float(-54.6789E2)"  | -54.6789E2f
+        "float(-54.6789E+3)" | -54.6789E3f
+        "float(-54.6789E-6)" | -54.6789E-6f
     }
 
     @Unroll
@@ -162,49 +289,53 @@ output: \$age
         dataGenerator.next() == parsedValue
 
         where:
-        value         | parsedValue
-        ".12345"      | 0.12345
-        ".6789e9"     | 0.6789E9
-        ".6789e+3"    | 0.6789E3
-        ".6789e-4"    | 0.6789E-4
-        ".6789E7"     | 0.6789E7
-        ".6789E+2"    | 0.6789E2
-        ".6789E-5"    | 0.6789E-5
-       "+.12345"      | 0.12345
-        "+.6789e6"    | 0.6789E6
-        "+.6789e+4"   | 0.6789E4
-        "+.6789e-3"   | 0.6789E-3
-        "+.6789E5"    | 0.6789E5
-        "+.6789E+2"   | 0.6789E2
-        "+.6789E-7"   | 0.6789E-7
-        "-.12345"     | -0.12345
-        "-.6789e4"    | -0.6789E4
-        "-.6789e+2"   | -0.6789E2
-        "-.6789e-3"   | -0.6789E-3
-        "-.6789E3"    | -0.6789E3
-        "-.6789E+5"   | -0.6789E5
-        "-.6789E-8"   | -0.6789E-8
-        "54.6789"     | 54.6789
-        "54.6789e5"   | 54.6789E5
-        "54.6789e+6"  | 54.6789E6
-        "54.6789e-7"  | 54.6789E-7
-        "54.6789E8"   | 54.6789E8
-        "54.6789E+2"  | 54.6789E2
-        "54.6789E-5"  | 54.6789E-5
-        "+54.6789"    | 54.6789
-        "+54.6789e3"  | 54.6789E3
-        "+54.6789e+6" | 54.6789E6
-        "+54.6789e-8" | 54.6789E-8
-        "+54.6789E5"  | 54.6789E5
-        "+54.6789E+3" | 54.6789E3
-        "+54.6789E-8" | 54.6789E-8
-        "-54.6789"    | -54.6789
-        "-54.6789e4"  | -54.6789E4
-        "-54.6789e+5" | -54.6789E+5
-        "-54.6789e-7" | -54.6789E-7
-        "-54.6789E2"  | -54.6789E2
-        "-54.6789E+3" | -54.6789E3
-        "-54.6789E-6" | -54.6789E-6
+        value            | parsedValue
+        ".12345"         | 0.12345
+        ".6789e9"        | 0.6789E9
+        ".6789e+3"       | 0.6789E3
+        ".6789e-4"       | 0.6789E-4
+        ".6789E7"        | 0.6789E7
+        ".6789E+2"       | 0.6789E2
+        ".6789E-5"       | 0.6789E-5
+        "+.12345"        | 0.12345
+        "+.6789e6"       | 0.6789E6
+        "+.6789e+4"      | 0.6789E4
+        "+.6789e-3"      | 0.6789E-3
+        "+.6789E5"       | 0.6789E5
+        "+.6789E+2"      | 0.6789E2
+        "+.6789E-7"      | 0.6789E-7
+        "-.12345"        | -0.12345
+        "-.6789e4"       | -0.6789E4
+        "-.6789e+2"      | -0.6789E2
+        "-.6789e-3"      | -0.6789E-3
+        "-.6789E3"       | -0.6789E3
+        "-.6789E+5"      | -0.6789E5
+        "-.6789E-8"      | -0.6789E-8
+        "54.6789"        | 54.6789
+        "54.6789e5"      | 54.6789E5
+        "54.6789e+6"     | 54.6789E6
+        "54.6789e-7"     | 54.6789E-7
+        "54.6789E8"      | 54.6789E8
+        "54.6789E+2"     | 54.6789E2
+        "54.6789E-5"     | 54.6789E-5
+        "+54.6789"       | 54.6789
+        "+54.6789e3"     | 54.6789E3
+        "+54.6789e+6"    | 54.6789E6
+        "+54.6789e-8"    | 54.6789E-8
+        "+54.6789E5"     | 54.6789E5
+        "+54.6789E+3"    | 54.6789E3
+        "+54.6789E-8"    | 54.6789E-8
+        "-54.6789"       | -54.6789
+        "-54.6789e4"     | -54.6789E4
+        "-54.6789e+5"    | -54.6789E+5
+        "-54.6789e-7"    | -54.6789E-7
+        "-54.6789E2"     | -54.6789E2
+        "-54.6789E+3"    | -54.6789E3
+        "-54.6789E-6"    | -54.6789E-6
+        "double(23)"     | 23d
+        "double(-.23)"   | -0.23
+        "double(2.3)"    | 2.3
+        "double(+33.21)" | 33.21
     }
 
     def "should parse null value"() {
@@ -221,7 +352,7 @@ output: \$age
     }
 
     @Unroll
-    def "should parse long range #expression value"() {
+    def "should parse byte range #expression value"() {
         given:
         def config = """
 values:
@@ -234,21 +365,82 @@ output: \$age
         def result = dataGenerator.next()
 
         then:
+        result instanceof Byte
         start <= result && result <= end
 
         where:
-        expression      | start | end
-        "-10..-5"       | -10   | -5
-        " -10..-5"      | -10   | -5
-        "   -10..-5   " | -10   | -5
-        "-10..0  "      | -10   | 0
-        "  -10..5"      | -10   | 5
-        "0..10"         | 0     | 10
-        "5..10  "       | 5     | 10
+        expression              | start        | end
+        "byte(-10)..byte(-5)"   | (byte) -10   | (byte) -5
+        " byte( -10)..byte(-5)" | (byte) -10   | (byte) -5
+        "byte(-10)..byte(0)  "  | (byte) -10   | (byte) 0
+        " byte( -10)..byte(5)"  | (byte) -10   | (byte) 5
+        "byte(0)..byte(10)"     | (byte) 0     | (byte) 10
+        "byte(5)..byte(10)  "   | (byte) 5     | (byte) 10
     }
 
     @Unroll
-    def "should parse long range value with useEdgeCases set to true #expression"() {
+    def "should parse short range #expression value"() {
+        given:
+        def config = """
+values:
+  age: random($expression)
+output: \$age
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result instanceof Short
+        start <= result && result <= end
+
+        where:
+        expression                | start         | end
+        "short(-10)..short(-5)"   | (short) -10   | (short) -5
+        " short( -10)..short(-5)" | (short) -10   | (short) -5
+        "short(-10)..short(0)  "  | (short) -10   | (short) 0
+        " short( -10)..short(5)"  | (short) -10   | (short) 5
+        "short(0)..short(10)"     | (short) 0     | (short) 10
+        "short(5)..short(10)  "   | (short) 5     | (short) 10
+    }
+
+    @Unroll
+    def "should parse int range #expression value"() {
+        given:
+        def config = """
+values:
+  age: random($expression)
+output: \$age
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result instanceof Integer
+        start <= result && result <= end
+
+        where:
+        expression            | start | end
+        "-10..-5"             | -10   | -5
+        " -10..-5"            | -10   | -5
+        "   -10..-5   "       | -10   | -5
+        "-10..0  "            | -10   | 0
+        "  -10..5"            | -10   | 5
+        "0..10"               | 0     | 10
+        "5..10  "             | 5     | 10
+        "int(-10)..int(-5)"   | -10   | -5
+        " int( -10)..int(-5)" | -10   | -5
+        "int(-10)..int(0)  "  | -10   | 0
+        " int( -10)..int(5)"  | -10   | 5
+        "int(0)..int(10)"     | 0     | 10
+        "int(5)..int(10)  "   | 5     | 10
+    }
+
+    @Unroll
+    def "should parse int range value with useEdgeCases set to true #expression"() {
         given:
         def config = """
 values:
@@ -282,7 +474,7 @@ output: \$age
     }
 
     @Unroll
-    def "should parse long range value with useEdgeCases set to false #expression"() {
+    def "should parse int range value with useEdgeCases set to false #expression"() {
         given:
         def config = """
 values:
@@ -308,7 +500,7 @@ output: \$age
         "5..10  ,false"         | 5     | 10
     }
 
-    def "should parse long range value with uniform distribution when specified"() {
+    def "should parse int range value with uniform distribution when specified"() {
         given:
         def config = """
 values:
@@ -321,8 +513,8 @@ output: \$age
         then:
         dataGenerator.value.delegate.distribution.class == UniformDistribution
     }
-    
-    def "should parse long range value with default normal distribution when specified"() {
+
+    def "should parse int range value with default normal distribution when specified"() {
         given:
         def config = """
 values:
@@ -335,8 +527,8 @@ output: \$age
         then:
         dataGenerator.value.delegate.distribution.class == NormalDistribution
     }
-    
-    def "should parse long range value with specific normal distribution when specified"() {
+
+    def "should parse int range value with specific normal distribution when specified"() {
         given:
         def config = """
 values:
@@ -351,6 +543,35 @@ output: \$age
         distribution.class == NormalDistribution
         distribution.lower == 0.3
         distribution.upper == 12
+    }
+
+    @Unroll
+    def "should parse long range #expression value"() {
+        given:
+        def config = """
+values:
+  age: random($expression)
+output: \$age
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result instanceof Long
+        start <= result && result <= end
+
+        where:
+        expression              | start             | end
+        "-10432432432454..-5"   | -10432432432454   | -5
+        " -10..565645534534543" | -10               | 565645534534543
+        "long(-10)..long(-5)"   | -10               | -5
+        " long( -10)..long(-5)" | -10               | -5
+        "long(-10)..long(0)  "  | -10               | 0
+        " long( -10)..long(5)"  | -10               | 5
+        "long(0)..long(10)"     | 0                 | 10
+        "long(5)..long(10)  "   | 5                 | 10
     }
 
     @Unroll
@@ -377,6 +598,33 @@ output: \$age
     }
 
     @Unroll
+    def "should parse float range #expression value"() {
+        given:
+        def config = """
+values:
+  age: random($expression)
+output: \$age
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result instanceof Float
+        start <= result && result <= end
+
+        where:
+        expression                  | start    | end
+        "float(-10.3)..float(-5)"   | -10.3f   | -5f
+        " float( -10)..float(-5.1)" | -10f     | -5.1f
+        "float(-10.1)..float(0)  "  | -10.1f   | 0f
+        " float( -10)..float(5.02)" | -10f     | 5.02f
+        "float(0.1)..float(10.11)"  | 0.1f     | 10.11f
+        "float(5.0)..float(10.2)  " | 5.0f     | 10.1f
+    }
+
+    @Unroll
     def "should parse double range #expression value"() {
         given:
         def config = """
@@ -390,17 +638,24 @@ output: \$age
         def result = dataGenerator.next()
 
         then:
+        result instanceof Double
         startNum <= result && result <= endNum
 
         where:
-        expression              | startNum | endNum
-        "-10.332..-.023E-10"    | -10.332  | -0.023E-10
-        "  -10.332..-.023E-10"  | -10.332  | -0.023E-10
-        "-10.332..-.023E-10   " | -10.332  | -0.023E-10
-        "  -10.332..-.023E-10"  | -10.332  | -0.023E-10
-        "-5.2E-10..0"           | -5.2E-10 | 0d
-        "10..10.5"              | 10d      | 10.5
-        ".23..2.12e3"           | 0.23     | 2.12E3
+        expression                    | startNum | endNum
+        "-10.332..-.023E-10"          | -10.332  | -0.023E-10
+        "  -10.332..-.023E-10"        | -10.332  | -0.023E-10
+        "-10.332..-.023E-10   "       | -10.332  | -0.023E-10
+        "  -10.332..-.023E-10"        | -10.332  | -0.023E-10
+        "-5.2E-10..0"                 | -5.2E-10 | 0d
+        "10..10.5"                    | 10d      | 10.5
+        ".23..2.12e3"                 | 0.23     | 2.12E3
+        "double(-10.3)..double(-5)"   | -10.3d   | -5d
+        " double( -10)..double(-5.1)" | -10d     | -5.1d
+        "double(-10.1)..double(0)  "  | -10.1d   | 0d
+        " double( -10)..double(5.02)" | -10d     | 5.02d
+        "double(0.1)..double(10.11)"  | 0.1d     | 10.11d
+        "double(5.0)..double(10.2)  " | 5.0d     | 10.1d
     }
 
     @Unroll
@@ -508,7 +763,7 @@ output: \$age
         distribution.lower == 3.3
         distribution.upper == 4.4
     }
-    
+
     @Unroll
     def "should parse discrete value #expression"() {
         given:
@@ -527,7 +782,7 @@ output: \$value
 
         where:
         expression                 | values
-        "  5,6, 7 ,8 , 9   ,  10"  | [5L, 6L, 7L, 8L, 9L, 10L]
+        "  5,6, 7 ,8 , 9   ,  10"  | [5, 6, 7, 8, 9, 10]
         "5.0, 3.4 , +.12, 0.23   " | [5d, 3.4d, 0.12d, 0.23d]
         """"a", 'b' , 'c' ,"d" """ | ["a", "b", "c", "d"]
     }
@@ -611,13 +866,67 @@ output: \$value
 
         where:
         expression                 | values
-        "  5,6, 7 ,8 , 9   ,  10"  | [5L, 6L, 7L, 8L, 9L, 10L]
+        "  5,6, 7 ,8 , 9   ,  10"  | [5, 6, 7, 8, 9, 10]
         "5.0, 3.4 , +.12, 0.23   " | [5d, 3.4d, 0.12d, 0.23d]
         """"a", 'b' , 'c' ,"d" """ | ["a", "b", "c", "d"]
     }
 
     @Unroll
-    def "should parse circular range value long #expression"() {
+    def "should parse circular range value byte #expression"() {
+        given:
+        def config = """
+values:
+  value: circular($expression)
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+        def result = []
+        def byteValues = []
+        values.each { byteValues << (byte) it }
+
+        when:
+        values.size().times { result << dataGenerator.next() }
+
+        then:
+        result.every { it instanceof Byte }
+        result == byteValues
+
+        where:
+        expression                        | values
+        " byte(3)..byte(12 ) , byte(2 )"  | [3, 5, 7, 9, 11, 3, 5]
+        " byte(1)..byte(-6),byte(-1)"     | [1, 0, -1, -2, -3, -4, -5, -6, 1, 0, -1]
+        " byte(0)..byte(100) , byte(10) " | [0, 10, 20, 30, 40, 50]
+    }
+
+    @Unroll
+    def "should parse circular range value short #expression"() {
+        given:
+        def config = """
+values:
+  value: circular($expression)
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+        def result = []
+        def shortValues = []
+        values.each { shortValues << (short) it }
+
+        when:
+        values.size().times { result << dataGenerator.next() }
+
+        then:
+        result.every { it instanceof Short }
+        result == shortValues
+
+        where:
+        expression                          | values
+        " short(3)..short(12) , short(2)"   | [3, 5, 7, 9, 11, 3, 5]
+        " short(1)..short(-6),short(-1)"    | [1, 0, -1, -2, -3, -4, -5, -6, 1, 0, -1]
+        " short(0)..short(100) , short(10)" | [0, 10, 20, 30, 40, 50]
+    }
+
+    @Unroll
+    def "should parse circular range value int #expression"() {
         given:
         def config = """
 values:
@@ -631,13 +940,73 @@ output: \$value
         values.size().times { result << dataGenerator.next() }
 
         then:
+        result.every { it instanceof Integer }
         result == values
 
         where:
+        expression                    | values
+        " 3..12 , 2"                  | [3, 5, 7, 9, 11, 3, 5]
+        " 1..-6,-1"                   | [1, 0, -1, -2, -3, -4, -5, -6, 1, 0, -1]
+        " 0..100 , 10"                | [0, 10, 20, 30, 40, 50]
+        " int(3)..int(12) , int(2)"   | [3, 5, 7, 9, 11, 3, 5]
+        " int(1)..int(-6),int(-1)"    | [1, 0, -1, -2, -3, -4, -5, -6, 1, 0, -1]
+        " int(0)..int(100) , int(10)" | [0, 10, 20, 30, 40, 50]
+    }
+
+    @Unroll
+    def "should parse circular range value long #expression"() {
+        given:
+        def config = """
+values:
+  value: circular($expression)
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+        def result = []
+        def longValues = []
+        values.each { longValues << (long) it }
+
+        when:
+        values.size().times { result << dataGenerator.next() }
+
+        then:
+        result.every { it instanceof Long }
+        result == longValues
+
+        where:
         expression     | values
-        " 3..12 , 2"   | [3, 5, 7, 9, 11, 3, 5]
-        " 1..-6,-1"    | [1, 0, -1, -2, -3, -4, -5, -6, 1, 0, -1]
-        " 0..100 , 10" | [0, 10, 20, 30, 40, 50]
+        " long(3)..long(12) , long(2)"   | [3, 5, 7, 9, 11, 3, 5]
+        " long(1)..long(-6),long(-1)"    | [1, 0, -1, -2, -3, -4, -5, -6, 1, 0, -1]
+        " long(0)..long(100) , long(10)" | [0, 10, 20, 30, 40, 50]
+    }
+
+    @Unroll
+    def "should parse circular range value float #expression"() {
+        given:
+        def config = """
+values:
+  value: circular($expression)
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+        def result = []
+        def floatValues = []
+        values.each { floatValues << (float) it }
+
+        when:
+        values.size().times { result << dataGenerator.next() }
+
+        then:
+        result.every { it instanceof Float }
+        for (int i = 0; i < floatValues.size(); i++) {
+            Math.abs(floatValues[i] - result[i]) < 0.001
+        }
+
+        where:
+        expression                             | values
+        "float(2.1)..float(2.55), float(0.05)" | [2.1, 2.15, 2.20, 2.25, 2.30, 2.35, 3.40, 2.45, 2.50, 2.55, 2.1]
+        "float(9.5)..float(7), float(-0.5)"    | [9.5, 9.0, 8.5, 8.0, 7.5, 7.0, 9.5]
+        "float(2.0)..float(-4.5), float(-1.5)" | [2.0, 0.5, -1.0, -2.5, -4.0, 2.0]
     }
 
     @Unroll
@@ -655,15 +1024,19 @@ output: \$value
         values.size().times { result << dataGenerator.next() }
 
         then:
+        result.every { it instanceof Double }
         for (int i = 0; i < values.size(); i++) {
             Math.abs(values[i] - result[i]) < 0.00001
         }
 
         where:
-        expression        | values
-        "2.1..2.55, 0.05" | [2.1, 2.15, 2.20, 2.25, 2.30, 2.35, 3.40, 2.45, 2.50, 2.55, 2.1]
-        "9.5..7, -0.5"    | [9.5, 9.0, 8.5, 8.0, 7.5, 7.0, 9.5]
-        "2.0..-4.5, -1.5" | [2.0, 0.5, -1.0, -2.5, -4.0, 2.0]
+        expression                                | values
+        "2.1..2.55, 0.05"                         | [2.1, 2.15, 2.20, 2.25, 2.30, 2.35, 3.40, 2.45, 2.50, 2.55, 2.1]
+        "9.5..7, -0.5"                            | [9.5, 9.0, 8.5, 8.0, 7.5, 7.0, 9.5]
+        "2.0..-4.5, -1.5"                         | [2.0, 0.5, -1.0, -2.5, -4.0, 2.0]
+        "double(2.1)..double(2.55), double(0.05)" | [2.1, 2.15, 2.20, 2.25, 2.30, 2.35, 3.40, 2.45, 2.50, 2.55, 2.1]
+        "double(9.5)..double(7), double(-0.5)"    | [9.5, 9.0, 8.5, 8.0, 7.5, 7.0, 9.5]
+        "double(2.0)..double(-4.5), double(-1.5)" | [2.0, 0.5, -1.0, -2.5, -4.0, 2.0]
     }
 
     def "should parse list value #expression"() {
@@ -778,7 +1151,7 @@ output: \$value
 
         where:
         expression                                       | values
-        " (2,2.5),(7, 10) , (4 ,3.5), (8, 8)"            | [2L, 7L, 4L, 8L]
+        " (2,2.5),(7, 10) , (4 ,3.5), (8, 8)"            | [2, 7, 4, 8]
         "(5.1,5.2), (8.0, 1) ,(3.3, 5), (100.1, 10.2)"   | [5.1d, 8.0d, 3.3d, 100.1d]
         """("a", 2),('b', 3.2) , ("c", 2), ("d", 5.3)""" | ["a", "b", "c", "d"]
     }
@@ -807,7 +1180,7 @@ output: \$value
 
         where:
         expression                                   | values
-        " (2,2),(7, 10) , (4 ,3), (8, 8)"            | [2L:2, 7L:10, 4L:3, 8L:8]
+        " (2,2),(7, 10) , (4 ,3), (8, 8)"            | [2:2, 7:10, 4:3, 8:8]
         "(5.1,5), (8.0, 1) ,(3.3, 5), (100.1, 10)"   | [5.1d:5, 8.0d:1, 3.3d:5, 100.1d:10]
         """("a", 2),('b', 3) , ("c", 2), ("d", 5)""" | ["a":2, "b":3, "c":2, "d":5]
     }
@@ -833,7 +1206,7 @@ output: \$value
 
         where:
         expression                                   | values
-        " (2,2),(7, 10) , (4 ,3), (8, 8)"            | [2L:2, 7L:10, 4L:3, 8L:8]
+        " (2,2),(7, 10) , (4 ,3), (8, 8)"            | [2:2, 7:10, 4:3, 8:8]
         "(5.1,5), (8.0, 1) ,(3.3, 5), (100.1, 10)"   | [5.1d:5, 8.0d:1, 3.3d:5, 100.1d:10]
         """("a", 2),('b', 3) , ("c", 2), ("d", 5)""" | ["a":2, "b":3, "c":2, "d":5]
     }
@@ -968,7 +1341,7 @@ output: $result
         def result = dataGenerator.next()
 
         then:
-        result.x in [5L, 10L, 11L, 12L, 13L, 14L, 15L, 20L]
+        result.x in [5, 10, 11, 12, 13, 14, 15, 20]
         result.y == "2017-06-07"
         result.z == "constant string"
         result.w == 25

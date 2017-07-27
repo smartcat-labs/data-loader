@@ -51,6 +51,32 @@ class BuilderMethodsSpec extends Specification {
         result.graduateDate.compareTo(end) < 0
     }
 
+    def "use Byte range"() {
+        given:
+        def gen = new ObjectGeneratorBuilder().prop("age", random(range((byte) 7, (byte) 77))).build()
+
+        when:
+        def result = gen.next()
+
+        then:
+        result.age instanceof Byte
+        result.age >= 7
+        result.age < 77
+    }
+
+    def "use Short range"() {
+        given:
+        def gen = new ObjectGeneratorBuilder().prop("age", random(range((short) 7, (short) 77))).build()
+
+        when:
+        def result = gen.next()
+
+        then:
+        result.age instanceof Short
+        result.age >= 7
+        result.age < 77
+    }
+
     def "use Integer range"() {
         given:
         def gen = new ObjectGeneratorBuilder().prop("age", random(range(7, 77))).build()
@@ -59,8 +85,48 @@ class BuilderMethodsSpec extends Specification {
         def result = gen.next()
 
         then:
+        result.age instanceof Integer
         result.age >= 7
         result.age < 77
+    }
+
+    def "use Long range"() {
+        given:
+        def gen = new ObjectGeneratorBuilder().prop("age", random(range(7L, 77L))).build()
+
+        when:
+        def result = gen.next()
+
+        then:
+        result.age instanceof Long
+        result.age >= 7
+        result.age < 77
+    }
+
+    def "use Float range"() {
+        given:
+        def gen = new ObjectGeneratorBuilder().prop("age", random(range(7.0f, 77.0f))).build()
+
+        when:
+        def result = gen.next()
+
+        then:
+        result.age instanceof Float
+        result.age >= 7.0f
+        result.age < 77.0f
+    }
+
+    def "use Double range"() {
+        given:
+        def gen = new ObjectGeneratorBuilder().prop("age", random(range(7.0d, 77.0d))).build()
+
+        when:
+        def result = gen.next()
+
+        then:
+        result.age instanceof Double
+        result.age >= 7.0d
+        result.age < 77.0d
     }
 
     def "random should throw RuntimeException for unsupported type"() {
@@ -71,14 +137,15 @@ class BuilderMethodsSpec extends Specification {
         thrown(RuntimeException)
     }
 
-    def "use circular range"() {
+    def "use Byte circular range"() {
         given:
-        def gen = new ObjectGeneratorBuilder().prop("id", circular(range(1, 2_000_000), 1)).build()
+        def gen = new ObjectGeneratorBuilder().prop("id", circular(range((byte) 1, (byte) 25), (byte) 1)).build()
 
         when:
         def result1 = gen.next()
 
         then:
+        result1.id instanceof Byte
         result1.id == 1
 
         when:
@@ -86,6 +153,96 @@ class BuilderMethodsSpec extends Specification {
 
         then:
         result2.id == 2
+    }
+
+    def "use Short circular range"() {
+        given:
+        def gen = new ObjectGeneratorBuilder().prop("id", circular(range((short) 1, (short) 255), (short) 1)).build()
+
+        when:
+        def result1 = gen.next()
+
+        then:
+        result1.id instanceof Short
+        result1.id == 1
+
+        when:
+        def result2 = gen.next()
+
+        then:
+        result2.id == 2
+    }
+
+    def "use Integer circular range"() {
+        given:
+        def gen = new ObjectGeneratorBuilder().prop("id", circular(range(1, 2_000_000), 1)).build()
+
+        when:
+        def result1 = gen.next()
+
+        then:
+        result1.id instanceof Integer
+        result1.id == 1
+
+        when:
+        def result2 = gen.next()
+
+        then:
+        result2.id == 2
+    }
+
+    def "use Long circular range"() {
+        given:
+        def gen = new ObjectGeneratorBuilder().prop("id", circular(range(1L, 2_000_000_000L), 1L)).build()
+
+        when:
+        def result1 = gen.next()
+
+        then:
+        result1.id instanceof Long
+        result1.id == 1
+
+        when:
+        def result2 = gen.next()
+
+        then:
+        result2.id == 2
+    }
+
+    def "use Float circular range"() {
+        given:
+        def gen = new ObjectGeneratorBuilder().prop("id", circular(range(0.0f, 10_000f), 0.1f)).build()
+
+        when:
+        def result1 = gen.next()
+
+        then:
+        result1.id instanceof Float
+        result1.id == 0.0f
+
+        when:
+        def result2 = gen.next()
+
+        then:
+        result2.id == 0.1f
+    }
+
+    def "use Double circular range"() {
+        given:
+        def gen = new ObjectGeneratorBuilder().prop("id", circular(range(0.0d, 10_000d), 0.1d)).build()
+
+        when:
+        def result1 = gen.next()
+
+        then:
+        result1.id instanceof Double
+        result1.id == 0.0d
+
+        when:
+        def result2 = gen.next()
+
+        then:
+        result2.id == 0.1d
     }
 
     def "circular should throw RuntimeException for unsupported range type"() {
