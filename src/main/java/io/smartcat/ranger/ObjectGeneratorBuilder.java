@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.smartcat.ranger.core.CompositeValue;
-import io.smartcat.ranger.core.PrimitiveValue;
+import io.smartcat.ranger.core.ConstantValue;
 import io.smartcat.ranger.core.TypeConverterValue;
 import io.smartcat.ranger.core.Value;
 
@@ -33,7 +33,7 @@ public class ObjectGeneratorBuilder {
     @SuppressWarnings({ "rawtypes" })
     public <V> ObjectGeneratorBuilder prop(String property, V value) {
         propertyValues.put(property,
-                value instanceof ObjectGenerator ? ((ObjectGenerator) value).value : PrimitiveValue.of(value));
+                value instanceof ObjectGenerator ? ((ObjectGenerator) value).value : ConstantValue.of(value));
         return this;
     }
 

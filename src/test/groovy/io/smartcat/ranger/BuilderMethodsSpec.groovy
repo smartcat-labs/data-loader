@@ -287,9 +287,9 @@ class BuilderMethodsSpec extends Specification {
         result2.names == ["Peter", "Rodger", "Steve"]
     }
 
-    def "use random length string without ranges"() {
+    def "use random content string without ranges"() {
         given:
-        def gen = new ObjectGeneratorBuilder().prop("randomString", randomLengthString(5)).build()
+        def gen = new ObjectGeneratorBuilder().prop("randomString", randomContentString(constant(5))).build()
         def chars = ('a'..'z').collect { it } + ('A'..'Z').collect { it } + ('0'..'9').collect { it }
 
         when:
@@ -300,23 +300,30 @@ class BuilderMethodsSpec extends Specification {
         result.randomString.every { it in chars }
     }
 
-    def "use random length string with ranges"() {
+    def "use random content string with ranges"() {
         given:
         char c1 = 'a'
         char c2 = 'f'
         char c3 = '0'
         char c4 = '9'
         def gen = new ObjectGeneratorBuilder()
-        .prop("randomString", randomLengthString(10, range(c1, c2), range(c3, c4))).build()
+        .prop("randomString", randomContentString(circular(range(10, 15), 1), range(c1, c2), range(c3, c4))).build()
         def chars = ('a'..'z').collect { it } + ('0'..'9').collect { it }
 
         when:
-        def result = gen.next()
+        def result1 = gen.next()
 
         then:
-        result.randomString.length() == 10
-        result.randomString.every { it in chars }
-    } 
+        result1.randomString.length() == 10
+        result1.randomString.every { it in chars }
+
+        when:
+        def result2 = gen.next()
+
+        then:
+        result2.randomString.length() == 11
+        result2.randomString.every { it in chars }
+    }
 
     def "use json"() {
         given:

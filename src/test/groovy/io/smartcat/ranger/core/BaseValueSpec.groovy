@@ -11,6 +11,6 @@ class BaseValueSpec extends Specification {
     }
 
     def val(value) {
-        PrimitiveValue.of(value)
+        ConstantValue.of(value)
     }
 }

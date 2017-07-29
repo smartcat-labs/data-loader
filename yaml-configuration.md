@@ -292,30 +292,41 @@ Possible sequence is:
 "27dbc38f-cadf-4d42-b18a-44c839e8b8f1", "575fb812-bb98-4f76-b31b-bf42e3ac2d62", "a7e229f3-875d-4a6a-9a5d-fb0670c3afdf", ...
 ```
 
-## Random length string
+## Random content string
 
-Generates random string of specified length with optional character ranges. If ranges not specified, string will contain only characters from following ranges: `'A'-'Z'`, `'a'-'z'` and `'0'-'9'`.
+Generates random string of specified length with optional character ranges. If ranges not specified, string will contain only characters from following ranges: `'A'-'Z'`, `'a'-'z'` and `'0'-'9'`. Length can be specified as a number, but also as an expression which can evaluate to different number each time. Uniform distribution is used to select characters from character ranges.
+
 There are two parameter variations:
 
 ```yaml
 values:
-  randomString1: randomLengthString(5)
+  randomString1: randomContentString(5)
 output: $randomString1
 ```
-```
+```yaml
 values:
-  randomString2: randomLengthString(8, ['A'..'F', '0'..'9'])
+  randomString2: randomContentString(8, ['A'..'F', '0'..'9'])
 output: $randomString2
 ```
+```yaml
+values:
+  randomString3: randomContentString(random(5..10), ['A'..'Z'])
+output: $randomString3
+```
 
-First generator will generate string of length 5 with characters from ranges: `'A'-'Z'`, `'a'-'z'` and `'0'-'9'`.
+`randomString1` will generate strings of length 5 with characters from ranges: `'A'-'Z'`, `'a'-'z'` and `'0'-'9'`.
 ```
 "Ldsfa", "3Jdf0", "AOSyu", "qr4Qe", "sf23c", "sdFfi", "320fS", ...
 ```
 
-Second generator would generate strings of length 8 from specified range of characters.
+`randomString2` will generate strings of length 8 from specified range of characters.
 ```
 "EF893232", "2E49D0AB", "BE129E15", "938FFC1C", "BB8A43ED", "829D1CA2", ...
+```
+
+`randomString3` will generate strings of length from 5 to 10 with characters from range: `'A'-'Z'`.
+```
+"SDFAD", "LJAOSDUF", "DJSKIEMNLS", "KEUXLANX", "DFSAW", "DFAEAN", ...
 ```
 
 ## Now functions

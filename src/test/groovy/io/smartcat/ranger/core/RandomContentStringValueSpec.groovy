@@ -2,11 +2,11 @@ package io.smartcat.ranger.core
 
 import spock.lang.Specification
 
-class RandomLengthStringValueSpec extends Specification {
+class RandomContentStringValueSpec extends Specification {
 
     def "calling get multiple times without reset should return same value"() {
         given:
-        def value = new RandomLengthStringValue(5)
+        def value = new RandomContentStringValue(ConstantValue.of(5))
         def firstResult = value.get()
         def result = []
 
@@ -19,7 +19,7 @@ class RandomLengthStringValueSpec extends Specification {
 
     def "should return alphanumeric strings when only length is specified"() {
         given:
-        def value = new RandomLengthStringValue(9)
+        def value = new RandomContentStringValue(ConstantValue.of(9))
         def result = []
         def chars = ('a'..'z').collect { it } + ('A'..'Z').collect { it } + ('0'..'9').collect { it }
 
@@ -34,7 +34,7 @@ class RandomLengthStringValueSpec extends Specification {
         given:
         char c3 = '3'
         char c9 = '9'
-        def value = new RandomLengthStringValue(5, [new Range(c3, c9)])
+        def value = new RandomContentStringValue(ConstantValue.of(5), [new Range(c3, c9)])
         def chars = ('3'..'9').collect { it }
         def result = []
 
@@ -51,7 +51,7 @@ class RandomLengthStringValueSpec extends Specification {
         char c5 = '5'
         char cK = 'K'
         char cW = 'W'
-        def value = new RandomLengthStringValue(15, [new Range(c2, c5), new Range(cK, cW)])
+        def value = new RandomContentStringValue(ConstantValue.of(15), [new Range(c2, c5), new Range(cK, cW)])
         def chars = ('2'..'5').collect { it } + ('K'..'W').collect { it }
         def result = []
 

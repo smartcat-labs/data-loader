@@ -2,7 +2,7 @@ package io.smartcat.ranger.parser;
 
 import io.smartcat.ranger.ObjectGenerator;
 import io.smartcat.ranger.core.CompositeValue;
-import io.smartcat.ranger.core.PrimitiveValue;
+import io.smartcat.ranger.core.ConstantValue;
 import io.smartcat.ranger.core.TypeConverterValue;
 import io.smartcat.ranger.core.Value;
 import io.smartcat.ranger.core.ValueProxy;
@@ -136,7 +136,7 @@ public class ConfigurationParser {
             ParsingResult<Value<?>> result = parseRunner.run((String) def);
             return result.valueStack.pop();
         } else {
-            return PrimitiveValue.of(def);
+            return ConstantValue.of(def);
         }
     }
 

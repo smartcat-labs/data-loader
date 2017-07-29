@@ -82,7 +82,7 @@ output: $a
     }
 
     @Unroll
-    def "should parse primitive string value when string is #text"() {
+    def "should parse string value when string is #text"() {
         given:
         def config = """
 values:
@@ -110,7 +110,7 @@ output: \$name
     }
 
     @Unroll
-    def "should parse primitive byte #value"() {
+    def "should parse byte #value"() {
         given:
         def config = """
 values:
@@ -134,7 +134,7 @@ output: \$name
     }
 
     @Unroll
-    def "should parse primitive short #value"() {
+    def "should parse short #value"() {
         given:
         def config = """
 values:
@@ -158,7 +158,7 @@ output: \$name
     }
 
     @Unroll
-    def "should parse primitive integer #value"() {
+    def "should parse integer #value"() {
         given:
         def config = """
 values:
@@ -185,7 +185,7 @@ output: \$age
     }
 
     @Unroll
-    def "should parse primitive long #value"() {
+    def "should parse long #value"() {
         given:
         def config = """
 values:
@@ -212,7 +212,7 @@ output: \$age
     }
 
     @Unroll
-    def "should parse primitive float #value"() {
+    def "should parse float #value"() {
         given:
         def config = """
 values:
@@ -276,7 +276,7 @@ output: \$age
     }
 
     @Unroll
-    def "should parse primitive double #value"() {
+    def "should parse double #value"() {
         given:
         def config = """
 values:
@@ -1212,11 +1212,11 @@ output: \$value
     }
 
     @Unroll
-    def "should parse random length value #expression"() {
+    def "should parse random content value #expression"() {
         given:
         def config = """
 values:
-  value: randomLengthString($expression)
+  value: randomContentString($expression)
 output: \$value
 """
         def dataGenerator = buildGenerator(config)
@@ -1233,6 +1233,38 @@ output: \$value
         "4"                                                              | 4      | ('a'..'z').collect { it } + ('A'..'Z').collect { it } + ('0'..'9').collect { it }
         "5, ['3'..'8', 'A'..'C'] "                                       | 5      | ('3'..'8').collect { it } + ('A'..'C').collect { it }
         """6, ['\\''..'.', '.'..';', ','..'/', '"'..'.', '#'..'\\\\']""" | 6      | ('"'..'}').collect { it }
+    }
+
+    def "should parse random content value with varable length"() {
+        given:
+        def config = """
+values:
+  value: randomContentString(circular(5..10, 1), ['A'..'Z'])
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+        def alowedValues = ('A'..'Z').collect { it }
+
+        when:
+        def result1 = dataGenerator.next()
+
+        then:
+        result1.length() == 5
+        result1.every { it in alowedValues }
+
+        when:
+        def result2 = dataGenerator.next()
+
+        then:
+        result2.length() == 6
+        result2.every { it in alowedValues }
+
+        when:
+        def result3 = dataGenerator.next()
+
+        then:
+        result3.length() == 7
+        result3.every { it in alowedValues }
     }
 
     @Unroll
@@ -1348,7 +1380,7 @@ output: $result
         result.q in [null, ""]
     }
 
-    def "should parse config when there are no values and output is primitive"() {
+    def "should parse config when there are no values and output is integer literal"() {
         given:
         def config = """
 values:

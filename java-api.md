@@ -28,6 +28,19 @@ This will result in generator always generating value 4.
 Almost all methods support all Java primitive number types (byte, short, int, long, float, double), there is no need for limiting only on int, long or double types if other types are more suitable in particular case.
 Below is given a list of helper methods for construction of `ObjectGenerator`. Methods are provided by `BuilderMethods` class.
 
+## Constant
+
+Creates constant object generator which will always return same value.
+
+```java
+ObjectGenerator<String> names = constant("Peter");
+
+ObjectGenerator<Integer> age = constant(28);
+```
+
+`names` generator will always return `"Peter"`.
+`age` generator will always return `28`.
+
 ## Random
 
 Has two meanings depending on the arguments.
@@ -200,29 +213,36 @@ Possible sequence is:
 "27dbc38f-cadf-4d42-b18a-44c839e8b8f1", "575fb812-bb98-4f76-b31b-bf42e3ac2d62", "a7e229f3-875d-4a6a-9a5d-fb0670c3afdf", ...
 ```
 
-## Random length string
+## Random content string
 
-Generates random string of specified length with optional character ranges. If ranges not specified, string will contain only characters from following ranges: `'A'-'Z'`, `'a'-'z'` and `'0'-'9'`.
+Generates random string of specified length with optional character ranges. If ranges not specified, string will contain only characters from following ranges: `'A'-'Z'`, `'a'-'z'` and `'0'-'9'`. Length needs to be specified as an object generator which can evaluate to different number each time. Uniform distribution is used to select characters from character ranges.
 
 There are several parameter variations:
 
 ```java
-ObjectGenerator<String> randomString1 = randomLengthString(5);
+ObjectGenerator<String> randomString1 = randomContentString(5);
 
-ObjectGenerator<String> randomString2 = randomLengthString(8, range('A', 'F'), range('0', '9'));
+ObjectGenerator<String> randomString2 = randomContentString(8, range('A', 'F'), range('0', '9'));
 
 List<Range<Character>> ranges = Arrays.asList(range('A', 'F'), range('0', '9'));
-ObjectGenerator<String> randomString2 = randomLengthString(8, ranges);
+ObjectGenerator<String> randomString2 = randomContentString(8, ranges);
+
+ObjectGenerator<String> randomString3 = randomContentString(random(range(5, 10)), range('A', 'Z'), range('0', '9'));
 ```
 
-First generator will generate string of length 5 with characters from ranges: `'A'-'Z'`, `'a'-'z'` and `'0'-'9'`.
+`randomString1` will generate strings of length 5 with characters from ranges: `'A'-'Z'`, `'a'-'z'` and `'0'-'9'`.
 ```
 "Ldsfa", "3Jdf0", "AOSyu", "qr4Qe", "sf23c", "sdFfi", "320fS", ...
 ```
 
-Second generator would generate strings of length 8 from specified range of characters.
+`randomString2` will generate strings of length 8 from specified range of characters.
 ```
 "EF893232", "2E49D0AB", "BE129E15", "938FFC1C", "BB8A43ED", "829D1CA2", ...
+```
+
+`randomString3` will generate strings of length from 5 to 10 and with characters from ranges: `'A'-'Z'` and `'0'-'9'`.
+```
+"FASDFO23", "32421", "DFDSAF", "FDSFIAH98Q", "IUEK92", "NVISHDF82", ...
 ```
 
 ## Now methods

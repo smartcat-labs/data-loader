@@ -12,35 +12,38 @@ import io.smartcat.ranger.distribution.UniformDistribution;
 /**
  * Generates random strings of specified <code>length</code> and from specified character ranges.
  */
-public class RandomLengthStringValue extends Value<String> {
+public class RandomContentStringValue extends Value<String> {
 
     private static final List<Range<Character>> DEFAULT_RANGES = Arrays.asList(new Range<Character>('a', 'z'),
             new Range<Character>('A', 'Z'), new Range<Character>('0', '9'));
 
-    private final int length;
+    private final Value<Integer> lengthValue;
     private final List<Character> possibleCharacters;
     private final Distribution distribution;
 
     /**
-     * Constructs random length string value with specified <code>length</code> and default character range.
+     * Constructs random content string value with specified <code>lengthValue</code> and default character range.
      *
-     * @param length Length of generated string.
+     * @param lengthValue Value that returns integer which represents length of generated string. It should never
+     *            generate length that is less than 1.
      */
-    public RandomLengthStringValue(int length) {
-        this(length, DEFAULT_RANGES);
+    public RandomContentStringValue(Value<Integer> lengthValue) {
+        this(lengthValue, DEFAULT_RANGES);
     }
 
     /**
-     * Constructs random length string value with specified <code>length</code> and specified <code>charRanges</code>.
+     * Constructs random content string value with specified <code>lengthValue</code> and specified
+     * <code>charRanges</code>.
      *
-     * @param length Length of generated string.
+     * @param lengthValue Value that returns integer which represents length of generated string. It should never
+     *            generate length that is less than 1.
      * @param charRanges Ranges of characters from which string will be constructed.
      */
-    public RandomLengthStringValue(int length, List<Range<Character>> charRanges) {
-        if (length < 1) {
-            throw new IllegalArgumentException("Length must be positive number.");
+    public RandomContentStringValue(Value<Integer> lengthValue, List<Range<Character>> charRanges) {
+        if (lengthValue == null) {
+            throw new IllegalArgumentException("lengthValue cannot be null.");
         }
-        this.length = length;
+        this.lengthValue = lengthValue;
         Set<Character> chars = new HashSet<>();
         for (Range<Character> range : charRanges) {
             if (!range.isIncreasing()) {
@@ -55,7 +58,17 @@ public class RandomLengthStringValue extends Value<String> {
     }
 
     @Override
+    public void reset() {
+        super.reset();
+        lengthValue.reset();
+    }
+
+    @Override
     protected void eval() {
+        int length = lengthValue.get();
+        if (length < 1) {
+            throw new RuntimeException("Generated length cannot be less than 1, but was: " + length);
+        }
         char[] chars = new char[length];
         for (int i = 0; i < length; i++) {
             chars[i] = possibleCharacters.get(distribution.nextInt(possibleCharacters.size()));

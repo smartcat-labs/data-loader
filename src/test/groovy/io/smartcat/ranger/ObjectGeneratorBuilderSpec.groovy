@@ -20,7 +20,7 @@ class ObjectGeneratorBuilderSpec extends Specification {
         val.nullProp == null
     }
 
-    def "should create primitive value of any type except ObjectGenerator"() {
+    def "should create constant value of any type except ObjectGenerator"() {
         given:
         def builder = new ObjectGeneratorBuilder()
 

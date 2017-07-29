@@ -20,8 +20,8 @@ import io.smartcat.ranger.core.NowLocalDateTimeValue;
 import io.smartcat.ranger.core.NowLocalDateValue;
 import io.smartcat.ranger.core.NowValue;
 import io.smartcat.ranger.core.NullValue;
-import io.smartcat.ranger.core.PrimitiveValue;
-import io.smartcat.ranger.core.RandomLengthStringValue;
+import io.smartcat.ranger.core.ConstantValue;
+import io.smartcat.ranger.core.RandomContentStringValue;
 import io.smartcat.ranger.core.Range;
 import io.smartcat.ranger.core.RangeValue;
 import io.smartcat.ranger.core.RangeValueFactory;
@@ -365,7 +365,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Number value definition rule.
      */
     public Rule numberLiteralValue() {
-        return Sequence(numberLiteral(), push(PrimitiveValue.of(pop())));
+        return Sequence(numberLiteral(), push(ConstantValue.of(pop())));
     }
 
     /**
@@ -384,7 +384,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Boolean value definition rule.
      */
     public Rule booleanLiteralValue() {
-        return Sequence(booleanLiteral(), push(PrimitiveValue.of(pop())));
+        return Sequence(booleanLiteral(), push(ConstantValue.of(pop())));
     }
 
     /**
@@ -441,7 +441,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return String value definition rule.
      */
     public Rule stringLiteralValue() {
-        return Sequence(FirstOf(stringLiteral(), nakedStringLiteral()), push(PrimitiveValue.of(pop())));
+        return Sequence(FirstOf(stringLiteral(), nakedStringLiteral()), push(ConstantValue.of(pop())));
     }
 
     /**
@@ -688,14 +688,14 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
-     * Random length value definition.
+     * Random content value definition.
      *
-     * @return Random length value definition rule.
+     * @return Random content value definition rule.
      */
-    public Rule randomLengthStringValue() {
+    public Rule randomContentStringValue() {
         return Sequence(
-                function("randomLengthString", Sequence(integerLiteral(), Optional(comma(), bracketList(charRange())))),
-                push(createRandomLengthStringValue()));
+                function("randomContentString", Sequence(value(), Optional(comma(), bracketList(charRange())))),
+                push(createRandomContentStringValue()));
     }
 
     /**
@@ -741,7 +741,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule generator() {
         return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue(), circularRangeValue(), listValue(),
-                weightedValue(), exactWeightedValue(), randomLengthStringValue(), now(), nowDate(), nowLocalDate(),
+                weightedValue(), exactWeightedValue(), randomContentStringValue(), now(), nowDate(), nowLocalDate(),
                 nowLocalDateTime());
     }
 
@@ -883,14 +883,14 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
-     * Creates random length value.
+     * Creates random content value.
      *
-     * @return Instance of {@link RandomLengthStringValue}.
+     * @return Instance of {@link RandomContentStringValue}.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected RandomLengthStringValue createRandomLengthStringValue() {
-        return peek() instanceof List ? new RandomLengthStringValue((Integer) pop(1), (List) pop())
-                : new RandomLengthStringValue((Integer) pop());
+    protected RandomContentStringValue createRandomContentStringValue() {
+        return peek() instanceof List ? new RandomContentStringValue((Value<Integer>) pop(1), (List) pop())
+                : new RandomContentStringValue((Value<Integer>) pop());
     }
 
     /**
