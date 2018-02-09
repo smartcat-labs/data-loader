@@ -426,6 +426,93 @@ These functions perform arithmetic operations on provided values:
 * `divide('float', 4, 2)` returns `float` value 2
 * `divide('double', 4, 2)` returns `double` value 2
 
+## CSV
+
+It is also possible to use CSV file as source of data and to combine it with other Ranger's functions and values.
+There are three parameter variations:
+
+```yaml
+values:
+  csv: csv("my-csv.csv")
+output: $csv
+```
+```yaml
+values:
+  csv: csv("my-csv.csv", ',')
+output: $csv
+```
+```yaml
+values:
+  csv: csv("my-csv.csv", ',', "\\n", false, '"', '#', true, null())
+output: $csv
+```
+
+First two variations are shorthand variants, with reasonable defaults, third variation represents full list of parameters.
+If parameters are not specified (first or second variations) default values are used.
+List of parameters with explanation and default value:
+
+```
+1. path
+   Default value - No default value, mandatory
+   Description - Path to a CSV file
+
+2. delimiter
+   Default value - ','
+   Description - Delimiter of columns within CSV file
+
+3. recordSeparator
+   Default value - "\n"
+   Description - Delimiter of records within CSV file
+
+4. trim
+   Default value - true
+   Description - True if each column value is to be trimmed for leading and trailing whitespace, otherwise false
+
+5. quote
+   Default value - null
+   Character that will be stripped from beginning and end of each column if present. If set to null, no characters will be stripped (nothing will be used as quote character)
+   If null needs to be set explicitly, that can be done with null value function 'null()'.
+
+6. commentMarker
+   Default value - '#'
+   Description - Character to use as a comment marker, everything after it is considered comment
+
+7. ignoreEmptyLines
+   Default value - true
+   Description - True if empty lines are to be ignored, otherwise false
+
+8. nullString
+   Default value - null
+   Description - Converts string with given value to null. If set to null, no conversion will be done
+   If null needs to be set explicitly, that can be done with null value function 'null()'.
+```
+
+If for example we have CSV with following values:
+
+```csv
+John,Smith,555-1331,New York,US
+Peter,Braun,133-1123,Berlin,DE
+
+# Commented line,Should, not be taken,into,account
+Jose,Garcia,328-3221,Madrid,ES
+```
+
+And following code:
+
+```yaml
+values:
+  csv: csv("filePath", ',', "\n", true, '"', '#', true, null())
+output: string("{} {} - {} {}", get("c0", $csv), get("c1", $csv), get("c3", $csv), get("c4", $csv))
+```
+
+It would generate following lines:
+
+```
+John Smith - New York US
+Peter Braun - Berlin DE
+Jose Gercia - Madrid ES
+```
+
 ## String transformer
 
 Creates a formatted string using the specified format string and values.

@@ -327,6 +327,52 @@ These methods perform arithmetic operations on provided values:
 * `divide(Float.class, 4, 2)` returns `Float` value 2
 * `divide(Double.class, 4, 2)` returns `Double` value 2
 
+## CSV
+
+It is also possible to use CSV file as source of data and to combine it with other Ranger's `ObjectGenrator`s.
+Resulting `ObjectGenerator` will return map where keys are `c0`, `c1`, `c2`, ...
+representing column values with given index.
+There are three method overloads with different number of arguments:
+
+```java
+// Only file path specified
+ObjectGenrator<Map<String, String>> csv1 = csv("filePath");
+
+// File path and delimiter specified
+ObjectGenrator<Map<String, String>> csv2 = csv("filePath", ',');
+
+// File path, delimiter, record separator, trim, quote character, comment marker, ignore empty lines and null string value specified.
+ObjectGenrator<Map<String, String>> csv3 = csv("filePath", ',', "\n", true, '"', '#', true, "NULL");
+```
+
+If for example we have CSV with following values:
+
+```csv
+John,Smith,555-1331,New York,US
+Peter,Braun,133-1123,Berlin,DE
+
+# Commented line,Should, not be taken,into,account
+Jose,Garcia,328-3221,Madrid,ES
+```
+
+and following code:
+
+```java
+ObjectGenrator<Map<String, String>> csv = csv("filePath", ',', "\n", true, '"', '#', true, "NULL");
+for (int i = 0; i < 3; i++) {
+    Map<String, String> val = csv.next();
+    System.out.println("Name: " + val.get("c0") + " " + val.get("c1") + " - " + val.get("c3") + " " + val.get("c4"));
+}
+```
+
+It would generate following lines:
+
+```
+John Smith - New York US
+Peter Braun - Berlin DE
+Jose Gercia - Madrid ES
+```
+
 ## String transformer
 
 Creates a formatted string using the specified format string and values.

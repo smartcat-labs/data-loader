@@ -1375,6 +1375,235 @@ output: \$value
         "divide('int', divide('int', 15, 3), 5)"    | 1          | Integer
     }
 
+    
+    def "should parse csv value with all defaults"() {
+        given:
+        def config = """
+values:
+  value: csv("src/test/resources/csv/a.csv")
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result.c0 == "John"
+        result.c1 == "Smith"
+        result.c2 == "555-1331"
+        result.c3 == "New York"
+        result.c4 == "US"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result.c0 == "Peter"
+        result.c1 == "Braun"
+        result.c2 == "133-1123"
+        result.c3 == "Berlin"
+        result.c4 == "DE"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result.c0 == "Jose"
+        result.c1 == "Garcia"
+        result.c2 == "328-3221"
+        result.c3 == "Madrid"
+        result.c4 == "ES"
+    }
+
+    def "should parse csv value combined with getter"() {
+        given:
+        def config = """
+values:
+  value: csv("src/test/resources/csv/a.csv")
+output: string("{} {}", get("c0", \$value), get("c1", \$value))
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result == "John Smith"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result == "Peter Braun"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result == "Jose Garcia"
+    }
+
+    def "should parse csv value with delimiter specified"() {
+        given:
+        def config = """
+values:
+  value: csv("src/test/resources/csv/b.csv", ';')
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result.c0 == "John"
+        result.c1 == "Smith"
+        result.c2 == "555-1331"
+        result.c3 == "New York"
+        result.c4 == "US"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result.c0 == "Peter"
+        result.c1 == "Braun"
+        result.c2 == "133-1123"
+        result.c3 == "Berlin"
+        result.c4 == "DE"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result.c0 == "Jose"
+        result.c1 == "Garcia"
+        result.c2 == "328-3221"
+        result.c3 == "Madrid"
+        result.c4 == "ES"
+    }
+
+    def "should parse csv value with all properties specified - null string undefined"() {
+        given:
+        def config = """
+values:
+  value: csv("src/test/resources/csv/c.csv", ';', "\\n", false, '"', '#', true, null())
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result.c0 == "John"
+        result.c1 == "Smith"
+        result.c2 == "555-1331"
+        result.c3 == "New York "
+        result.c4 == "US"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result.c0 == "null"
+        result.c1 == "Braun"
+        result.c2 == "133-1123"
+        result.c3 == "Berlin"
+        result.c4 == "DE"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result.c0 == "Jose"
+        result.c1 == "Garcia"
+        result.c2 == "328-3221"
+        result.c3 == "Madrid"
+        result.c4 == "ES"
+    }
+
+    def "should parse csv value with all properties specified - quote char disabled"() {
+        given:
+        def config = """
+values:
+  value: csv("src/test/resources/csv/c.csv", ';', "\\n", false, null(), '#', true, null())
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result.c0 == "John"
+        result.c1 == "Smith"
+        result.c2 == "555-1331"
+        result.c3 == "New York "
+        result.c4 == "US"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result.c0 == "null"
+        result.c1 == '"Braun"'
+        result.c2 == '"133-1123"'
+        result.c3 == "Berlin"
+        result.c4 == "DE"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result.c0 == "Jose"
+        result.c1 == "Garcia"
+        result.c2 == "328-3221"
+        result.c3 == "Madrid"
+        result.c4 == "ES"
+    }
+    
+    def "should parse csv value with all properties specified - null string defined"() {
+        given:
+        def config = """
+values:
+  value: csv("src/test/resources/csv/c.csv", ';', "\\n", false, '"', '#', true, "null")
+output: \$value
+"""
+        def dataGenerator = buildGenerator(config)
+
+        when:
+        def result = dataGenerator.next()
+
+        then:
+        result.c0 == "John"
+        result.c1 == "Smith"
+        result.c2 == "555-1331"
+        result.c3 == "New York "
+        result.c4 == "US"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result.c0 == null
+        result.c1 == "Braun"
+        result.c2 == "133-1123"
+        result.c3 == "Berlin"
+        result.c4 == "DE"
+
+        when:
+        result = dataGenerator.next()
+
+        then:
+        result.c0 == "Jose"
+        result.c1 == "Garcia"
+        result.c2 == "328-3221"
+        result.c3 == "Madrid"
+        result.c4 == "ES"
+    }
+
     @Unroll
     def "should parse weighted value #expression"() {
         given:

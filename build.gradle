@@ -33,6 +33,7 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonDatabindVersion"
     compile "org.parboiled:parboiled-java:$parboiledJavaVersion"
     compile "org.yaml:snakeyaml:$snakeyamlVersion"
+    compile "org.apache.commons:commons-csv:$commonsCsvVersion"
 
     testCompile "junit:junit:$junitVersion"
     testCompile "org.spockframework:spock-core:$spockCoreVersion"

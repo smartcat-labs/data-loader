@@ -511,6 +511,115 @@ class BuilderMethodsSpec extends Specification {
         divide(Long, constant(20L), divide(Integer, constant(15), constant(3))) | Long    | 4L       | "nested divide method"
     }
 
+    def "use csv value with one argument"() {
+        given:
+        def gen = csv("src/test/resources/csv/a.csv")
+
+        when:
+        def result = gen.next()
+
+        then:
+        result.c0 == "John"
+        result.c1 == "Smith"
+        result.c2 == "555-1331"
+        result.c3 == "New York"
+        result.c4 == "US"
+
+        when:
+        result = gen.next()
+
+        then:
+        result.c0 == "Peter"
+        result.c1 == "Braun"
+        result.c2 == "133-1123"
+        result.c3 == "Berlin"
+        result.c4 == "DE"
+
+        when:
+        result = gen.next()
+
+        then:
+        result.c0 == "Jose"
+        result.c1 == "Garcia"
+        result.c2 == "328-3221"
+        result.c3 == "Madrid"
+        result.c4 == "ES"
+    }
+
+    def "use csv value with two arguments"() {
+        given:
+        char delimiter = ';'
+        def gen = csv("src/test/resources/csv/b.csv", delimiter)
+
+        when:
+        def result = gen.next()
+
+        then:
+        result.c0 == "John"
+        result.c1 == "Smith"
+        result.c2 == "555-1331"
+        result.c3 == "New York"
+        result.c4 == "US"
+
+        when:
+        result = gen.next()
+
+        then:
+        result.c0 == "Peter"
+        result.c1 == "Braun"
+        result.c2 == "133-1123"
+        result.c3 == "Berlin"
+        result.c4 == "DE"
+
+        when:
+        result = gen.next()
+
+        then:
+        result.c0 == "Jose"
+        result.c1 == "Garcia"
+        result.c2 == "328-3221"
+        result.c3 == "Madrid"
+        result.c4 == "ES"
+    }
+
+    def "use csv value with all arguments"() {
+        given:
+        char delimiter = ';'
+        Character quoteChar = '"'
+        char commentMarker = '#'
+        def gen = csv("src/test/resources/csv/c.csv", delimiter, "\\n", false, quoteChar, commentMarker, true, null)
+
+        when:
+        def result = gen.next()
+
+        then:
+        result.c0 == "John"
+        result.c1 == "Smith"
+        result.c2 == "555-1331"
+        result.c3 == "New York "
+        result.c4 == "US"
+
+        when:
+        result = gen.next()
+
+        then:
+        result.c0 == "null"
+        result.c1 == "Braun"
+        result.c2 == "133-1123"
+        result.c3 == "Berlin"
+        result.c4 == "DE"
+
+        when:
+        result = gen.next()
+
+        then:
+        result.c0 == "Jose"
+        result.c1 == "Garcia"
+        result.c2 == "328-3221"
+        result.c3 == "Madrid"
+        result.c4 == "ES"
+    }
+
     def "use exactly"() {
         given:
         def gen = new ObjectGeneratorBuilder()

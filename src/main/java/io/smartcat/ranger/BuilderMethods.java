@@ -70,6 +70,8 @@ import io.smartcat.ranger.core.arithmetic.SubtractionValueFloat;
 import io.smartcat.ranger.core.arithmetic.SubtractionValueInteger;
 import io.smartcat.ranger.core.arithmetic.SubtractionValueLong;
 import io.smartcat.ranger.core.arithmetic.SubtractionValueShort;
+import io.smartcat.ranger.core.csv.CsvReaderValue;
+import io.smartcat.ranger.core.csv.CSVParserSettings;
 import io.smartcat.ranger.distribution.Distribution;
 
 /**
@@ -508,7 +510,7 @@ public class BuilderMethods {
     @SuppressWarnings("unchecked")
     public static <T> ObjectGenerator<T> add(Class<T> type, ObjectGenerator<T> summand1, ObjectGenerator<T> summand2) {
         if (type.equals(Byte.class)) {
-                return (ObjectGenerator<T>) wrap(new AdditionValueByte(summand1.value, summand2.value));
+            return (ObjectGenerator<T>) wrap(new AdditionValueByte(summand1.value, summand2.value));
         } else if (type.equals(Short.class)) {
             return (ObjectGenerator<T>) wrap(new AdditionValueShort(summand1.value, summand2.value));
         } else if (type.equals(Integer.class)) {
@@ -537,7 +539,7 @@ public class BuilderMethods {
     public static <T> ObjectGenerator<T> subtract(Class<T> type, ObjectGenerator<T> minuend,
             ObjectGenerator<T> subtrahend) {
         if (type.equals(Byte.class)) {
-                return (ObjectGenerator<T>) wrap(new SubtractionValueByte(minuend.value, subtrahend.value));
+            return (ObjectGenerator<T>) wrap(new SubtractionValueByte(minuend.value, subtrahend.value));
         } else if (type.equals(Short.class)) {
             return (ObjectGenerator<T>) wrap(new SubtractionValueShort(minuend.value, subtrahend.value));
         } else if (type.equals(Integer.class)) {
@@ -566,7 +568,7 @@ public class BuilderMethods {
     public static <T> ObjectGenerator<T> multiply(Class<T> type, ObjectGenerator<T> factor1,
             ObjectGenerator<T> factor2) {
         if (type.equals(Byte.class)) {
-                return (ObjectGenerator<T>) wrap(new MultiplicationValueByte(factor1.value, factor2.value));
+            return (ObjectGenerator<T>) wrap(new MultiplicationValueByte(factor1.value, factor2.value));
         } else if (type.equals(Short.class)) {
             return (ObjectGenerator<T>) wrap(new MultiplicationValueShort(factor1.value, factor2.value));
         } else if (type.equals(Integer.class)) {
@@ -595,7 +597,7 @@ public class BuilderMethods {
     public static <T> ObjectGenerator<T> divide(Class<T> type, ObjectGenerator<T> dividend,
             ObjectGenerator<T> divisor) {
         if (type.equals(Byte.class)) {
-                return (ObjectGenerator<T>) wrap(new DivisionValueByte(dividend.value, divisor.value));
+            return (ObjectGenerator<T>) wrap(new DivisionValueByte(dividend.value, divisor.value));
         } else if (type.equals(Short.class)) {
             return (ObjectGenerator<T>) wrap(new DivisionValueShort(dividend.value, divisor.value));
         } else if (type.equals(Integer.class)) {
@@ -609,6 +611,69 @@ public class BuilderMethods {
         } else {
             throw new RuntimeException("Type: " + type.getName() + " not supported.");
         }
+    }
+
+    /**
+     * Creates an instance of {@link ObjectGenerator} which reads CSV file and returns new record on each iteration
+     * until CSV file is depleted. Default values for other parameters:
+     * <ul>
+     * <li><code>delimiter</code> - <code>','</code></li>
+     * <li><code>recordSeparator</code> - <code>"\n"</code></li>
+     * <li><code>trim</code> - <code>true</code></li>
+     * <li><code>quote</code> - <code>null</code> (disabled)</li>
+     * <li><code>commentMarker</code> - <code>'#'</code></li>
+     * <li><code>ignoreEmptyLines</code> - <code>true</code></li>
+     * <li><code>nullString</code> - <code>null</code> (disabled)</li>
+     * </ul>
+     *
+     * @param path Path to the CSV file.
+     * @return An instance of {@link ObjectGenerator} which reads CSV file.
+     */
+    public static ObjectGenerator<Map<String, String>> csv(String path) {
+        return wrap(new CsvReaderValue(new CSVParserSettings(path)));
+    }
+
+    /**
+     * Creates an instance of {@link ObjectGenerator} which reads CSV file and returns new record on each iteration
+     * until CSV file is depleted. Default values for other parameters:
+     * <ul>
+     * <li><code>recordSeparator</code> - <code>"\n"</code></li>
+     * <li><code>trim</code> - <code>true</code></li>
+     * <li><code>quote</code> - <code>null</code> (disabled)</li>
+     * <li><code>commentMarker</code> - <code>'#'</code></li>
+     * <li><code>ignoreEmptyLines</code> - <code>true</code></li>
+     * <li><code>nullString</code> - <code>null</code> (disabled)</li>
+     * </ul>
+     *
+     * @param path Path to the CSV file.
+     * @param delimiter Delimiter of columns within CSV file.
+     * @return An instance of {@link ObjectGenerator} which reads CSV file.
+     */
+    public static ObjectGenerator<Map<String, String>> csv(String path, char delimiter) {
+        return wrap(new CsvReaderValue(new CSVParserSettings(path, delimiter)));
+    }
+
+    /**
+     * Creates an instance of {@link ObjectGenerator} which reads CSV file and returns new record on each iteration
+     * until CSV file is depleted.
+     *
+     * @param path Path to the CSV file.
+     * @param delimiter Delimiter of columns within CSV file.
+     * @param recordSeparator Delimiter of records within CSV file.
+     * @param trim True if each column value is to be trimmed for leading and trailing whitespace, otherwise
+     *            <code>false</code>.
+     * @param quote Character that will be stripped from beginning and end of each column if present. If set to
+     *            <code>null</code>, no characters will be stripped (nothing will be used as quote character).
+     * @param commentMarker Character to use as a comment marker, everything after it is considered comment.
+     * @param ignoreEmptyLines True if empty lines are to be ignored, otherwise <code>false</code>.
+     * @param nullString Converts string with given value to <code>null</code>. If set to <code>null</code>, no
+     *            conversion will be done.
+     * @return An instance of {@link ObjectGenerator} which reads CSV file.
+     */
+    public static ObjectGenerator<Map<String, String>> csv(String path, char delimiter, String recordSeparator,
+            boolean trim, Character quote, char commentMarker, boolean ignoreEmptyLines, String nullString) {
+        return wrap(new CsvReaderValue(new CSVParserSettings(path, delimiter, recordSeparator, trim, quote,
+                commentMarker, ignoreEmptyLines, nullString)));
     }
 
     /**

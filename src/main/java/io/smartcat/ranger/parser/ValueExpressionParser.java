@@ -61,6 +61,8 @@ import io.smartcat.ranger.core.arithmetic.SubtractionValueFloat;
 import io.smartcat.ranger.core.arithmetic.SubtractionValueInteger;
 import io.smartcat.ranger.core.arithmetic.SubtractionValueLong;
 import io.smartcat.ranger.core.arithmetic.SubtractionValueShort;
+import io.smartcat.ranger.core.csv.CsvReaderValue;
+import io.smartcat.ranger.core.csv.CSVParserSettings;
 import io.smartcat.ranger.distribution.Distribution;
 import io.smartcat.ranger.distribution.NormalDistribution;
 import io.smartcat.ranger.distribution.UniformDistribution;
@@ -325,14 +327,11 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule explicitFloatLiteral() {
         return Sequence(
-                function("float",
-                        Sequence(
-                                Sequence(Optional(sign()),
-                                        FirstOf(Sequence(unsignedIntegerLiteral(), '.', unsignedIntegerLiteral(),
-                                                Optional(exponent())),
-                                                Sequence('.', unsignedIntegerLiteral(), Optional(exponent())),
-                                                Sequence(unsignedIntegerLiteral(), Optional(exponent())))),
-                                push(match()))),
+                function("float", Sequence(Sequence(Optional(sign()),
+                        FirstOf(Sequence(unsignedIntegerLiteral(), '.', unsignedIntegerLiteral(), Optional(exponent())),
+                                Sequence('.', unsignedIntegerLiteral(), Optional(exponent())),
+                                Sequence(unsignedIntegerLiteral(), Optional(exponent())))),
+                        push(match()))),
                 push(Float.parseFloat((String) pop())));
     }
 
@@ -356,14 +355,11 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule explicitDoubleLiteral() {
         return Sequence(
-                function("double",
-                        Sequence(
-                                Sequence(Optional(sign()),
-                                        FirstOf(Sequence(unsignedIntegerLiteral(), '.', unsignedIntegerLiteral(),
-                                                Optional(exponent())),
-                                                Sequence('.', unsignedIntegerLiteral(), Optional(exponent())),
-                                                Sequence(unsignedIntegerLiteral(), Optional(exponent())))),
-                                push(match()))),
+                function("double", Sequence(Sequence(Optional(sign()),
+                        FirstOf(Sequence(unsignedIntegerLiteral(), '.', unsignedIntegerLiteral(), Optional(exponent())),
+                                Sequence('.', unsignedIntegerLiteral(), Optional(exponent())),
+                                Sequence(unsignedIntegerLiteral(), Optional(exponent())))),
+                        push(match()))),
                 push(Double.parseDouble((String) pop())));
     }
 
@@ -699,8 +695,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      */
     public Rule randomLengthListValue() {
         return Sequence(function("list", Sequence(numberLiteral(), comma(), numberLiteral(), comma(), value(),
-                Optional(comma(), distribution()))), push(createRandomLengthListValue())
-        );
+                Optional(comma(), distribution()))), push(createRandomLengthListValue()));
     }
 
     /**
@@ -752,8 +747,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Random content value definition rule.
      */
     public Rule randomContentStringValue() {
-        return Sequence(
-                function("randomContentString", Sequence(value(), Optional(comma(), bracketList(charRange())))),
+        return Sequence(function("randomContentString", Sequence(value(), Optional(comma(), bracketList(charRange())))),
                 push(createRandomContentStringValue()));
     }
 
@@ -834,6 +828,22 @@ public class ValueExpressionParser extends BaseParser<Object> {
     }
 
     /**
+     * CSV value definition.
+     *
+     * @return CSV value definition rule.
+     */
+    public Rule csvReaderValue() {
+        return Sequence(
+                function("csv",
+                        Sequence(stringLiteral(),
+                                Optional(comma(), charLiteral(),
+                                        Optional(comma(), stringLiteral(), comma(), booleanLiteral(), comma(),
+                                                FirstOf(nullValue(), charLiteral()), comma(), charLiteral(), comma(),
+                                                booleanLiteral(), comma(), FirstOf(nullValue(), stringLiteral()))))),
+                push(createCsvReaderValue()));
+    }
+
+    /**
      * Generator definition.
      *
      * @return Generator definition rule.
@@ -842,7 +852,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
         return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue(), circularRangeValue(), listValue(),
                 emptyListValue(), emptyMapValue(), randomLengthListValue(), weightedValue(), exactWeightedValue(),
                 randomContentStringValue(), now(), nowDate(), nowLocalDate(), nowLocalDateTime(), additionValue(),
-                subtractionValue(), multiplicationValue(), divisionValue());
+                subtractionValue(), multiplicationValue(), divisionValue(), csvReaderValue());
     }
 
     /**
@@ -892,8 +902,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
      * @return Transformer definition rule.
      */
     public Rule transformer() {
-        return FirstOf(stringTransformer(), jsonTransformer(), timeFormatTransformer(),
-                getterTransformer());
+        return FirstOf(stringTransformer(), jsonTransformer(), timeFormatTransformer(), getterTransformer());
     }
 
     /**
@@ -1034,20 +1043,20 @@ public class ValueExpressionParser extends BaseParser<Object> {
         Value summand1 = (Value) pop(1);
         Value summand2 = (Value) pop();
         switch (type) {
-            case "byte":
-                return new AdditionValueByte(summand1, summand2);
-            case "short":
-                return new AdditionValueShort(summand1, summand2);
-            case "int":
-                return new AdditionValueInteger(summand1, summand2);
-            case "long":
-                return new AdditionValueLong(summand1, summand2);
-            case "float":
-                return new AdditionValueFloat(summand1, summand2);
-            case "double":
-                return new AdditionValueDouble(summand1, summand2);
-            default:
-                throw new RuntimeException("Unsupported type for addition value. Type: " + type);
+        case "byte":
+            return new AdditionValueByte(summand1, summand2);
+        case "short":
+            return new AdditionValueShort(summand1, summand2);
+        case "int":
+            return new AdditionValueInteger(summand1, summand2);
+        case "long":
+            return new AdditionValueLong(summand1, summand2);
+        case "float":
+            return new AdditionValueFloat(summand1, summand2);
+        case "double":
+            return new AdditionValueDouble(summand1, summand2);
+        default:
+            throw new RuntimeException("Unsupported type for addition value. Type: " + type);
         }
     }
 
@@ -1062,20 +1071,20 @@ public class ValueExpressionParser extends BaseParser<Object> {
         Value minuend = (Value) pop(1);
         Value subtrahend = (Value) pop();
         switch (type) {
-            case "byte":
-                return new SubtractionValueByte(minuend, subtrahend);
-            case "short":
-                return new SubtractionValueShort(minuend, subtrahend);
-            case "int":
-                return new SubtractionValueInteger(minuend, subtrahend);
-            case "long":
-                return new SubtractionValueLong(minuend, subtrahend);
-            case "float":
-                return new SubtractionValueFloat(minuend, subtrahend);
-            case "double":
-                return new SubtractionValueDouble(minuend, subtrahend);
-            default:
-                throw new RuntimeException("Unsupported type for subtraction value. Type: " + type);
+        case "byte":
+            return new SubtractionValueByte(minuend, subtrahend);
+        case "short":
+            return new SubtractionValueShort(minuend, subtrahend);
+        case "int":
+            return new SubtractionValueInteger(minuend, subtrahend);
+        case "long":
+            return new SubtractionValueLong(minuend, subtrahend);
+        case "float":
+            return new SubtractionValueFloat(minuend, subtrahend);
+        case "double":
+            return new SubtractionValueDouble(minuend, subtrahend);
+        default:
+            throw new RuntimeException("Unsupported type for subtraction value. Type: " + type);
         }
     }
 
@@ -1090,49 +1099,74 @@ public class ValueExpressionParser extends BaseParser<Object> {
         Value factor1 = (Value) pop(1);
         Value factor2 = (Value) pop();
         switch (type) {
-            case "byte":
-                return new MultiplicationValueByte(factor1, factor2);
-            case "short":
-                return new MultiplicationValueShort(factor1, factor2);
-            case "int":
-                return new MultiplicationValueInteger(factor1, factor2);
-            case "long":
-                return new MultiplicationValueLong(factor1, factor2);
-            case "float":
-                return new MultiplicationValueFloat(factor1, factor2);
-            case "double":
-                return new MultiplicationValueDouble(factor1, factor2);
-            default:
-                throw new RuntimeException("Unsupported type for multplication value. Type: " + type);
+        case "byte":
+            return new MultiplicationValueByte(factor1, factor2);
+        case "short":
+            return new MultiplicationValueShort(factor1, factor2);
+        case "int":
+            return new MultiplicationValueInteger(factor1, factor2);
+        case "long":
+            return new MultiplicationValueLong(factor1, factor2);
+        case "float":
+            return new MultiplicationValueFloat(factor1, factor2);
+        case "double":
+            return new MultiplicationValueDouble(factor1, factor2);
+        default:
+            throw new RuntimeException("Unsupported type for multplication value. Type: " + type);
         }
     }
 
     /**
-    * Creates division value.
-    *
-    * @return An division value.
-    */
+     * Creates division value.
+     *
+     * @return An division value.
+     */
     @SuppressWarnings("rawtypes")
     protected Object createDivisionValue() {
         String type = (String) pop(2);
         Value dividend = (Value) pop(1);
         Value divisor = (Value) pop();
         switch (type) {
-            case "byte":
-                return new DivisionValueByte(dividend, divisor);
-            case "short":
-                return new DivisionValueShort(dividend, divisor);
-            case "int":
-                return new DivisionValueInteger(dividend, divisor);
-            case "long":
-                return new DivisionValueLong(dividend, divisor);
-            case "float":
-                return new DivisionValueFloat(dividend, divisor);
-            case "double":
-                return new DivisionValueDouble(dividend, divisor);
-            default:
-                throw new RuntimeException("Unsupported type for division value. Type: " + type);
+        case "byte":
+            return new DivisionValueByte(dividend, divisor);
+        case "short":
+            return new DivisionValueShort(dividend, divisor);
+        case "int":
+            return new DivisionValueInteger(dividend, divisor);
+        case "long":
+            return new DivisionValueLong(dividend, divisor);
+        case "float":
+            return new DivisionValueFloat(dividend, divisor);
+        case "double":
+            return new DivisionValueDouble(dividend, divisor);
+        default:
+            throw new RuntimeException("Unsupported type for division value. Type: " + type);
         }
+    }
+
+    /**
+     * Creates CSV value.
+     *
+     * @return An CSV value.
+     */
+    protected CsvReaderValue createCsvReaderValue() {
+        CSVParserSettings parserSettings = null;
+        switch (getContext().getValueStack().size()) {
+        case 1:
+            parserSettings = new CSVParserSettings((String) pop());
+            break;
+        case 2:
+            parserSettings = new CSVParserSettings((String) pop(1), (char) pop());
+            break;
+        case 8:
+            parserSettings = new CSVParserSettings((String) pop(7), (char) pop(6), (String) pop(5), (boolean) pop(4),
+                    peek(3) instanceof NullValue ? null : (Character) pop(3), (char) pop(2), (boolean) pop(1),
+                    peek() instanceof NullValue ? null : (String) pop());
+            break;
+        default:
+            throw new RuntimeException("Unsupported number of parameters, should not happen ever.");
+        }
+        return new CsvReaderValue(parserSettings);
     }
 
     /**
