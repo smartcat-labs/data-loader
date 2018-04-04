@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.smartcat.ranger.core.CircularRangeValueByte;
 import io.smartcat.ranger.core.CircularRangeValueDouble;
 import io.smartcat.ranger.core.CircularRangeValueFloat;
@@ -678,7 +680,7 @@ public class BuilderMethods {
 
     /**
      * Creates an instance of {@link ObjectGenerator} which converts specified instance of {@link ObjectGenerator} to
-     * JSON.
+     * JSON. Uses default instance of {@link ObjectMapper} to converted to JSON.
      *
      * @param generator Instance of {@link ObjectGenerator} which value will be converted to JSON.
      * @return An instance of {@link ObjectGenerator} which converts specified instance of {@link ObjectGenerator} to
@@ -686,6 +688,19 @@ public class BuilderMethods {
      */
     public static ObjectGenerator<String> json(ObjectGenerator<?> generator) {
         return wrap(new JsonTransformer(generator.value));
+    }
+
+    /**
+     * Creates an instance of {@link ObjectGenerator} which converts specified instance of {@link ObjectGenerator} to
+     * JSON.
+     *
+     * @param generator Instance of {@link ObjectGenerator} which value will be converted to JSON.
+     * @param objectMapper Object mapper to use when converting value to JSON.
+     * @return An instance of {@link ObjectGenerator} which converts specified instance of {@link ObjectGenerator} to
+     *         JSON.
+     */
+    public static ObjectGenerator<String> json(ObjectGenerator<?> generator, ObjectMapper objectMapper) {
+        return wrap(new JsonTransformer(generator.value, objectMapper));
     }
 
     /**

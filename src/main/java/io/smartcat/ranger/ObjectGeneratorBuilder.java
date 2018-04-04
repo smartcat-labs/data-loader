@@ -3,6 +3,8 @@ package io.smartcat.ranger;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.smartcat.ranger.core.CompositeValue;
 import io.smartcat.ranger.core.ConstantValue;
 import io.smartcat.ranger.core.TypeConverterValue;
@@ -56,10 +58,24 @@ public class ObjectGeneratorBuilder {
      * @return Instance of {@link ObjectGenerator}.
      */
     public <T> ObjectGenerator<T> build(Class<T> objectType) {
+        return build(objectType, new ObjectMapper());
+    }
+
+    /**
+     * Builds {@link ObjectGenerator} based on current builder configuration. Resulting {@link ObjectGenerator} will try
+     * to convert configured output to specified <code>objectType</code>.
+     *
+     * @param objectType Type of object to which conversion will be attempted.
+     * @param objectMapper Object mapper which will be used for conversion.
+     * @param <T> Type of object {@link ObjectGenerator} will generate.
+     * @return Instance of {@link ObjectGenerator}.
+     */
+    public <T> ObjectGenerator<T> build(Class<T> objectType, ObjectMapper objectMapper) {
         if (objectType == null) {
             throw new RuntimeException("objectType cannot be null.");
         }
-        return new ObjectGenerator<T>(new TypeConverterValue<>(objectType, new CompositeValue(propertyValues)));
+        CompositeValue compositeValue = new CompositeValue(propertyValues);
+        return new ObjectGenerator<T>(new TypeConverterValue<>(objectType, compositeValue, objectMapper));
     }
 
 }

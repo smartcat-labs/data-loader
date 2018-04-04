@@ -13,15 +13,29 @@ public class JsonTransformer extends Transformer<String> {
 
     /**
      * Constructs JSON transformer with specified <code>value</code>.
+     * New default instance of {@link ObjectMapper} will be used.
      *
      * @param value Value which will be transformed into its JSON representation.
      */
     public JsonTransformer(Value<?> value) {
+        this(value, new ObjectMapper());
+    }
+
+    /**
+     * Constructs JSON transformer with specified <code>value</code> and <code>objectMapper</code>.
+     *
+     * @param value Value which will be transformed into its JSON representation.
+     * @param objectMapper Object mapper which will be used to map value to JSON.
+     */
+    public JsonTransformer(Value<?> value, ObjectMapper objectMapper) {
         if (value == null) {
             throw new IllegalArgumentException("Value cannot be null.");
         }
+        if (objectMapper == null) {
+            throw new IllegalArgumentException("Object mapper cannot be null.");
+        }
         this.value = value;
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = objectMapper;
     }
 
     @Override
