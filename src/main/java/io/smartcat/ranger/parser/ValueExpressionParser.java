@@ -33,6 +33,7 @@ import io.smartcat.ranger.core.RangeValueLong;
 import io.smartcat.ranger.core.StringTransformer;
 import io.smartcat.ranger.core.TimeFormatTransformer;
 import io.smartcat.ranger.core.UUIDValue;
+import io.smartcat.ranger.core.UserDefinedValue;
 import io.smartcat.ranger.core.Value;
 import io.smartcat.ranger.core.ValueProxy;
 import io.smartcat.ranger.core.WeightedValue;
@@ -750,7 +751,18 @@ public class ValueExpressionParser extends BaseParser<Object> {
         return Sequence(function("randomContentString", Sequence(value(), Optional(comma(), bracketList(charRange())))),
                 push(createRandomContentStringValue()));
     }
-
+    
+    /**
+     * UserDefined Content Value definition
+     * 
+     * @return UserDefined Content Value definition Rule
+     */
+    public Rule userDefinedValue() {
+            return Sequence(
+                            function("userDefinedValue", Sequence(value(), comma(), value(), comma(), value(), comma(), value())),
+                            push(createUserDefinedValue()));
+    }
+    
     /**
      * Now definition.
      *
@@ -852,7 +864,7 @@ public class ValueExpressionParser extends BaseParser<Object> {
         return FirstOf(discreteValue(), rangeValue(), uuidValue(), circularValue(), circularRangeValue(), listValue(),
                 emptyListValue(), emptyMapValue(), randomLengthListValue(), weightedValue(), exactWeightedValue(),
                 randomContentStringValue(), now(), nowDate(), nowLocalDate(), nowLocalDateTime(), additionValue(),
-                subtractionValue(), multiplicationValue(), divisionValue(), csvReaderValue());
+                subtractionValue(), multiplicationValue(), divisionValue(), csvReaderValue(),userDefinedValue());
     }
 
     /**
@@ -1168,7 +1180,17 @@ public class ValueExpressionParser extends BaseParser<Object> {
         }
         return new CsvReaderValue(parserSettings);
     }
-
+    
+    /**
+     * Creates a UserDefinedValue fetched from the configured Data Source.
+     * @return UserDefinedValue
+     */
+    @SuppressWarnings("unchecked")
+    protected UserDefinedValue createUserDefinedValue() {
+            return new UserDefinedValue((Value<String>) pop(), (Value<String>) pop(), (Value<String>) pop(),
+                            (Value<String>) pop());
+    }
+    
     /**
      * Trims off ' and " characters from beginning and end of the string.
      *
