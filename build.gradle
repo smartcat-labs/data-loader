@@ -34,6 +34,8 @@ dependencies {
     compile "org.parboiled:parboiled-java:$parboiledJavaVersion"
     compile "org.yaml:snakeyaml:$snakeyamlVersion"
     compile "org.apache.commons:commons-csv:$commonsCsvVersion"
+    compile "com.googlecode.json-simple:json-simple:$gsonVersion"
+    compile "com.jayway.jsonpath:json-path:$jsonPathVersion"
 
     testCompile "junit:junit:$junitVersion"
     testCompile "org.spockframework:spock-core:$spockCoreVersion"
