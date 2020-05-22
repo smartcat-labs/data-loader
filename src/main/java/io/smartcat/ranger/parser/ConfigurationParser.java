@@ -77,7 +77,7 @@ public class ConfigurationParser {
 
     private void checkSectionExistence(Map<String, Object> config, String name) {
         if (!config.containsKey(name)) {
-            throw new RuntimeException("Configuraiton must contain '" + name + "' section.");
+            throw new RuntimeException("Configuration must contain '" + name + "' section.");
         }
     }
 
